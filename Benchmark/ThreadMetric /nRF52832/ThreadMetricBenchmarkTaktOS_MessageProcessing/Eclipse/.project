@@ -31,19 +31,19 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
-			<name>src/message_processing.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/message_processing.c</locationURI>
-		</link>
-		<link>
 			<name>src/main.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/src/main.cpp</locationURI>
 		</link>
 		<link>
+			<name>src/message_processing.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/src/message_processing.c</locationURI>
+		</link>
+		<link>
 			<name>src/tm_api.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/tm_api.h</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/src/tm_api.h</locationURI>
 		</link>
 		<link>
 			<name>src/tm_port.cpp</name>
@@ -53,7 +53,7 @@
 		<link>
 			<name>src/tm_report.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/tm_report.c</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/src/tm_report.c</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

@@ -38,7 +38,7 @@
 		<link>
 			<name>src/basic_processing.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/basic_processing.c</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/src/basic_processing.c</locationURI>
 		</link>
 		<link>
 			<name>src/inc</name>
@@ -58,7 +58,7 @@
 		<link>
 			<name>src/tm_api.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/tm_api.h</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/src/tm_api.h</locationURI>
 		</link>
 		<link>
 			<name>src/tm_port.c</name>
@@ -68,7 +68,7 @@
 		<link>
 			<name>src/tm_report.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/tm_report.c</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/src/tm_report.c</locationURI>
 		</link>
 		<link>
 			<name>src/tx_initialize_low_level.S</name>

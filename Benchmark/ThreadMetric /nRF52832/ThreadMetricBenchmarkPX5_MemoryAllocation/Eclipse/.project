@@ -31,19 +31,24 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
-			<name>src/memory_allocation.c</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/memory_allocation.c</locationURI>
-		</link>
-		<link>
 			<name>src/main.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/src/main.c</locationURI>
 		</link>
 		<link>
+			<name>src/memory_allocation.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/src/memory_allocation.c</locationURI>
+		</link>
+		<link>
+			<name>src/px5_proc_stack.S</name>
+			<type>1</type>
+			<locationURI>PARENT-1-PROJECT_LOC/src/px5_proc_stack.S</locationURI>
+		</link>
+		<link>
 			<name>src/tm_api.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/tm_api.h</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/src/tm_api.h</locationURI>
 		</link>
 		<link>
 			<name>src/tm_port.c</name>
@@ -53,12 +58,7 @@
 		<link>
 			<name>src/tm_report.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/tm_report.c</locationURI>
-		</link>
-		<link>
-			<name>src/px5_proc_stack.S</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/px5_proc_stack.S</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/src/tm_report.c</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
