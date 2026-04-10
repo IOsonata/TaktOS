@@ -353,10 +353,55 @@ void tm_cause_interrupt(void)
     NVIC_STIR = SW_IRQ_N;
 }
 
+// -----------------------------------------------------------------------------
+// Non-Blocking Asynchronous UART via nRF52 EasyDMA
+// -----------------------------------------------------------------------------
+#define TM_UART_BUF_SIZE 512
+static char     g_uart_tx_buf[TM_UART_BUF_SIZE];
+static uint32_t g_uart_tx_idx = 0;
+static bool     g_uart_tx_started = false;
+
+static void tm_uart_flush_async(void)
+{
+    if (g_uart_tx_idx > 0)
+    {
+        // Only block if a PREVIOUS DMA transfer is somehow still running.
+        // Because the report thread sleeps for 30s after flushing,
+        // this will evaluate instantly with zero CPU wait time.
+        if (g_uart_tx_started)
+        {
+            while (!UARTE0_ENDTX) {}
+        }
+
+        // Hand the buffer to EasyDMA and fire
+        UARTE0_ENDTX      = 0u;
+        UARTE0_TXD_PTR    = (uint32_t)(uintptr_t)g_uart_tx_buf;
+        UARTE0_TXD_MAXCNT = g_uart_tx_idx;
+        UARTE0_STARTTX    = 1u;
+
+        g_uart_tx_started = true;
+        g_uart_tx_idx     = 0; // Reset index for the next 30-second report
+    }
+}
+
 void tm_putchar(int c)
 {
-    char ch = (char)c;
-    tm_uart_send(&ch, 1u);
+    static char last_c = 0;
+
+    // Push character to RAM in ~1 clock cycle
+    if (g_uart_tx_idx < TM_UART_BUF_SIZE)
+    {
+        g_uart_tx_buf[g_uart_tx_idx++] = (char)c;
+    }
+
+    // The Thread-Metric report always ends its block with "\n\n".
+    // Or flush automatically if we are about to overflow.
+    if ((c == '\n' && last_c == '\n') || (g_uart_tx_idx >= TM_UART_BUF_SIZE))
+    {
+        tm_uart_flush_async();
+    }
+
+    last_c = (char)c;
 }
 
 void SysTick_Handler(void)
