@@ -233,41 +233,41 @@ Finished building: ThreadMetricBenchmarkTaktOS_BasicProcessing_nRF54L15.hex
  
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_BasicProcessing_nRF54L15.elf"
-   text	   data	    bss	    dec	    hex	filename
-   5965	     24	  15368	  21357	   536d	ThreadMetricBenchmarkTaktOS_BasicProcessing_nRF54L15.elf
+   text     data      bss      dec      hex  filename
+   6013       24    15368    21405     539d  ThreadMetricBenchmarkTaktOS_BasicProcessing_nRF54L15.elf
 Finished building: ThreadMetricBenchmarkTaktOS_BasicProcessing_nRF54L15.siz
 
 
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 30
-Time Period Total:  374422
+Time Period Total:  374405
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 60
-Time Period Total:  374423
+Time Period Total:  374405
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 90
-Time Period Total:  374423
+Time Period Total:  374405
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 120
-Time Period Total:  374423
+Time Period Total:  374405
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 150
-Time Period Total:  374421
+Time Period Total:  374404
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 180
-Time Period Total:  374422
+Time Period Total:  374405
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 210
-Time Period Total:  374422
+Time Period Total:  374404
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 240
-Time Period Total:  374422
+Time Period Total:  374404
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 270
-Time Period Total:  374421
+Time Period Total:  374404
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 300
-Time Period Total:  374422
+Time Period Total:  374404
 
 
 
@@ -277,41 +277,42 @@ Finished building: ThreadMetricBenchmarkTaktOS_CooperativeScheduling_nRF54L15.he
  
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_CooperativeScheduling_nRF54L15.elf"
-   text	   data	    bss	    dec	    hex	filename
-   7799	     24	  11304	  19127	   4ab7	ThreadMetricBenchmarkTaktOS_CooperativeScheduling_nRF54L15.elf
+   text     data      bss      dec      hex  filename
+   7883       24    11304    19211     4b0b  ThreadMetricBenchmarkTaktOS_CooperativeScheduling_nRF54L15.elf
 Finished building: ThreadMetricBenchmarkTaktOS_CooperativeScheduling_nRF54L15.siz
 
 
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 30
-Time Period Total:  42177678
+Time Period Total:  39161986
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 60
-Time Period Total:  42176914
+Time Period Total:  39161277
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 90
-Time Period Total:  42176932
+Time Period Total:  39161295
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 120
-Time Period Total:  42176933
+Time Period Total:  39161295
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 150
-Time Period Total:  42176812
+Time Period Total:  39161183
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 180
-Time Period Total:  42176813
+Time Period Total:  39161183
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 210
-Time Period Total:  42176813
+Time Period Total:  39161183
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 240
-Time Period Total:  42176813
+Time Period Total:  39161184
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 270
-Time Period Total:  42176813
+Time Period Total:  39161183
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 300
-Time Period Total:  42176813
+Time Period Total:  39161183
+
 
 
 
@@ -322,41 +323,42 @@ Finished building: ThreadMetricBenchmarkTaktOS_MessageProcessing_nRF54L15.hex
  
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_MessageProcessing_nRF54L15.elf"
-   text	   data	    bss	    dec	    hex	filename
-   6875	     24	  11504	  18403	   47e3	ThreadMetricBenchmarkTaktOS_MessageProcessing_nRF54L15.elf
+   text     data      bss      dec      hex  filename
+   6923       24    11504    18451     4813  ThreadMetricBenchmarkTaktOS_MessageProcessing_nRF54L15.elf
 Finished building: ThreadMetricBenchmarkTaktOS_MessageProcessing_nRF54L15.siz
 
 
 
 **** Thread-Metric Message Processing Test **** Relative Time: 30
-Time Period Total:  27609993
+Time Period Total:  27608993
 
 **** Thread-Metric Message Processing Test **** Relative Time: 60
-Time Period Total:  27609809
+Time Period Total:  27608808
 
 **** Thread-Metric Message Processing Test **** Relative Time: 90
-Time Period Total:  27609821
+Time Period Total:  27608820
 
 **** Thread-Metric Message Processing Test **** Relative Time: 120
-Time Period Total:  27609821
+Time Period Total:  27608820
 
 **** Thread-Metric Message Processing Test **** Relative Time: 150
-Time Period Total:  27609742
+Time Period Total:  27608741
 
 **** Thread-Metric Message Processing Test **** Relative Time: 180
-Time Period Total:  27609742
+Time Period Total:  27608741
 
 **** Thread-Metric Message Processing Test **** Relative Time: 210
-Time Period Total:  27609742
+Time Period Total:  27608741
 
 **** Thread-Metric Message Processing Test **** Relative Time: 240
-Time Period Total:  27609742
+Time Period Total:  27608742
 
 **** Thread-Metric Message Processing Test **** Relative Time: 270
-Time Period Total:  27609742
+Time Period Total:  27608741
 
 **** Thread-Metric Message Processing Test **** Relative Time: 300
-Time Period Total:  27609742
+Time Period Total:  27608741
+
 
 
 
@@ -369,41 +371,41 @@ Finished building: ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_nRF54L15.hex
  
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_nRF54L15.elf"
-   text	   data	    bss	    dec	    hex	filename
-   7608	     24	  11304	  18936	   49f8	ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_nRF54L15.elf
+   text     data      bss      dec      hex  filename
+   7664       24    11304    18992     4a30  ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_nRF54L15.elf
 Finished building: ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_nRF54L15.siz
 
 
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 30
-Time Period Total:  13362853
+Time Period Total:  13287495
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 60
-Time Period Total:  13362648
+Time Period Total:  13287293
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 90
-Time Period Total:  13362654
+Time Period Total:  13287298
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 120
-Time Period Total:  13362655
+Time Period Total:  13287299
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 150
-Time Period Total:  13362618
+Time Period Total:  13287261
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 180
-Time Period Total:  13362617
+Time Period Total:  13287261
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 210
-Time Period Total:  13362617
+Time Period Total:  13287262
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 240
-Time Period Total:  13362617
+Time Period Total:  13287261
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 270
-Time Period Total:  13362616
+Time Period Total:  13287260
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 300
-Time Period Total:  13362618
+Time Period Total:  13287261
 
 
 
@@ -415,42 +417,41 @@ Finished building: ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_nRF54L1
  
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_nRF54L15.elf"
-   text	   data	    bss	    dec	    hex	filename
-   6446	     24	  11288	  17758	   455e	ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_nRF54L15.elf
+   text     data      bss      dec      hex  filename
+   6494       24    11288    17806     458e  ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_nRF54L15.elf
 Finished building: ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_nRF54L15.siz
 
 
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 30
-Time Period Total:  59966236
+Time Period Total:  59963319
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 60
-Time Period Total:  59964470
+Time Period Total:  59961553
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 90
-Time Period Total:  59964495
+Time Period Total:  59961577
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 120
-Time Period Total:  59964496
+Time Period Total:  59961578
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 150
-Time Period Total:  59964324
+Time Period Total:  59961406
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 180
-Time Period Total:  59964324
+Time Period Total:  59961407
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 210
-Time Period Total:  59964325
+Time Period Total:  59961406
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 240
-Time Period Total:  59964324
+Time Period Total:  59961407
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 270
-Time Period Total:  59964324
+Time Period Total:  59961407
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 300
-Time Period Total:  59964325
-
+Time Period Total:  59961406
 
 
 
