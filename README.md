@@ -14,6 +14,17 @@
 
 **Zero dynamic memory.** The kernel never calls `malloc` or any allocator. Every object — threads (TCB + stack in one user-supplied buffer), semaphores, mutexes, queues (backing storage user-supplied) — is statically declared by the application. Memory layout is fully determined at compile time.
 
+### Yield semantics
+
+`TaktOSThreadYield()` is **immediate only in normal Thread mode**: not in Handler mode, interrupts enabled, and at least one peer exists at the same priority. In that case the ready ring is rotated and `PendSV` is requested immediately.
+
+Two special cases are handled safely rather than corrupting scheduler state:
+
+- **Called from an ISR / Handler mode:** the yield is **deferred** by setting an internal flag. The tick handler consumes that flag on the next tick and performs the same round-robin rotation with a correct `pCurrent`.
+- **Called from Thread mode with `PRIMASK` already set:** the yield is also **deferred**. This avoids re-enabling interrupts inside the caller's critical section.
+
+So the operational rule is: **immediate yield in normal Thread mode; deferred yield from ISR or while interrupts are masked.**
+
 ---
 
 ## At a glance
@@ -35,22 +46,22 @@
 
 ## On-target benchmark results — Thread-Metric
 
-**Platform:** nRF52832 PCA10040 · Cortex-M4F · 64 MHz · arm-none-eabi-gcc 15.2.1 · `-Os` · 1 kHz tick  
-**Suite:** eclipse-threadx/threadx Thread-Metric (MIT) · steady-state 30-second iteration counts (higher = better)  
-**Build:** All three RTOSes built with identical flags and linker script on the same board. ThreadX tested with source code.
+**Platform:** nRF54L15 · Cortex-M33 · 128 MHz · arm-none-eabi-gcc 15.2.1 · `-Os` · 1 kHz tick  
+**Suite:** eclipse-threadx/threadx Thread-Metric (MIT) · steady-state 300-second iteration counts (higher = better)  
+**Build:** All three RTOSes built with identical flags on the same MCU. ThreadX tested with source code.
 
 | Test | TaktOS | ThreadX | FreeRTOS | T / TX | T / FR |
 |---|---|---|---|---|---|
-| TM1  Basic Processing | 124,658 | 124,702 | 124,679 | 1.00× | 1.00× |
-| TM2  Cooperative Scheduling | 16,349,937 | 10,660,764 | 8,473,241 ⚠️ | **1.53×** | **1.93×** |
-| TM3  Preemptive Scheduling | 5,095,925 | 4,396,380 | 2,366,640 | **1.16×** | **2.15×** |
-| TM6  Message Processing | 9,034,249 | 6,749,360 | 2,251,869 | **1.34×** | **4.01×** |
-| TM7  Synchronization | 21,289,905 | 15,334,262 | 4,112,298 | **1.39×** | **5.18×** |
-| **Geometric mean (TM2–TM7)** | | | | **1.35×** | **3.05×** |
+| TM1  Basic Processing | 374,422 | 374,403 | 374,303 | 1.00× | 1.00× |
+| TM2  Cooperative Scheduling | 42,176,813 | 26,466,010 | 26,474,445 | **1.59×** | **1.59×** |
+| TM3  Preemptive Scheduling | 13,362,618 | 11,757,316 | 6,721,773 | **1.14×** | **1.99×** |
+| TM6  Message Processing | 27,609,742 | 19,092,528 | 6,947,836 | **1.45×** | **3.97×** |
+| TM7  Synchronization | 59,964,325 | 38,375,092 | 11,555,762 | **1.56×** | **5.19×** |
+| **Geometric mean (TM2–TM7)** | | | | **1.42×** | **2.84×** |
 
-⚠️ FreeRTOS TM2: produced repeated "counters more than 1 different from average" determinism errors. TaktOS and ThreadX: zero determinism errors on all tests.
+TaktOS, ThreadX, and FreeRTOS all produced stable steady-state windows in these runs.
 
-**TM1 note:** All three RTOSes score within 0.04% on single-thread compute. No context switches occur during the TM1 window — the result calibrates the measurement, not RTOS performance.
+**TM1 note:** All three RTOSes score essentially the same on single-thread compute. No context switches occur during the TM1 window — the result reflects compiler output, not RTOS scheduling performance.
 
 **TM4 and TM5 are not run.** TM4 requires a hardware timer IRQ owned by the test harness — TaktOS does not own application IRQs by design. TM5 measures dynamic memory allocation — TaktOS has no heap by design.
 
@@ -58,25 +69,25 @@
 
 | RTOS | .text bytes | vs TaktOS |
 |---|---|---|
-| TaktOS | 5,618 | — |
-| ThreadX | 6,205 | +10% |
-| FreeRTOS | 9,096 | +62% |
+| TaktOS | 6,446 | — |
+| ThreadX | 7,239 | +12% |
+| FreeRTOS | 8,824 | +37% |
 
 ---
 
 ## Why TaktOS is faster
 
-### vs FreeRTOS (3.05× geometric mean, directly measured)
+### vs FreeRTOS (2.84× geometric mean, directly measured)
 
 1. **CLZ priority bitmap** — `__builtin_clz` on a 32-bit bitmap gives O(1) highest-priority lookup in the scheduler. Updated at event time; the context switch handler reads one precomputed pointer.
 2. **PRIMASK critical sections** — `MRS` + `CPSID` / `MSR`: 2 instructions, no pipeline flush. FreeRTOS `BASEPRI` requires `DSB` + `ISB` after every write (~8 cy penalty per boundary on Cortex-M4).
 3. **Inlined semaphore fast path** — `TaktOSSemGive` and `TaktOSSemTake` are `always_inline` static functions in `TaktOSSem.h`. The uncontended fast path executes with zero function-call overhead — the dominant gain on TM7.
 4. **Direct-pointer queue** — `writePtr`/`readPtr` are direct buffer addresses. Slot address is one load — no index multiply, no modulo. `TaktQueueFastCopy` uses switch-unrolled word assignments for 1–8 word messages.
-5. **Prefetch-buffer fit** — `PendSV_Handler` body (36 bytes, confirmed from `.map`) fits within the nRF52832's 128-byte I-code prefetch window.
+5. **Short switch path** — the context-switch hot path stays compact, minimizing front-end overhead and helping the scheduler scale cleanly as event frequency rises.
 
-### vs ThreadX (1.35× geometric mean, directly measured, source-tuned)
+### vs ThreadX (1.42× geometric mean, directly measured, source-tuned)
 
-ThreadX uses a precomputed `execute_ptr` updated on every ready/block operation — the same approach as TaktOS. The gap is smaller than vs FreeRTOS. TaktOS leads most strongly on TM2 cooperative (1.53×) and TM7 synchronization (1.39×), where the tighter semaphore and yield paths show the clearest advantage.
+ThreadX uses a precomputed `execute_ptr` updated on every ready/block operation — the same approach as TaktOS. The gap is smaller than vs FreeRTOS, but still material on nRF54L15. TaktOS leads most strongly on TM2 cooperative (1.59×) and TM7 synchronization (1.56×), where the tighter semaphore and yield paths show the clearest advantage.
 
 ---
 
@@ -117,7 +128,7 @@ TaktOS/
 │   ├── taktos_queue.cpp      # queue slow paths
 │   ├── taktos_thread.cpp     # thread lifecycle
 │   └── posix/                # PSE51 implementation
-├── Benchmark/Thread-Metric/      # Thread-Metric Eclipse projects (nRF52832, nRF54L15)
+├── Benchmark/Thread-Metric/  # Thread-Metric Eclipse projects (nRF52832, nRF54L15)
 ├── examples/                 # basic, mutex, posix, queue
 └── test/unit/                # host-native Google Test, no arch dependency
 ```
@@ -127,7 +138,7 @@ TaktOS/
 Each architecture implements four C functions declared in `TaktOS.h`:
 
 ```c
-void  TaktOSTickInit  (uint32_t CoreClockFreq, uint32_t tickHz);
+void  TaktOSTickInit  (uint32_t KernClockHz, uint32_t tickHz, TaktOSTickClockSrc_t tickClockSrc);
 void  TaktOSCtxSwitch (void);   // request deferred context switch
 void  TaktOSStartFirst(void);   // launch first task — never returns
 void *TaktOSStackInit (void *stackTop, void (*entry)(void*), void *arg);
@@ -219,7 +230,7 @@ TaktOS ships as a precompiled static library per architecture variant.
 There is no user config header. All kernel parameters are passed at runtime:
 
 ```c
-TaktOSInit(64000000u, 1000u);   // core clock Hz, tick rate Hz
+TaktOSInit(64000000u, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR);   // tick input Hz, tick rate Hz, tick clock source
 ```
 
 Stack overflow detection (paint+check guard word) is always active.
@@ -243,11 +254,11 @@ Documented in *Beyond Blinky* by Nguyen Hoan Hoang.
 ## Status
 
 - [x] ARM Cortex-M0/M0+ port
-- [x] ARM Cortex-M4/M7/M33/M55 port — Thread-Metric validated on nRF52832
+- [x] ARM Cortex-M4/M7/M33/M55 port — Thread-Metric validated on nRF54L15
 - [x] RISC-V RV32IMAC port (GD32VF103 / CLINT)
 - [x] RISC-V ESP32-C3 / ESP32-C6 port (SYSTIMER + interrupt matrix)
 - [x] POSIX PSE51 layer (pthread, sem, mqueue, timer)
-- [x] Thread-Metric TM1/TM2/TM3/TM6/TM7 — TaktOS, FreeRTOS, ThreadX measured on nRF52832
+- [x] Thread-Metric TM1/TM2/TM3/TM6/TM7 — TaktOS, FreeRTOS, ThreadX measured on nRF54L15
 - [ ] DWT validation on STM32F407 — **required before cycle-count publication**
 - [ ] mcycle validation on GD32VF103
 - [ ] MC/DC coverage run (`test/unit/`)
