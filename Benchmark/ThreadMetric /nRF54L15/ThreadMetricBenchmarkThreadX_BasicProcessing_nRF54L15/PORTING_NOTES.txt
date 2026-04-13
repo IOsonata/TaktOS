@@ -1,0 +1,5 @@
+Update Eclipse include/lib paths for ThreadX in your local tree.
+
+
+This project expects the official Eclipse ThreadX tree at suite root: ../../threadx
+Run the helper script in the suite root before importing/building.

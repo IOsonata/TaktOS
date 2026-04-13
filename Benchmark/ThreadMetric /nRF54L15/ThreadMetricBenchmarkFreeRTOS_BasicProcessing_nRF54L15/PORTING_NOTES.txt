@@ -1,0 +1,6 @@
+Update Eclipse include/lib paths for FreeRTOS in your local tree.
+Expected linker lib placeholder: FreeRTOS_M33
+
+
+This project expects the official FreeRTOS-Kernel tree at suite root: ../../FreeRTOS-Kernel
+Run the helper script in the suite root before importing/building.

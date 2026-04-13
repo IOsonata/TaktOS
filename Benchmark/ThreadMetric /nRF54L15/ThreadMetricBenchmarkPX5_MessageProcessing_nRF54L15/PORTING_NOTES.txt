@@ -1,0 +1,2 @@
+Update Eclipse include/lib paths for PX5 in your local tree.
+Expected linker lib placeholder: PX5_M33

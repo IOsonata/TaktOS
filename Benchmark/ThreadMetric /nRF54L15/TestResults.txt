@@ -1,0 +1,689 @@
+
+Compiler : arm-none-eabi-gcc-15.2.1
+Optimization -Os
+Tick rate 1000Hz
+MCU : nRF54L15
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_BasicProcessing_nRF54L15.elf"  "ThreadMetricBenchmarkFreeRTOS_BasicProcessing_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkFreeRTOS_BasicProcessing_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_BasicProcessing_nRF54L15.elf"
+   text	   data	    bss	    dec	    hex	filename
+   6856	     24	  17360	  24240	   5eb0	ThreadMetricBenchmarkFreeRTOS_BasicProcessing_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkFreeRTOS_BasicProcessing_nRF54L15.siz
+
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 30
+Time Period Total:  374304
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 60
+Time Period Total:  374304
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 90
+Time Period Total:  374304
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 120
+Time Period Total:  374304
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 150
+Time Period Total:  374303
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 180
+Time Period Total:  374303
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 210
+Time Period Total:  374303
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 240
+Time Period Total:  374304
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 270
+Time Period Total:  374303
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 300
+Time Period Total:  374303
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_nRF54L15.elf"  "ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_nRF54L15.elf"
+   text	   data	    bss	    dec	    hex	filename
+   8636	     24	  13296	  21956	   55c4	ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_nRF54L15.siz
+
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 30
+Time Period Total:  26474986
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 60
+Time Period Total:  26474507
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 90
+Time Period Total:  26474520
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 120
+Time Period Total:  26474520
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 150
+Time Period Total:  26474444
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 180
+Time Period Total:  26474445
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 210
+Time Period Total:  26474444
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 240
+Time Period Total:  26474445
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 270
+Time Period Total:  26474444
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 300
+Time Period Total:  26474445
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_MessageProcessing_nRF54L15.elf"  "ThreadMetricBenchmarkFreeRTOS_MessageProcessing_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkFreeRTOS_MessageProcessing_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_MessageProcessing_nRF54L15.elf"
+   text	   data	    bss	    dec	    hex	filename
+   8540	     24	  13528	  22092	   564c	ThreadMetricBenchmarkFreeRTOS_MessageProcessing_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkFreeRTOS_MessageProcessing_nRF54L15.siz
+
+
+**** Thread-Metric Message Processing Test **** Relative Time: 30
+Time Period Total:  6947879
+
+**** Thread-Metric Message Processing Test **** Relative Time: 60
+Time Period Total:  6947853
+
+**** Thread-Metric Message Processing Test **** Relative Time: 90
+Time Period Total:  6947855
+
+**** Thread-Metric Message Processing Test **** Relative Time: 120
+Time Period Total:  6947856
+
+**** Thread-Metric Message Processing Test **** Relative Time: 150
+Time Period Total:  6947836
+
+**** Thread-Metric Message Processing Test **** Relative Time: 180
+Time Period Total:  6947836
+
+**** Thread-Metric Message Processing Test **** Relative Time: 210
+Time Period Total:  6947836
+
+**** Thread-Metric Message Processing Test **** Relative Time: 240
+Time Period Total:  6947836
+
+**** Thread-Metric Message Processing Test **** Relative Time: 270
+Time Period Total:  6947836
+
+**** Thread-Metric Message Processing Test **** Relative Time: 300
+Time Period Total:  6947836
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling_nRF54L15.elf"  "ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling_nRF54L15.elf"
+   text	   data	    bss	    dec	    hex	filename
+   8496	     24	  13296	  21816	   5538	ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling_nRF54L15.siz
+
+
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 30
+Time Period Total:  6721870
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 60
+Time Period Total:  6721790
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 90
+Time Period Total:  6721790
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 120
+Time Period Total:  6721791
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 150
+Time Period Total:  6721773
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 180
+Time Period Total:  6721771
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 210
+Time Period Total:  6721773
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 240
+Time Period Total:  6721772
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 270
+Time Period Total:  6721772
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 300
+Time Period Total:  6721773
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing_nRF54L15.elf"  "ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing_nRF54L15.elf"
+   text	   data	    bss	    dec	    hex	filename
+   8824	     24	  13336	  22184	   56a8	ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing_nRF54L15.siz
+
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 30
+Time Period Total:  11556130
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 60
+Time Period Total:  11555791
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 90
+Time Period Total:  11555796
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 120
+Time Period Total:  11555795
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 150
+Time Period Total:  11555763
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 180
+Time Period Total:  11555762
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 210
+Time Period Total:  11555763
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 240
+Time Period Total:  11555762
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 270
+Time Period Total:  11555763
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 300
+Time Period Total:  11555762
+
+
+
+
+========================================================================
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkTaktOS_BasicProcessing_nRF54L15.elf"  "ThreadMetricBenchmarkTaktOS_BasicProcessing_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkTaktOS_BasicProcessing_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_BasicProcessing_nRF54L15.elf"
+   text	   data	    bss	    dec	    hex	filename
+   5965	     24	  15368	  21357	   536d	ThreadMetricBenchmarkTaktOS_BasicProcessing_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkTaktOS_BasicProcessing_nRF54L15.siz
+
+
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 30
+Time Period Total:  374422
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 60
+Time Period Total:  374423
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 90
+Time Period Total:  374423
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 120
+Time Period Total:  374423
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 150
+Time Period Total:  374421
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 180
+Time Period Total:  374422
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 210
+Time Period Total:  374422
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 240
+Time Period Total:  374422
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 270
+Time Period Total:  374421
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 300
+Time Period Total:  374422
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkTaktOS_CooperativeScheduling_nRF54L15.elf"  "ThreadMetricBenchmarkTaktOS_CooperativeScheduling_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkTaktOS_CooperativeScheduling_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_CooperativeScheduling_nRF54L15.elf"
+   text	   data	    bss	    dec	    hex	filename
+   7799	     24	  11304	  19127	   4ab7	ThreadMetricBenchmarkTaktOS_CooperativeScheduling_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkTaktOS_CooperativeScheduling_nRF54L15.siz
+
+
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 30
+Time Period Total:  42177678
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 60
+Time Period Total:  42176914
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 90
+Time Period Total:  42176932
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 120
+Time Period Total:  42176933
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 150
+Time Period Total:  42176812
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 180
+Time Period Total:  42176813
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 210
+Time Period Total:  42176813
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 240
+Time Period Total:  42176813
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 270
+Time Period Total:  42176813
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 300
+Time Period Total:  42176813
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkTaktOS_MessageProcessing_nRF54L15.elf"  "ThreadMetricBenchmarkTaktOS_MessageProcessing_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkTaktOS_MessageProcessing_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_MessageProcessing_nRF54L15.elf"
+   text	   data	    bss	    dec	    hex	filename
+   6875	     24	  11504	  18403	   47e3	ThreadMetricBenchmarkTaktOS_MessageProcessing_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkTaktOS_MessageProcessing_nRF54L15.siz
+
+
+
+**** Thread-Metric Message Processing Test **** Relative Time: 30
+Time Period Total:  27609993
+
+**** Thread-Metric Message Processing Test **** Relative Time: 60
+Time Period Total:  27609809
+
+**** Thread-Metric Message Processing Test **** Relative Time: 90
+Time Period Total:  27609821
+
+**** Thread-Metric Message Processing Test **** Relative Time: 120
+Time Period Total:  27609821
+
+**** Thread-Metric Message Processing Test **** Relative Time: 150
+Time Period Total:  27609742
+
+**** Thread-Metric Message Processing Test **** Relative Time: 180
+Time Period Total:  27609742
+
+**** Thread-Metric Message Processing Test **** Relative Time: 210
+Time Period Total:  27609742
+
+**** Thread-Metric Message Processing Test **** Relative Time: 240
+Time Period Total:  27609742
+
+**** Thread-Metric Message Processing Test **** Relative Time: 270
+Time Period Total:  27609742
+
+**** Thread-Metric Message Processing Test **** Relative Time: 300
+Time Period Total:  27609742
+
+
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_nRF54L15.elf"  "ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_nRF54L15.elf"
+   text	   data	    bss	    dec	    hex	filename
+   7608	     24	  11304	  18936	   49f8	ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_nRF54L15.siz
+
+
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 30
+Time Period Total:  13362853
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 60
+Time Period Total:  13362648
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 90
+Time Period Total:  13362654
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 120
+Time Period Total:  13362655
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 150
+Time Period Total:  13362618
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 180
+Time Period Total:  13362617
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 210
+Time Period Total:  13362617
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 240
+Time Period Total:  13362617
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 270
+Time Period Total:  13362616
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 300
+Time Period Total:  13362618
+
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_nRF54L15.elf"  "ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_nRF54L15.elf"
+   text	   data	    bss	    dec	    hex	filename
+   6446	     24	  11288	  17758	   455e	ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_nRF54L15.siz
+
+
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 30
+Time Period Total:  59966236
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 60
+Time Period Total:  59964470
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 90
+Time Period Total:  59964495
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 120
+Time Period Total:  59964496
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 150
+Time Period Total:  59964324
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 180
+Time Period Total:  59964324
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 210
+Time Period Total:  59964325
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 240
+Time Period Total:  59964324
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 270
+Time Period Total:  59964324
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 300
+Time Period Total:  59964325
+
+
+
+
+========================================================================
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkThreadX_BasicProcessing_nRF54L15.elf"  "ThreadMetricBenchmarkThreadX_BasicProcessing_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkThreadX_BasicProcessing_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_BasicProcessing_nRF54L15.elf"
+   text	   data	    bss	    dec	    hex	filename
+   6650	     28	  16852	  23530	   5bea	ThreadMetricBenchmarkThreadX_BasicProcessing_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkThreadX_BasicProcessing_nRF54L15.siz
+
+
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 30
+Time Period Total:  374402
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 60
+Time Period Total:  374403
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 90
+Time Period Total:  374404
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 120
+Time Period Total:  374404
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 150
+Time Period Total:  374402
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 180
+Time Period Total:  374403
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 210
+Time Period Total:  374403
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 240
+Time Period Total:  374402
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 270
+Time Period Total:  374403
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 300
+Time Period Total:  374403
+
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkThreadX_CooperativeScheduling_nRF54L15.elf"  "ThreadMetricBenchmarkThreadX_CooperativeScheduling_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkThreadX_CooperativeScheduling_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_CooperativeScheduling_nRF54L15.elf"
+   text	   data	    bss	    dec	    hex	filename
+   8536	     28	  12788	  21352	   5368	ThreadMetricBenchmarkThreadX_CooperativeScheduling_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkThreadX_CooperativeScheduling_nRF54L15.siz
+
+
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 30
+Time Period Total:  26466176
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 60
+Time Period Total:  26466071
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 90
+Time Period Total:  26466085
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 120
+Time Period Total:  26466085
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 150
+Time Period Total:  26466011
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 180
+Time Period Total:  26466010
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 210
+Time Period Total:  26466010
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 240
+Time Period Total:  26466010
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 270
+Time Period Total:  26466011
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 300
+Time Period Total:  26466010
+
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkThreadX_MessageProcessing_nRF54L15.elf"  "ThreadMetricBenchmarkThreadX_MessageProcessing_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkThreadX_MessageProcessing_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_MessageProcessing_nRF54L15.elf"
+   text	   data	    bss	    dec	    hex	filename
+   7852	     28	  13012	  20892	   519c	ThreadMetricBenchmarkThreadX_MessageProcessing_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkThreadX_MessageProcessing_nRF54L15.siz
+
+
+**** Thread-Metric Message Processing Test **** Relative Time: 30
+Time Period Total:  19092605
+
+**** Thread-Metric Message Processing Test **** Relative Time: 60
+Time Period Total:  19092574
+
+**** Thread-Metric Message Processing Test **** Relative Time: 90
+Time Period Total:  19092597
+
+**** Thread-Metric Message Processing Test **** Relative Time: 120
+Time Period Total:  19092583
+
+**** Thread-Metric Message Processing Test **** Relative Time: 150
+Time Period Total:  19092527
+
+**** Thread-Metric Message Processing Test **** Relative Time: 180
+Time Period Total:  19092528
+
+**** Thread-Metric Message Processing Test **** Relative Time: 210
+Time Period Total:  19092543
+
+**** Thread-Metric Message Processing Test **** Relative Time: 240
+Time Period Total:  19092528
+
+**** Thread-Metric Message Processing Test **** Relative Time: 270
+Time Period Total:  19092528
+
+**** Thread-Metric Message Processing Test **** Relative Time: 300
+Time Period Total:  19092528
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkThreadX_PreemptiveScheduling_nRF54L15.elf"  "ThreadMetricBenchmarkThreadX_PreemptiveScheduling_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkThreadX_PreemptiveScheduling_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_PreemptiveScheduling_nRF54L15.elf"
+   text	   data	    bss	    dec	    hex	filename
+   8581	     28	  12788	  21397	   5395	ThreadMetricBenchmarkThreadX_PreemptiveScheduling_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkThreadX_PreemptiveScheduling_nRF54L15.siz
+
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 30
+Time Period Total:  11757373
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 60
+Time Period Total:  11757344
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 90
+Time Period Total:  11757350
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 120
+Time Period Total:  11757350
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 150
+Time Period Total:  11757332
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 180
+Time Period Total:  11757316
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 210
+Time Period Total:  11757316
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 240
+Time Period Total:  11757318
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 270
+Time Period Total:  11757331
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 300
+Time Period Total:  11757316
+
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkThreadX_SynchronizationProcessing_nRF54L15.elf"  "ThreadMetricBenchmarkThreadX_SynchronizationProcessing_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkThreadX_SynchronizationProcessing_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_SynchronizationProcessing_nRF54L15.elf"
+   text	   data	    bss	    dec	    hex	filename
+   7239	     28	  12796	  20063	   4e5f	ThreadMetricBenchmarkThreadX_SynchronizationProcessing_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkThreadX_SynchronizationProcessing_nRF54L15.siz
+
+
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 30
+Time Period Total:  38376124
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 60
+Time Period Total:  38375184
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 90
+Time Period Total:  38375201
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 120
+Time Period Total:  38375201
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 150
+Time Period Total:  38375092
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 180
+Time Period Total:  38375092
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 210
+Time Period Total:  38375092
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 240
+Time Period Total:  38375092
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 270
+Time Period Total:  38375092
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 300
+Time Period Total:  38375092
+
+
+
+
+
+
+
+
