@@ -65,20 +65,21 @@ struct TmThreadDesc {
     bool            resume_before_start;
     uint8_t         tm_priority;
     void          (*entry)(void);
-    TaktOSThread_t *handle;
+    bool            materialized;
+    TaktOSThread    thread;
     uint8_t         mem[TAKTOS_THREAD_STACK_SIZE(TM_TAKTOS_STACK_BYTES)] __attribute__((aligned(4)));
 };
 
 static TmThreadDesc  g_threads[TM_TAKTOS_MAX_THREADS];
 static bool          g_kernel_started = false;
 
-static TaktOSQueue_t g_queues[TM_TAKTOS_MAX_QUEUES];
+static TaktOSQueue g_queues[TM_TAKTOS_MAX_QUEUES];
 static uint8_t       g_queue_storage[TM_TAKTOS_MAX_QUEUES]
                                    [TM_TAKTOS_QUEUE_DEPTH * TM_TAKTOS_QUEUE_MSG_SIZE]
                                    __attribute__((aligned(4)));
 static bool          g_queue_created[TM_TAKTOS_MAX_QUEUES];
 
-static TaktOSSem_t   g_semaphores[TM_TAKTOS_MAX_SEMAPHORES];
+static TaktOSSem   g_semaphores[TM_TAKTOS_MAX_SEMAPHORES];
 static bool          g_semaphore_created[TM_TAKTOS_MAX_SEMAPHORES];
 
 static uint8_t       g_pool_area[TM_TAKTOS_MAX_POOLS][TM_POOL_SIZE] __attribute__((aligned(sizeof(void*))));
@@ -165,15 +166,18 @@ static int tm_materialize_thread(int thread_id)
     if (!t->allocated)
         return TM_ERROR;
 
-    if (t->handle != NULL)
+    if (t->materialized)
         return TM_SUCCESS;
 
-    t->handle = TaktOSThreadCreate(t->mem,
-                                   (uint32_t)sizeof(t->mem),
-                                   tm_thread_trampoline,
-                                   (void*)(uintptr_t)thread_id,
-                                   tm_to_taktos_priority(t->tm_priority));
-    return (t->handle != NULL) ? TM_SUCCESS : TM_ERROR;
+    if (t->thread.Create(t->mem,
+                         (uint32_t)sizeof(t->mem),
+                         tm_thread_trampoline,
+                         (void*)(uintptr_t)thread_id,
+                         tm_to_taktos_priority(t->tm_priority)) == NULL)
+        return TM_ERROR;
+
+    t->materialized = true;
+    return TM_SUCCESS;
 }
 
 static void tm_materialize_all_threads(void)
@@ -186,7 +190,7 @@ static void tm_materialize_all_threads(void)
     }
     for (i = 0; i < TM_TAKTOS_MAX_THREADS; ++i) {
         if (g_threads[i].allocated && !g_threads[i].resume_before_start) {
-            if (TaktOSThreadSuspend(g_threads[i].handle) != TAKTOS_OK) {
+            if (g_threads[i].thread.Suspend() != TAKTOS_OK) {
                 tm_check_fail("FATAL: initial thread suspend failed\n");
             }
         }
@@ -202,7 +206,7 @@ extern "C" void tm_initialize(void (*test_initialization_function)(void))
         g_threads[i].resume_before_start = false;
         g_threads[i].tm_priority = 31u;
         g_threads[i].entry = NULL;
-        g_threads[i].handle = NULL;
+        g_threads[i].materialized = false;
     }
     for (i = 0; i < TM_TAKTOS_MAX_QUEUES; ++i) {
         g_queue_created[i] = false;
@@ -251,7 +255,7 @@ extern "C" int tm_thread_create(int thread_id, int priority, void (*entry_functi
     if (g_kernel_started) {
         if (tm_materialize_thread(thread_id) != TM_SUCCESS)
             return TM_ERROR;
-        return (TaktOSThreadSuspend(t->handle) == TAKTOS_OK) ? TM_SUCCESS : TM_ERROR;
+        return (t->thread.Suspend() == TAKTOS_OK) ? TM_SUCCESS : TM_ERROR;
     }
 
     return TM_SUCCESS;
@@ -267,7 +271,7 @@ extern "C" int tm_thread_resume(int thread_id)
         return TM_SUCCESS;
     }
 
-    return (TaktOSThreadResume(g_threads[thread_id].handle) == TAKTOS_OK) ? TM_SUCCESS : TM_ERROR;
+    return (g_threads[thread_id].thread.Resume() == TAKTOS_OK) ? TM_SUCCESS : TM_ERROR;
 }
 
 extern "C" int tm_thread_suspend(int thread_id)
@@ -280,7 +284,7 @@ extern "C" int tm_thread_suspend(int thread_id)
         return TM_SUCCESS;
     }
 
-    return (TaktOSThreadSuspend(g_threads[thread_id].handle) == TAKTOS_OK) ? TM_SUCCESS : TM_ERROR;
+    return (g_threads[thread_id].thread.Suspend() == TAKTOS_OK) ? TM_SUCCESS : TM_ERROR;
 }
 
 extern "C" void tm_thread_relinquish(void)
@@ -299,10 +303,9 @@ extern "C" int tm_queue_create(int queue_id)
     if (queue_id < 0 || queue_id >= TM_TAKTOS_MAX_QUEUES)
         return TM_ERROR;
 
-    if (TaktOSQueueInit(&g_queues[queue_id],
-                        g_queue_storage[queue_id],
-                        TM_TAKTOS_QUEUE_MSG_SIZE,
-                        TM_TAKTOS_QUEUE_DEPTH) != TAKTOS_OK) {
+    if (g_queues[queue_id].Init(g_queue_storage[queue_id],
+                               TM_TAKTOS_QUEUE_MSG_SIZE,
+                               TM_TAKTOS_QUEUE_DEPTH) != TAKTOS_OK) {
         return TM_ERROR;
     }
 
@@ -315,7 +318,7 @@ extern "C" int tm_queue_send(int queue_id, unsigned long *message_ptr)
     if (queue_id < 0 || queue_id >= TM_TAKTOS_MAX_QUEUES || !g_queue_created[queue_id] || message_ptr == NULL)
         return TM_ERROR;
 
-    return (TaktOSQueueSend(&g_queues[queue_id], message_ptr, false) == TAKTOS_OK) ? TM_SUCCESS : TM_ERROR;
+    return (g_queues[queue_id].Send(message_ptr, false) == TAKTOS_OK) ? TM_SUCCESS : TM_ERROR;
 }
 
 extern "C" int tm_queue_receive(int queue_id, unsigned long *message_ptr)
@@ -323,7 +326,7 @@ extern "C" int tm_queue_receive(int queue_id, unsigned long *message_ptr)
     if (queue_id < 0 || queue_id >= TM_TAKTOS_MAX_QUEUES || !g_queue_created[queue_id] || message_ptr == NULL)
         return TM_ERROR;
 
-    return (TaktOSQueueReceive(&g_queues[queue_id], message_ptr, false, TAKTOS_NO_WAIT) == TAKTOS_OK) ? TM_SUCCESS : TM_ERROR;
+    return (g_queues[queue_id].Receive(message_ptr, false, TAKTOS_NO_WAIT) == TAKTOS_OK) ? TM_SUCCESS : TM_ERROR;
 }
 
 extern "C" int tm_semaphore_create(int semaphore_id)
@@ -331,7 +334,7 @@ extern "C" int tm_semaphore_create(int semaphore_id)
     if (semaphore_id < 0 || semaphore_id >= TM_TAKTOS_MAX_SEMAPHORES)
         return TM_ERROR;
 
-    if (TaktOSSemInit(&g_semaphores[semaphore_id], 1u, 1u) != TAKTOS_OK)
+    if (g_semaphores[semaphore_id].Init(1u, 1u) != TAKTOS_OK)
         return TM_ERROR;
 
     g_semaphore_created[semaphore_id] = true;
@@ -343,7 +346,7 @@ extern "C" int tm_semaphore_get(int semaphore_id)
     if (semaphore_id < 0 || semaphore_id >= TM_TAKTOS_MAX_SEMAPHORES || !g_semaphore_created[semaphore_id])
         return TM_ERROR;
 
-    return (TaktOSSemTake(&g_semaphores[semaphore_id], false, TAKTOS_NO_WAIT) == TAKTOS_OK) ? TM_SUCCESS : TM_ERROR;
+    return (g_semaphores[semaphore_id].Take(false, TAKTOS_NO_WAIT) == TAKTOS_OK) ? TM_SUCCESS : TM_ERROR;
 }
 
 extern "C" int tm_semaphore_put(int semaphore_id)
@@ -351,7 +354,7 @@ extern "C" int tm_semaphore_put(int semaphore_id)
     if (semaphore_id < 0 || semaphore_id >= TM_TAKTOS_MAX_SEMAPHORES || !g_semaphore_created[semaphore_id])
         return TM_ERROR;
 
-    return (TaktOSSemGive(&g_semaphores[semaphore_id], false) == TAKTOS_OK) ? TM_SUCCESS : TM_ERROR;
+    return (g_semaphores[semaphore_id].Give(false) == TAKTOS_OK) ? TM_SUCCESS : TM_ERROR;
 }
 
 extern "C" int tm_memory_pool_create(int pool_id)

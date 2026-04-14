@@ -66,9 +66,9 @@
 			<locationURI>PARENT-1-PROJECT_LOC/src/FreeRTOSConfig.h</locationURI>
 		</link>
 		<link>
-			<name>src/main.cpp</name>
+			<name>src/main.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/main.cpp</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/src/main.c</locationURI>
 		</link>
 		<link>
 			<name>src/synchronization_processing.c</name>
@@ -81,9 +81,9 @@
 			<locationURI>PARENT-1-PROJECT_LOC/src/tm_api.h</locationURI>
 		</link>
 		<link>
-			<name>src/tm_port.cpp</name>
+			<name>src/tm_port.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/tm_port.cpp</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/src/tm_port.c</locationURI>
 		</link>
 		<link>
 			<name>src/tm_report.c</name>
