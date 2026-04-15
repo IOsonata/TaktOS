@@ -43,12 +43,17 @@
 		<link>
 			<name>src/tm_api.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/tm_api.h</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/src/tm_api.h</locationURI>
 		</link>
 		<link>
-			<name>src/tm_port.cpp</name>
+			<name>src/tm_port_taktos.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/tm_port.cpp</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/src/tm_port_taktos.c</locationURI>
+		</link>
+		<link>
+			<name>src/tm_port_taktos.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/src/tm_port_taktos.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/tm_report.c</name>

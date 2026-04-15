@@ -134,6 +134,272 @@ Time Period Total:  6947836
 Time Period Total:  6947836
 
 
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_MutexBargingTest_nRF54L15.elf"  "ThreadMetricBenchmarkFreeRTOS_MutexBargingTest_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkFreeRTOS_MutexBargingTest_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_MutexBargingTest_nRF54L15.elf"
+   text     data      bss      dec      hex  filename
+  11500       20    13256    24776     60c8  ThreadMetricBenchmarkFreeRTOS_MutexBargingTest_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkFreeRTOS_MutexBargingTest_nRF54L15.siz
+
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 30
+Total ops this window : 7076760
+  Workers (total)     : 6956736
+  Interlopers (total) : 120024  (barge fraction: 0.016)
+  -- Workers --
+    Worker 0 (pri 10): 1740561
+    Worker 1 (pri 10): 1737250
+    Worker 2 (pri 10): 1740562
+    Worker 3 (pri 10): 1738363
+  -- Interlopers --
+    Interloper 0 (pri 3): 30006
+    Interloper 1 (pri 3): 30006
+    Interloper 2 (pri 3): 30006
+    Interloper 3 (pri 3): 30006
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 60
+Total ops this window : 7076792
+  Workers (total)     : 6956632
+  Interlopers (total) : 120160  (barge fraction: 0.016)
+  -- Workers --
+    Worker 0 (pri 10): 1740542
+    Worker 1 (pri 10): 1737218
+    Worker 2 (pri 10): 1738324
+    Worker 3 (pri 10): 1740548
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 90
+Total ops this window : 7076792
+  Workers (total)     : 6956632
+  Interlopers (total) : 120160  (barge fraction: 0.016)
+  -- Workers --
+    Worker 0 (pri 10): 1740542
+    Worker 1 (pri 10): 1737218
+    Worker 2 (pri 10): 1740548
+    Worker 3 (pri 10): 1738324
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 120
+Total ops this window : 7076792
+  Workers (total)     : 6956632
+  Interlopers (total) : 120160  (barge fraction: 0.016)
+  -- Workers --
+    Worker 0 (pri 10): 1740542
+    Worker 1 (pri 10): 1737218
+    Worker 2 (pri 10): 1738324
+    Worker 3 (pri 10): 1740548
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 150
+Total ops this window : 7076799
+  Workers (total)     : 6956639
+  Interlopers (total) : 120160  (barge fraction: 0.016)
+  -- Workers --
+    Worker 0 (pri 10): 1740541
+    Worker 1 (pri 10): 1737228
+    Worker 2 (pri 10): 1740539
+    Worker 3 (pri 10): 1738331
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 180
+Total ops this window : 7077133
+  Workers (total)     : 6956969
+  Interlopers (total) : 120164  (barge fraction: 0.016)
+  -- Workers --
+    Worker 0 (pri 10): 1740608
+    Worker 1 (pri 10): 1737327
+    Worker 2 (pri 10): 1740615
+    Worker 3 (pri 10): 1738419
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 210
+Total ops this window : 7076817
+  Workers (total)     : 6956657
+  Interlopers (total) : 120160  (barge fraction: 0.016)
+  -- Workers --
+    Worker 0 (pri 10): 1740537
+    Worker 1 (pri 10): 1737241
+    Worker 2 (pri 10): 1740536
+    Worker 3 (pri 10): 1738343
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 240
+Total ops this window : 7077008
+  Workers (total)     : 6956844
+  Interlopers (total) : 120164  (barge fraction: 0.016)
+  -- Workers --
+    Worker 0 (pri 10): 1740600
+    Worker 1 (pri 10): 1737268
+    Worker 2 (pri 10): 1740600
+    Worker 3 (pri 10): 1738376
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 270
+Total ops this window : 7076789
+  Workers (total)     : 6956629
+  Interlopers (total) : 120160  (barge fraction: 0.016)
+  -- Workers --
+    Worker 0 (pri 10): 1740537
+    Worker 1 (pri 10): 1737222
+    Worker 2 (pri 10): 1740536
+    Worker 3 (pri 10): 1738334
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 300
+Total ops this window : 7076852
+  Workers (total)     : 6956692
+  Interlopers (total) : 120160  (barge fraction: 0.016)
+  -- Workers --
+    Worker 0 (pri 10): 1740541
+    Worker 1 (pri 10): 1737254
+    Worker 2 (pri 10): 1740549
+    Worker 3 (pri 10): 1738348
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_MutexProcessing_nRF54L15.elf"  "ThreadMetricBenchmarkFreeRTOS_MutexProcessing_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkFreeRTOS_MutexProcessing_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_MutexProcessing_nRF54L15.elf"
+   text     data      bss      dec      hex  filename
+   9526       20    13224    22770     58f2  ThreadMetricBenchmarkFreeRTOS_MutexProcessing_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkFreeRTOS_MutexProcessing_nRF54L15.siz
+
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 30
+Total ops this window: 7260001
+  Worker 0: 1815001
+  Worker 1: 1815000
+  Worker 2: 1814998
+  Worker 3: 1815002
+  Min / Max: 1814998 / 1815002
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 60
+Total ops this window: 7259922
+  Worker 0: 1814981
+  Worker 1: 1814980
+  Worker 2: 1814981
+  Worker 3: 1814980
+  Min / Max: 1814980 / 1814981
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 90
+Total ops this window: 7259923
+  Worker 0: 1814981
+  Worker 1: 1814981
+  Worker 2: 1814980
+  Worker 3: 1814981
+  Min / Max: 1814980 / 1814981
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 120
+Total ops this window: 7259910
+  Worker 0: 1814977
+  Worker 1: 1814977
+  Worker 2: 1814977
+  Worker 3: 1814979
+  Min / Max: 1814977 / 1814979
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 150
+Total ops this window: 7259902
+  Worker 0: 1814975
+  Worker 1: 1814976
+  Worker 2: 1814976
+  Worker 3: 1814975
+  Min / Max: 1814975 / 1814976
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 180
+Total ops this window: 7259902
+  Worker 0: 1814976
+  Worker 1: 1814975
+  Worker 2: 1814975
+  Worker 3: 1814976
+  Min / Max: 1814975 / 1814976
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 210
+Total ops this window: 7259902
+  Worker 0: 1814975
+  Worker 1: 1814976
+  Worker 2: 1814976
+  Worker 3: 1814975
+  Min / Max: 1814975 / 1814976
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 240
+Total ops this window: 7259902
+  Worker 0: 1814976
+  Worker 1: 1814975
+  Worker 2: 1814975
+  Worker 3: 1814976
+  Min / Max: 1814975 / 1814976
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 270
+Total ops this window: 7259902
+  Worker 0: 1814975
+  Worker 1: 1814976
+  Worker 2: 1814976
+  Worker 3: 1814975
+  Min / Max: 1814975 / 1814976
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 300
+Total ops this window: 7259902
+  Worker 0: 1814976
+  Worker 1: 1814975
+  Worker 2: 1814975
+  Worker 3: 1814976
+  Min / Max: 1814975 / 1814976
+  Fairness ratio: 0.999
+
+
 
 
 Invoking: Cross ARM GNU Create Flash Image
@@ -361,6 +627,270 @@ Time Period Total:  27608741
 
 
 
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkTaktOS_MutexBargingTest_nRF54L15.elf"  "ThreadMetricBenchmarkTaktOS_MutexBargingTest_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkTaktOS_MutexBargingTest_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_MutexBargingTest_nRF54L15.elf"
+   text     data      bss      dec      hex  filename
+   9332       24    11260    20616     5088  ThreadMetricBenchmarkTaktOS_MutexBargingTest_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkTaktOS_MutexBargingTest_nRF54L15.siz
+
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 30
+Total ops this window : 19320041
+  Workers (total)     : 19200017
+  Interlopers (total) : 120024  (barge fraction: 0.006)
+  -- Workers --
+    Worker 0 (pri 10): 4800005
+    Worker 1 (pri 10): 4800004
+    Worker 2 (pri 10): 4800004
+    Worker 3 (pri 10): 4800004
+  -- Interlopers --
+    Interloper 0 (pri 3): 30006
+    Interloper 1 (pri 3): 30006
+    Interloper 2 (pri 3): 30006
+    Interloper 3 (pri 3): 30006
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 60
+Total ops this window : 19319887
+  Workers (total)     : 19199727
+  Interlopers (total) : 120160  (barge fraction: 0.006)
+  -- Workers --
+    Worker 0 (pri 10): 4799931
+    Worker 1 (pri 10): 4799932
+    Worker 2 (pri 10): 4799932
+    Worker 3 (pri 10): 4799932
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 90
+Total ops this window : 19319865
+  Workers (total)     : 19199705
+  Interlopers (total) : 120160  (barge fraction: 0.006)
+  -- Workers --
+    Worker 0 (pri 10): 4799927
+    Worker 1 (pri 10): 4799926
+    Worker 2 (pri 10): 4799926
+    Worker 3 (pri 10): 4799926
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 120
+Total ops this window : 19319888
+  Workers (total)     : 19199728
+  Interlopers (total) : 120160  (barge fraction: 0.006)
+  -- Workers --
+    Worker 0 (pri 10): 4799932
+    Worker 1 (pri 10): 4799932
+    Worker 2 (pri 10): 4799932
+    Worker 3 (pri 10): 4799932
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 150
+Total ops this window : 19319832
+  Workers (total)     : 19199672
+  Interlopers (total) : 120160  (barge fraction: 0.006)
+  -- Workers --
+    Worker 0 (pri 10): 4799918
+    Worker 1 (pri 10): 4799918
+    Worker 2 (pri 10): 4799918
+    Worker 3 (pri 10): 4799918
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 180
+Total ops this window : 19319832
+  Workers (total)     : 19199672
+  Interlopers (total) : 120160  (barge fraction: 0.006)
+  -- Workers --
+    Worker 0 (pri 10): 4799918
+    Worker 1 (pri 10): 4799918
+    Worker 2 (pri 10): 4799918
+    Worker 3 (pri 10): 4799918
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 210
+Total ops this window : 19319832
+  Workers (total)     : 19199672
+  Interlopers (total) : 120160  (barge fraction: 0.006)
+  -- Workers --
+    Worker 0 (pri 10): 4799918
+    Worker 1 (pri 10): 4799918
+    Worker 2 (pri 10): 4799918
+    Worker 3 (pri 10): 4799918
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 240
+Total ops this window : 19319832
+  Workers (total)     : 19199672
+  Interlopers (total) : 120160  (barge fraction: 0.006)
+  -- Workers --
+    Worker 0 (pri 10): 4799918
+    Worker 1 (pri 10): 4799918
+    Worker 2 (pri 10): 4799918
+    Worker 3 (pri 10): 4799918
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 270
+Total ops this window : 19319832
+  Workers (total)     : 19199672
+  Interlopers (total) : 120160  (barge fraction: 0.006)
+  -- Workers --
+    Worker 0 (pri 10): 4799918
+    Worker 1 (pri 10): 4799918
+    Worker 2 (pri 10): 4799918
+    Worker 3 (pri 10): 4799918
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 300
+Total ops this window : 19319832
+  Workers (total)     : 19199672
+  Interlopers (total) : 120160  (barge fraction: 0.006)
+  -- Workers --
+    Worker 0 (pri 10): 4799918
+    Worker 1 (pri 10): 4799918
+    Worker 2 (pri 10): 4799918
+    Worker 3 (pri 10): 4799918
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkTaktOS_MutexProcessing_nRF54L15.elf"  "ThreadMetricBenchmarkTaktOS_MutexProcessing_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkTaktOS_MutexProcessing_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_MutexProcessing_nRF54L15.elf"
+   text     data      bss      dec      hex  filename
+   7348       24    11228    18600     48a8  ThreadMetricBenchmarkTaktOS_MutexProcessing_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkTaktOS_MutexProcessing_nRF54L15.siz
+
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 30
+Total ops this window: 19679998
+  Worker 0: 4920000
+  Worker 1: 4920000
+  Worker 2: 4919999
+  Worker 3: 4919999
+  Min / Max: 4919999 / 4920000
+  Fairness ratio: 0.127
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 60
+Total ops this window: 19679563
+  Worker 0: 4919891
+  Worker 1: 4919890
+  Worker 2: 4919891
+  Worker 3: 4919891
+  Min / Max: 4919890 / 4919891
+  Fairness ratio: 0.127
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 90
+Total ops this window: 19679578
+  Worker 0: 4919894
+  Worker 1: 4919895
+  Worker 2: 4919895
+  Worker 3: 4919894
+  Min / Max: 4919894 / 4919895
+  Fairness ratio: 0.127
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 120
+Total ops this window: 19679577
+  Worker 0: 4919894
+  Worker 1: 4919894
+  Worker 2: 4919894
+  Worker 3: 4919895
+  Min / Max: 4919894 / 4919895
+  Fairness ratio: 0.127
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 150
+Total ops this window: 19679522
+  Worker 0: 4919881
+  Worker 1: 4919881
+  Worker 2: 4919880
+  Worker 3: 4919880
+  Min / Max: 4919880 / 4919881
+  Fairness ratio: 0.127
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 180
+Total ops this window: 19679521
+  Worker 0: 4919880
+  Worker 1: 4919880
+  Worker 2: 4919881
+  Worker 3: 4919880
+  Min / Max: 4919880 / 4919881
+  Fairness ratio: 0.127
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 210
+Total ops this window: 19679522
+  Worker 0: 4919881
+  Worker 1: 4919880
+  Worker 2: 4919880
+  Worker 3: 4919881
+  Min / Max: 4919880 / 4919881
+  Fairness ratio: 0.127
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 240
+Total ops this window: 19679521
+  Worker 0: 4919880
+  Worker 1: 4919881
+  Worker 2: 4919880
+  Worker 3: 4919880
+  Min / Max: 4919880 / 4919881
+  Fairness ratio: 0.127
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 270
+Total ops this window: 19679522
+  Worker 0: 4919880
+  Worker 1: 4919880
+  Worker 2: 4919881
+  Worker 3: 4919881
+  Min / Max: 4919880 / 4919881
+  Fairness ratio: 0.127
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 300
+Total ops this window: 19679521
+  Worker 0: 4919881
+  Worker 1: 4919880
+  Worker 2: 4919880
+  Worker 3: 4919880
+  Min / Max: 4919880 / 4919881
+  Fairness ratio: 0.127
 
 
 
@@ -590,6 +1120,276 @@ Time Period Total:  19092528
 
 **** Thread-Metric Message Processing Test **** Relative Time: 300
 Time Period Total:  19092528
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkThreadX_MutexBargingTest_nRF54L15.elf"  "ThreadMetricBenchmarkThreadX_MutexBargingTest_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkThreadX_MutexBargingTest_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_MutexBargingTest_nRF54L15.elf"
+   text     data      bss      dec      hex  filename
+  10925       24    12736    23685     5c85  ThreadMetricBenchmarkThreadX_MutexBargingTest_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkThreadX_MutexBargingTest_nRF54L15.siz
+
+
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 30
+Total ops this window : 9839805
+  Workers (total)     : 9719781
+  Interlopers (total) : 120024  (barge fraction: 0.012)
+  -- Workers --
+    Worker 0 (pri 10): 2429946
+    Worker 1 (pri 10): 2429945
+    Worker 2 (pri 10): 2429945
+    Worker 3 (pri 10): 2429945
+  -- Interlopers --
+    Interloper 0 (pri 3): 30006
+    Interloper 1 (pri 3): 30006
+    Interloper 2 (pri 3): 30006
+    Interloper 3 (pri 3): 30006
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 60
+Total ops this window : 9840066
+  Workers (total)     : 9719906
+  Interlopers (total) : 120160  (barge fraction: 0.012)
+  -- Workers --
+    Worker 0 (pri 10): 2429976
+    Worker 1 (pri 10): 2429977
+    Worker 2 (pri 10): 2429977
+    Worker 3 (pri 10): 2429976
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 90
+Total ops this window : 9840061
+  Workers (total)     : 9719901
+  Interlopers (total) : 120160  (barge fraction: 0.012)
+  -- Workers --
+    Worker 0 (pri 10): 2429975
+    Worker 1 (pri 10): 2429975
+    Worker 2 (pri 10): 2429975
+    Worker 3 (pri 10): 2429976
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 120
+Total ops this window : 9840061
+  Workers (total)     : 9719901
+  Interlopers (total) : 120160  (barge fraction: 0.012)
+  -- Workers --
+    Worker 0 (pri 10): 2429976
+    Worker 1 (pri 10): 2429975
+    Worker 2 (pri 10): 2429975
+    Worker 3 (pri 10): 2429975
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 150
+Total ops this window : 9840043
+  Workers (total)     : 9719883
+  Interlopers (total) : 120160  (barge fraction: 0.012)
+  -- Workers --
+    Worker 0 (pri 10): 2429970
+    Worker 1 (pri 10): 2429971
+    Worker 2 (pri 10): 2429971
+    Worker 3 (pri 10): 2429971
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 180
+Total ops this window : 9840038
+  Workers (total)     : 9719878
+  Interlopers (total) : 120160  (barge fraction: 0.012)
+  -- Workers --
+    Worker 0 (pri 10): 2429970
+    Worker 1 (pri 10): 2429970
+    Worker 2 (pri 10): 2429969
+    Worker 3 (pri 10): 2429969
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 210
+Total ops this window : 9840038
+  Workers (total)     : 9719878
+  Interlopers (total) : 120160  (barge fraction: 0.012)
+  -- Workers --
+    Worker 0 (pri 10): 2429969
+    Worker 1 (pri 10): 2429969
+    Worker 2 (pri 10): 2429970
+    Worker 3 (pri 10): 2429970
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 240
+Total ops this window : 9840038
+  Workers (total)     : 9719878
+  Interlopers (total) : 120160  (barge fraction: 0.012)
+  -- Workers --
+    Worker 0 (pri 10): 2429970
+    Worker 1 (pri 10): 2429970
+    Worker 2 (pri 10): 2429969
+    Worker 3 (pri 10): 2429969
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 270
+Total ops this window : 9840038
+  Workers (total)     : 9719878
+  Interlopers (total) : 120160  (barge fraction: 0.012)
+  -- Workers --
+    Worker 0 (pri 10): 2429969
+    Worker 1 (pri 10): 2429969
+    Worker 2 (pri 10): 2429970
+    Worker 3 (pri 10): 2429970
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 300
+Total ops this window : 9840038
+  Workers (total)     : 9719878
+  Interlopers (total) : 120160  (barge fraction: 0.012)
+  -- Workers --
+    Worker 0 (pri 10): 2429970
+    Worker 1 (pri 10): 2429970
+    Worker 2 (pri 10): 2429969
+    Worker 3 (pri 10): 2429969
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkThreadX_MutexProcessing_nRF54L15.elf"  "ThreadMetricBenchmarkThreadX_MutexProcessing_nRF54L15.hex"
+Finished building: ThreadMetricBenchmarkThreadX_MutexProcessing_nRF54L15.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_MutexProcessing_nRF54L15.elf"
+   text     data      bss      dec      hex  filename
+   8949       24    12704    21677     54ad  ThreadMetricBenchmarkThreadX_MutexProcessing_nRF54L15.elf
+Finished building: ThreadMetricBenchmarkThreadX_MutexProcessing_nRF54L15.siz
+
+
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 30
+Total ops this window: 10105552
+  Worker 0: 2526388
+  Worker 1: 2526388
+  Worker 2: 2526388
+  Worker 3: 2526388
+  Min / Max: 2526388 / 2526388
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 60
+Total ops this window: 10105447
+  Worker 0: 2526362
+  Worker 1: 2526362
+  Worker 2: 2526362
+  Worker 3: 2526361
+  Min / Max: 2526361 / 2526362
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 90
+Total ops this window: 10105456
+  Worker 0: 2526364
+  Worker 1: 2526364
+  Worker 2: 2526364
+  Worker 3: 2526364
+  Min / Max: 2526364 / 2526364
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 120
+Total ops this window: 10105455
+  Worker 0: 2526364
+  Worker 1: 2526364
+  Worker 2: 2526363
+  Worker 3: 2526364
+  Min / Max: 2526363 / 2526364
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 150
+Total ops this window: 10105412
+  Worker 0: 2526353
+  Worker 1: 2526353
+  Worker 2: 2526353
+  Worker 3: 2526353
+  Min / Max: 2526353 / 2526353
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 180
+Total ops this window: 10105418
+  Worker 0: 2526354
+  Worker 1: 2526354
+  Worker 2: 2526355
+  Worker 3: 2526355
+  Min / Max: 2526354 / 2526355
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 210
+Total ops this window: 10105418
+  Worker 0: 2526355
+  Worker 1: 2526355
+  Worker 2: 2526354
+  Worker 3: 2526354
+  Min / Max: 2526354 / 2526355
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 240
+Total ops this window: 10105426
+  Worker 0: 2526356
+  Worker 1: 2526356
+  Worker 2: 2526357
+  Worker 3: 2526357
+  Min / Max: 2526356 / 2526357
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 270
+Total ops this window: 10105426
+  Worker 0: 2526357
+  Worker 1: 2526357
+  Worker 2: 2526356
+  Worker 3: 2526356
+  Min / Max: 2526356 / 2526357
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 300
+Total ops this window: 10105427
+  Worker 0: 2526357
+  Worker 1: 2526356
+  Worker 2: 2526357
+  Worker 3: 2526357
+  Min / Max: 2526356 / 2526357
+  Fairness ratio: 0.999
+
 
 
 

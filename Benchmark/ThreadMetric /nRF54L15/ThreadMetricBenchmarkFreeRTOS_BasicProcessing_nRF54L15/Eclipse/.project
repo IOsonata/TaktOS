@@ -31,36 +31,6 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
-		    <name>kernel/portable/port.c</name>
-		    <type>1</type>
-		    <locationURI>IOCOMPOSER_HOME/external/FreeRTOS-Kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c</locationURI>
-		</link>
-		<link>
-		    <name>kernel/portable/portasm.c</name>
-		    <type>1</type>
-		    <locationURI>IOCOMPOSER_HOME/external/FreeRTOS-Kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c</locationURI>
-		</link>
-		<link>
-			<name>kernel/list.c</name>
-			<type>1</type>
-			<locationURI>IOCOMPOSER_HOME/external/FreeRTOS-Kernel/list.c</locationURI>
-		</link>
-		<link>
-			<name>kernel/portable</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>kernel/queue.c</name>
-			<type>1</type>
-			<locationURI>IOCOMPOSER_HOME/external/FreeRTOS-Kernel/queue.c</locationURI>
-		</link>
-		<link>
-			<name>kernel/tasks.c</name>
-			<type>1</type>
-			<locationURI>IOCOMPOSER_HOME/external/FreeRTOS-Kernel/tasks.c</locationURI>
-		</link>
-		<link>
 			<name>src/FreeRTOSConfig.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/src/FreeRTOSConfig.h</locationURI>
@@ -71,6 +41,11 @@
 			<locationURI>PARENT-3-PROJECT_LOC/src/basic_processing.c</locationURI>
 		</link>
 		<link>
+			<name>src/kernel</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
 			<name>src/main.c</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/src/main.c</locationURI>
@@ -78,17 +53,47 @@
 		<link>
 			<name>src/tm_api.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/tm_api.h</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/src/tm_api.h</locationURI>
 		</link>
 		<link>
-			<name>src/tm_port.c</name>
+			<name>src/tm_port_freertos.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/tm_port.c</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/src/tm_port_freertos.c</locationURI>
 		</link>
 		<link>
 			<name>src/tm_report.c</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/tm_report.c</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/src/tm_report.c</locationURI>
+		</link>
+		<link>
+			<name>src/kernel/list.c</name>
+			<type>1</type>
+			<locationURI>IOCOMPOSER_HOME/external/FreeRTOS-Kernel/list.c</locationURI>
+		</link>
+		<link>
+			<name>src/kernel/portable</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>src/kernel/queue.c</name>
+			<type>1</type>
+			<locationURI>IOCOMPOSER_HOME/external/FreeRTOS-Kernel/queue.c</locationURI>
+		</link>
+		<link>
+			<name>src/kernel/tasks.c</name>
+			<type>1</type>
+			<locationURI>IOCOMPOSER_HOME/external/FreeRTOS-Kernel/tasks.c</locationURI>
+		</link>
+		<link>
+			<name>src/kernel/portable/port.c</name>
+			<type>1</type>
+			<locationURI>IOCOMPOSER_HOME/external/FreeRTOS-Kernel/portable/GCC/ARM_CM33_NTZ/non_secure/port.c</locationURI>
+		</link>
+		<link>
+			<name>src/kernel/portable/portasm.c</name>
+			<type>1</type>
+			<locationURI>IOCOMPOSER_HOME/external/FreeRTOS-Kernel/portable/GCC/ARM_CM33_NTZ/non_secure/portasm.c</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

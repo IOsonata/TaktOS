@@ -138,7 +138,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="src/bench_threadmetric.cpp|src/bench_main.cpp|src/SysTick.cpp|src/cfifo_test_mcu.c|src/cfifo-2.c|src/cfifo_final.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src/tm_port_taktos.c|src/bench_threadmetric.cpp|src/bench_main.cpp|src/SysTick.cpp|src/cfifo_test_mcu.c|src/cfifo-2.c|src/cfifo_final.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -197,6 +197,7 @@
 									<listOptionValue builtIn="false" value="NRF54L15_XXAA"/>
 									<listOptionValue builtIn="false" value="NRF_APPLICATION"/>
 									<listOptionValue builtIn="false" value="__PROGRAM_START"/>
+									<listOptionValue builtIn="false" value="TAKT_INLINE_OPTIMIZATION"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.include.paths.310893114" name="Include paths (-I)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.include.paths" useByScannerDiscovery="false" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;../../src&quot;"/>
@@ -213,6 +214,7 @@
 									<listOptionValue builtIn="false" value="NRF54L15_XXAA"/>
 									<listOptionValue builtIn="false" value="NRF_APPLICATION"/>
 									<listOptionValue builtIn="false" value="__PROGRAM_START"/>
+									<listOptionValue builtIn="false" value="TAKT_INLINE_OPTIMIZATION"/>
 								</option>
 								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.nortti.451548218" name="Do not use RTTI (-fno-rtti)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.nortti" useByScannerDiscovery="true" value="true" valueType="boolean"/>
 								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.noexceptions.1674848907" name="Do not use exceptions (-fno-exceptions)" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.noexceptions" useByScannerDiscovery="true" value="true" valueType="boolean"/>
@@ -283,7 +285,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="src/bench_threadmetric.cpp|src/bench_main.cpp|src/SysTick.cpp|src/cfifo_test_mcu.c|src/cfifo-2.c|src/cfifo_final.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="src/tm_port_taktos.c|src/bench_threadmetric.cpp|src/bench_main.cpp|src/SysTick.cpp|src/cfifo_test_mcu.c|src/cfifo-2.c|src/cfifo_final.c" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
