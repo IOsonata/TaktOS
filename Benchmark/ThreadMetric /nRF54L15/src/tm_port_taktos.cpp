@@ -10,9 +10,6 @@
 #include "TaktOSMutex.h"
 #include "TaktOSQueue.h"
 
-// MDK peripheral structs — NRF_UARTE30_S and NRF_UARTE_Type
-#include "nrf.h"
-
 
 // -----------------------------------------------------------------------------
 // TaktOS porting layer for the official Thread-Metric test suite.

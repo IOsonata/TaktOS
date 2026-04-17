@@ -2,7 +2,7 @@
 Compiler : arm-none-eabi-gcc-15.2.1
 Optimization -Os
 Tick rate 1000Hz
-
+MCU : nRF52832
 
 
 Invoking: Cross ARM GNU Create Flash Image
@@ -12,39 +12,41 @@ Finished building: ThreadMetricBenchmarkFreeRTOS_BasicProcessing.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_BasicProcessing.elf"
    text     data      bss      dec      hex  filename
-   7120       24    16664    23808     5d00  ThreadMetricBenchmarkFreeRTOS_BasicProcessing.elf
+   7580       28    22844    30452     76f4  ThreadMetricBenchmarkFreeRTOS_BasicProcessing.elf
 Finished building: ThreadMetricBenchmarkFreeRTOS_BasicProcessing.siz
  
 
+
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 30
-Time Period Total:  124682
+Time Period Total:  124607
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 60
-Time Period Total:  124679
+Time Period Total:  124608
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 90
-Time Period Total:  124679
+Time Period Total:  124609
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 120
-Time Period Total:  124679
+Time Period Total:  124608
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 150
-Time Period Total:  124679
+Time Period Total:  124608
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 180
-Time Period Total:  124679
+Time Period Total:  124608
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 210
-Time Period Total:  124678
+Time Period Total:  124608
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 240
-Time Period Total:  124679
+Time Period Total:  124608
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 270
-Time Period Total:  124679
+Time Period Total:  124608
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 300
-Time Period Total:  124679
+Time Period Total:  124608
+
 
 
 
@@ -56,44 +58,48 @@ Finished building: ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling.elf"
    text     data      bss      dec      hex  filename
-   7880       24    12584    20488     5008  ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling.elf
+   9340       28    18780    28148     6df4  ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling.elf
 Finished building: ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling.siz
  
 
+
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 30
-Time Period Total:  8473325
+Time Period Total:  8369409
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 60
-Time Period Total:  8473241
+Time Period Total:  8369379
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 90
-Time Period Total:  8473241
+ERROR: Invalid counter value(s). Cooperative counters should not be more than 1 different than the average!
+Time Period Total:  8369379
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 120
 ERROR: Invalid counter value(s). Cooperative counters should not be more than 1 different than the average!
-Time Period Total:  8473242
+Time Period Total:  8369345
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 150
-Time Period Total:  8473200
+ERROR: Invalid counter value(s). Cooperative counters should not be more than 1 different than the average!
+Time Period Total:  8369345
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 180
-Time Period Total:  8473218
+ERROR: Invalid counter value(s). Cooperative counters should not be more than 1 different than the average!
+Time Period Total:  8369345
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 210
 ERROR: Invalid counter value(s). Cooperative counters should not be more than 1 different than the average!
-Time Period Total:  8473217
+Time Period Total:  8369345
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 240
 ERROR: Invalid counter value(s). Cooperative counters should not be more than 1 different than the average!
-Time Period Total:  8473200
+Time Period Total:  8369345
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 270
 ERROR: Invalid counter value(s). Cooperative counters should not be more than 1 different than the average!
-Time Period Total:  8473200
+Time Period Total:  8369345
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 300
 ERROR: Invalid counter value(s). Cooperative counters should not be more than 1 different than the average!
-Time Period Total:  8473200
+Time Period Total:  8369345
 
 
 
@@ -106,40 +112,308 @@ Finished building: ThreadMetricBenchmarkFreeRTOS_MessageProcessing.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_MessageProcessing.elf"
    text     data      bss      dec      hex  filename
-   9324       24    12832    22180     56a4  ThreadMetricBenchmarkFreeRTOS_MessageProcessing.elf
+   9972       28    19012    29012     7154  ThreadMetricBenchmarkFreeRTOS_MessageProcessing.elf
 Finished building: ThreadMetricBenchmarkFreeRTOS_MessageProcessing.siz
  
 
+
 **** Thread-Metric Message Processing Test **** Relative Time: 30
-Time Period Total:  2251873
+Time Period Total:  2158124
 
 **** Thread-Metric Message Processing Test **** Relative Time: 60
-Time Period Total:  2251801
+Time Period Total:  2158115
 
 **** Thread-Metric Message Processing Test **** Relative Time: 90
-Time Period Total:  2251801
+Time Period Total:  2158116
 
 **** Thread-Metric Message Processing Test **** Relative Time: 120
-Time Period Total:  2251800
+Time Period Total:  2158116
 
 **** Thread-Metric Message Processing Test **** Relative Time: 150
-Time Period Total:  2251870
+Time Period Total:  2158115
 
 **** Thread-Metric Message Processing Test **** Relative Time: 180
-Time Period Total:  2251869
+Time Period Total:  2158116
 
 **** Thread-Metric Message Processing Test **** Relative Time: 210
-Time Period Total:  2251870
+Time Period Total:  2158116
 
 **** Thread-Metric Message Processing Test **** Relative Time: 240
-Time Period Total:  2251869
+Time Period Total:  2158116
 
 **** Thread-Metric Message Processing Test **** Relative Time: 270
-Time Period Total:  2251870
+Time Period Total:  2158115
 
 **** Thread-Metric Message Processing Test **** Relative Time: 300
-Time Period Total:  2251869
+Time Period Total:  2158116
 
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_MutexBargingTest.elf"  "ThreadMetricBenchmarkFreeRTOS_MutexBargingTest.hex"
+Finished building: ThreadMetricBenchmarkFreeRTOS_MutexBargingTest.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_MutexBargingTest.elf"
+   text     data      bss      dec      hex  filename
+  12920       28    64704    77652    12f54  ThreadMetricBenchmarkFreeRTOS_MutexBargingTest.elf
+Finished building: ThreadMetricBenchmarkFreeRTOS_MutexBargingTest.siz
+
+
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 30
+Total ops this window : 2269690
+  Workers (total)     : 2149666
+  Interlopers (total) : 120024  (barge fraction: 0.052)
+  -- Workers --
+    Worker 0 (pri 10): 537415
+    Worker 1 (pri 10): 536900
+    Worker 2 (pri 10): 537416
+    Worker 3 (pri 10): 537935
+  -- Interlopers --
+    Interloper 0 (pri 3): 30006
+    Interloper 1 (pri 3): 30006
+    Interloper 2 (pri 3): 30006
+    Interloper 3 (pri 3): 30006
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 60
+Total ops this window : 2269980
+  Workers (total)     : 2149816
+  Interlopers (total) : 120164  (barge fraction: 0.052)
+  -- Workers --
+    Worker 0 (pri 10): 537454
+    Worker 1 (pri 10): 537971
+    Worker 2 (pri 10): 537455
+    Worker 3 (pri 10): 536936
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 90
+Total ops this window : 2262662
+  Workers (total)     : 2142498
+  Interlopers (total) : 120164  (barge fraction: 0.053)
+  -- Workers --
+    Worker 0 (pri 10): 535624
+    Worker 1 (pri 10): 535625
+    Worker 2 (pri 10): 535625
+    Worker 3 (pri 10): 535624
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 120
+Total ops this window : 2262692
+  Workers (total)     : 2142528
+  Interlopers (total) : 120164  (barge fraction: 0.053)
+  -- Workers --
+    Worker 0 (pri 10): 535630
+    Worker 1 (pri 10): 535632
+    Worker 2 (pri 10): 535633
+    Worker 3 (pri 10): 535633
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 150
+Total ops this window : 2262677
+  Workers (total)     : 2142513
+  Interlopers (total) : 120164  (barge fraction: 0.053)
+  -- Workers --
+    Worker 0 (pri 10): 535629
+    Worker 1 (pri 10): 535627
+    Worker 2 (pri 10): 535627
+    Worker 3 (pri 10): 535630
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 180
+Total ops this window : 2269980
+  Workers (total)     : 2149816
+  Interlopers (total) : 120164  (barge fraction: 0.052)
+  -- Workers --
+    Worker 0 (pri 10): 537455
+    Worker 1 (pri 10): 536936
+    Worker 2 (pri 10): 537453
+    Worker 3 (pri 10): 537972
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 210
+Total ops this window : 2269980
+  Workers (total)     : 2149816
+  Interlopers (total) : 120164  (barge fraction: 0.052)
+  -- Workers --
+    Worker 0 (pri 10): 537454
+    Worker 1 (pri 10): 537972
+    Worker 2 (pri 10): 537453
+    Worker 3 (pri 10): 536937
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 240
+Total ops this window : 2269980
+  Workers (total)     : 2149816
+  Interlopers (total) : 120164  (barge fraction: 0.052)
+  -- Workers --
+    Worker 0 (pri 10): 537454
+    Worker 1 (pri 10): 536937
+    Worker 2 (pri 10): 537453
+    Worker 3 (pri 10): 537972
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 270
+Total ops this window : 2269980
+  Workers (total)     : 2149816
+  Interlopers (total) : 120164  (barge fraction: 0.052)
+  -- Workers --
+    Worker 0 (pri 10): 537454
+    Worker 1 (pri 10): 537972
+    Worker 2 (pri 10): 537453
+    Worker 3 (pri 10): 536937
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 300
+Total ops this window : 2269980
+  Workers (total)     : 2149816
+  Interlopers (total) : 120164  (barge fraction: 0.052)
+  -- Workers --
+    Worker 0 (pri 10): 537454
+    Worker 1 (pri 10): 536937
+    Worker 2 (pri 10): 537453
+    Worker 3 (pri 10): 537972
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_MutexProcessing.elf"  "ThreadMetricBenchmarkFreeRTOS_MutexProcessing.hex"
+Finished building: ThreadMetricBenchmarkFreeRTOS_MutexProcessing.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_MutexProcessing.elf"
+   text     data      bss      dec      hex  filename
+  11892       28    18852    30772     7834  ThreadMetricBenchmarkFreeRTOS_MutexProcessing.elf
+Finished building: ThreadMetricBenchmarkFreeRTOS_MutexProcessing.siz
+
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 30
+Total ops this window: 2422003
+  Worker 0: 605500
+  Worker 1: 605501
+  Worker 2: 605501
+  Worker 3: 605501
+  Min / Max: 605500 / 605501
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 60
+Total ops this window: 2421975
+  Worker 0: 605494
+  Worker 1: 605494
+  Worker 2: 605494
+  Worker 3: 605493
+  Min / Max: 605493 / 605494
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 90
+Total ops this window: 2421976
+  Worker 0: 605494
+  Worker 1: 605494
+  Worker 2: 605494
+  Worker 3: 605494
+  Min / Max: 605494 / 605494
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 120
+Total ops this window: 2421975
+  Worker 0: 605494
+  Worker 1: 605493
+  Worker 2: 605494
+  Worker 3: 605494
+  Min / Max: 605493 / 605494
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 150
+Total ops this window: 2421976
+  Worker 0: 605494
+  Worker 1: 605494
+  Worker 2: 605494
+  Worker 3: 605494
+  Min / Max: 605494 / 605494
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 180
+Total ops this window: 2421975
+  Worker 0: 605494
+  Worker 1: 605494
+  Worker 2: 605493
+  Worker 3: 605494
+  Min / Max: 605493 / 605494
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 210
+Total ops this window: 2421975
+  Worker 0: 605493
+  Worker 1: 605494
+  Worker 2: 605494
+  Worker 3: 605494
+  Min / Max: 605493 / 605494
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 240
+Total ops this window: 2421976
+  Worker 0: 605494
+  Worker 1: 605494
+  Worker 2: 605494
+  Worker 3: 605494
+  Min / Max: 605494 / 605494
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 270
+Total ops this window: 2421975
+  Worker 0: 605494
+  Worker 1: 605494
+  Worker 2: 605494
+  Worker 3: 605493
+  Min / Max: 605493 / 605494
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 300
+Total ops this window: 2421976
+  Worker 0: 605494
+  Worker 1: 605494
+  Worker 2: 605494
+  Worker 3: 605494
+  Min / Max: 605494 / 605494
+  Fairness ratio: 1.000
 
 
 
@@ -151,39 +425,41 @@ Finished building: ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling.elf"
    text     data      bss      dec      hex  filename
-   8100       24    12584    20708     50e4  ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling.elf
+   9560       28    18780    28368     6ed0  ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling.elf
 Finished building: ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling.siz
 
 
+
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 30
-Time Period Total:  2366665
+Time Period Total:  2380400
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 60
-Time Period Total:  2366646
+Time Period Total:  2380391
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 90
-Time Period Total:  2366648
+Time Period Total:  2380393
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 120
-Time Period Total:  2366646
+Time Period Total:  2380391
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 150
-Time Period Total:  2366640
+Time Period Total:  2380392
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 180
-Time Period Total:  2366641
+Time Period Total:  2380393
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 210
-Time Period Total:  2366641
+Time Period Total:  2380390
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 240
-Time Period Total:  2366640
+Time Period Total:  2380392
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 270
-Time Period Total:  2366641
+Time Period Total:  2380393
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 300
-Time Period Total:  2366640
+Time Period Total:  2380390
+
 
 
 
@@ -196,39 +472,41 @@ Finished building: ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing.elf"
    text     data      bss      dec      hex  filename
-   9096       24    12640    21760     5500  ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing.elf
+  10164       28    64900    75092    12554  ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing.elf
 Finished building: ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing.siz
 
 
+
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 30
-Time Period Total:  4112398
+Time Period Total:  3910907
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 60
-Time Period Total:  4112309
+Time Period Total:  3910892
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 90
-Time Period Total:  4112310
+Time Period Total:  3910892
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 120
-Time Period Total:  4112309
+Time Period Total:  3910892
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 150
-Time Period Total:  4112298
+Time Period Total:  3910892
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 180
-Time Period Total:  4112298
+Time Period Total:  3910892
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 210
-Time Period Total:  4112298
+Time Period Total:  3910892
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 240
-Time Period Total:  4112298
+Time Period Total:  3910892
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 270
-Time Period Total:  4112298
+Time Period Total:  3910892
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 300
-Time Period Total:  4112298
+Time Period Total:  3910892
+
 
 
 
@@ -242,39 +520,42 @@ Finished building: ThreadMetricBenchmarkTaktOS_BasicProcessing.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_BasicProcessing.elf"
    text     data      bss      dec      hex  filename
-   5141       20    15600    20761     5119  ThreadMetricBenchmarkTaktOS_BasicProcessing.elf
+   5697       28    21204    26929     6931  ThreadMetricBenchmarkTaktOS_BasicProcessing.elf
 Finished building: ThreadMetricBenchmarkTaktOS_BasicProcessing.siz
 
 
+
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 30
-Time Period Total:  124657
+Time Period Total:  143765
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 60
-Time Period Total:  124658
+Time Period Total:  143765
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 90
-Time Period Total:  124657
+Time Period Total:  143765
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 120
-Time Period Total:  124658
+Time Period Total:  143765
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 150
-Time Period Total:  124658
+Time Period Total:  143766
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 180
-Time Period Total:  124658
+Time Period Total:  143765
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 210
-Time Period Total:  124657
+Time Period Total:  143765
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 240
-Time Period Total:  124658
+Time Period Total:  143765
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 270
-Time Period Total:  124658
+Time Period Total:  143766
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 300
-Time Period Total:  124657
+Time Period Total:  143765
+
+
 
 
 
@@ -286,40 +567,40 @@ Finished building: ThreadMetricBenchmarkTaktOS_CooperativeScheduling.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_CooperativeScheduling.elf"
    text     data      bss      dec      hex  filename
-   5931       20    11520    17471     443f  ThreadMetricBenchmarkTaktOS_CooperativeScheduling.elf
+   7531       28    17140    24699     607b  ThreadMetricBenchmarkTaktOS_CooperativeScheduling.elf
 Finished building: ThreadMetricBenchmarkTaktOS_CooperativeScheduling.siz
 
 
+
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 30
-Time Period Total:  16349993
+Time Period Total:  13823070
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 60
-Time Period Total:  16349938
+Time Period Total:  13823021
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 90
-Time Period Total:  16349937
+Time Period Total:  13823021
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 120
-Time Period Total:  16349937
+Time Period Total:  13823021
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 150
-Time Period Total:  16349936
+Time Period Total:  13823020
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 180
-Time Period Total:  16349937
+Time Period Total:  13823020
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 210
-Time Period Total:  16349936
+Time Period Total:  13823020
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 240
-Time Period Total:  16349937
+Time Period Total:  13823020
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 270
-Time Period Total:  16349936
+Time Period Total:  13823020
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 300
-Time Period Total:  16349937
-
+Time Period Total:  13823020
 
 
 
@@ -332,39 +613,313 @@ Finished building: ThreadMetricBenchmarkTaktOS_MessageProcessing.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_MessageProcessing.elf"
    text     data      bss      dec      hex  filename
-   6039       20    11736    17795     4583  ThreadMetricBenchmarkTaktOS_MessageProcessing.elf
+   6555       24    17268    23847     5d27  ThreadMetricBenchmarkTaktOS_MessageProcessing.elf
 Finished building: ThreadMetricBenchmarkTaktOS_MessageProcessing.siz
 
 
+
 **** Thread-Metric Message Processing Test **** Relative Time: 30
-Time Period Total:  9034284
+Time Period Total:  8952221
 
 **** Thread-Metric Message Processing Test **** Relative Time: 60
-Time Period Total:  9034250
+Time Period Total:  8952189
 
 **** Thread-Metric Message Processing Test **** Relative Time: 90
-Time Period Total:  9034249
+Time Period Total:  8952189
 
 **** Thread-Metric Message Processing Test **** Relative Time: 120
-Time Period Total:  9034250
+Time Period Total:  8952190
 
 **** Thread-Metric Message Processing Test **** Relative Time: 150
-Time Period Total:  9034249
+Time Period Total:  8952189
 
 **** Thread-Metric Message Processing Test **** Relative Time: 180
-Time Period Total:  9034249
+Time Period Total:  8952189
 
 **** Thread-Metric Message Processing Test **** Relative Time: 210
-Time Period Total:  9034249
+Time Period Total:  8952189
 
 **** Thread-Metric Message Processing Test **** Relative Time: 240
-Time Period Total:  9034249
+Time Period Total:  8952189
 
 **** Thread-Metric Message Processing Test **** Relative Time: 270
-Time Period Total:  9034249
+Time Period Total:  8952189
 
 **** Thread-Metric Message Processing Test **** Relative Time: 300
-Time Period Total:  9034250
+Time Period Total:  8952189
+
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkTaktOS_MutexBargingTest.elf"  "ThreadMetricBenchmarkTaktOS_MutexBargingTest.hex"
+Finished building: ThreadMetricBenchmarkTaktOS_MutexBargingTest.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_MutexBargingTest.elf"
+   text     data      bss      dec      hex  filename
+   9232       24    16852    26108     65fc  ThreadMetricBenchmarkTaktOS_MutexBargingTest.elf
+Finished building: ThreadMetricBenchmarkTaktOS_MutexBargingTest.siz
+
+
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 30
+Total ops this window : 6637541
+  Workers (total)     : 6517517
+  Interlopers (total) : 120024  (barge fraction: 0.018)
+  -- Workers --
+    Worker 0 (pri 10): 1629380
+    Worker 1 (pri 10): 1629379
+    Worker 2 (pri 10): 1629379
+    Worker 3 (pri 10): 1629379
+  -- Interlopers --
+    Interloper 0 (pri 3): 30006
+    Interloper 1 (pri 3): 30006
+    Interloper 2 (pri 3): 30006
+    Interloper 3 (pri 3): 30006
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 60
+Total ops this window : 6637657
+  Workers (total)     : 6517493
+  Interlopers (total) : 120164  (barge fraction: 0.018)
+  -- Workers --
+    Worker 0 (pri 10): 1629373
+    Worker 1 (pri 10): 1629374
+    Worker 2 (pri 10): 1629373
+    Worker 3 (pri 10): 1629373
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 90
+Total ops this window : 6637657
+  Workers (total)     : 6517493
+  Interlopers (total) : 120164  (barge fraction: 0.018)
+  -- Workers --
+    Worker 0 (pri 10): 1629373
+    Worker 1 (pri 10): 1629373
+    Worker 2 (pri 10): 1629374
+    Worker 3 (pri 10): 1629373
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 120
+Total ops this window : 6637657
+  Workers (total)     : 6517493
+  Interlopers (total) : 120164  (barge fraction: 0.018)
+  -- Workers --
+    Worker 0 (pri 10): 1629373
+    Worker 1 (pri 10): 1629373
+    Worker 2 (pri 10): 1629373
+    Worker 3 (pri 10): 1629374
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 150
+Total ops this window : 6637656
+  Workers (total)     : 6517492
+  Interlopers (total) : 120164  (barge fraction: 0.018)
+  -- Workers --
+    Worker 0 (pri 10): 1629373
+    Worker 1 (pri 10): 1629373
+    Worker 2 (pri 10): 1629373
+    Worker 3 (pri 10): 1629373
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 180
+Total ops this window : 6637661
+  Workers (total)     : 6517497
+  Interlopers (total) : 120164  (barge fraction: 0.018)
+  -- Workers --
+    Worker 0 (pri 10): 1629375
+    Worker 1 (pri 10): 1629374
+    Worker 2 (pri 10): 1629374
+    Worker 3 (pri 10): 1629374
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 210
+Total ops this window : 6633486
+  Workers (total)     : 6513322
+  Interlopers (total) : 120164  (barge fraction: 0.018)
+  -- Workers --
+    Worker 0 (pri 10): 1628330
+    Worker 1 (pri 10): 1628331
+    Worker 2 (pri 10): 1628331
+    Worker 3 (pri 10): 1628330
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 240
+Total ops this window : 6633486
+  Workers (total)     : 6513322
+  Interlopers (total) : 120164  (barge fraction: 0.018)
+  -- Workers --
+    Worker 0 (pri 10): 1628331
+    Worker 1 (pri 10): 1628330
+    Worker 2 (pri 10): 1628330
+    Worker 3 (pri 10): 1628331
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 270
+Total ops this window : 6633486
+  Workers (total)     : 6513322
+  Interlopers (total) : 120164  (barge fraction: 0.018)
+  -- Workers --
+    Worker 0 (pri 10): 1628330
+    Worker 1 (pri 10): 1628331
+    Worker 2 (pri 10): 1628331
+    Worker 3 (pri 10): 1628330
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 300
+Total ops this window : 6633486
+  Workers (total)     : 6513322
+  Interlopers (total) : 120164  (barge fraction: 0.018)
+  -- Workers --
+    Worker 0 (pri 10): 1628331
+    Worker 1 (pri 10): 1628330
+    Worker 2 (pri 10): 1628330
+    Worker 3 (pri 10): 1628331
+  -- Interlopers --
+    Interloper 0 (pri 3): 30041
+    Interloper 1 (pri 3): 30041
+    Interloper 2 (pri 3): 30041
+    Interloper 3 (pri 3): 30041
+
+
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkTaktOS_MutexProcessing.elf"  "ThreadMetricBenchmarkTaktOS_MutexProcessing.hex"
+Finished building: ThreadMetricBenchmarkTaktOS_MutexProcessing.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_MutexProcessing.elf"
+   text     data      bss      dec      hex  filename
+   8158       24    16820    25002     61aa  ThreadMetricBenchmarkTaktOS_MutexProcessing.elf
+Finished building: ThreadMetricBenchmarkTaktOS_MutexProcessing.siz
+
+
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 30
+Total ops this window: 6916366
+  Worker 0: 1729092
+  Worker 1: 1729092
+  Worker 2: 1729091
+  Worker 3: 1729091
+  Min / Max: 1729091 / 1729092
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 60
+Total ops this window: 6916026
+  Worker 0: 1729006
+  Worker 1: 1729006
+  Worker 2: 1729007
+  Worker 3: 1729007
+  Min / Max: 1729006 / 1729007
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 90
+Total ops this window: 6916025
+  Worker 0: 1729007
+  Worker 1: 1729006
+  Worker 2: 1729006
+  Worker 3: 1729006
+  Min / Max: 1729006 / 1729007
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 120
+Total ops this window: 6916026
+  Worker 0: 1729006
+  Worker 1: 1729007
+  Worker 2: 1729007
+  Worker 3: 1729006
+  Min / Max: 1729006 / 1729007
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 150
+Total ops this window: 6916236
+  Worker 0: 1729059
+  Worker 1: 1729059
+  Worker 2: 1729059
+  Worker 3: 1729059
+  Min / Max: 1729059 / 1729059
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 180
+Total ops this window: 6916237
+  Worker 0: 1729059
+  Worker 1: 1729059
+  Worker 2: 1729059
+  Worker 3: 1729060
+  Min / Max: 1729059 / 1729060
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 210
+Total ops this window: 6916237
+  Worker 0: 1729060
+  Worker 1: 1729059
+  Worker 2: 1729059
+  Worker 3: 1729059
+  Min / Max: 1729059 / 1729060
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 240
+Total ops this window: 6916236
+  Worker 0: 1729059
+  Worker 1: 1729059
+  Worker 2: 1729059
+  Worker 3: 1729059
+  Min / Max: 1729059 / 1729059
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 270
+Total ops this window: 6916237
+  Worker 0: 1729059
+  Worker 1: 1729060
+  Worker 2: 1729059
+  Worker 3: 1729059
+  Min / Max: 1729059 / 1729060
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 300
+Total ops this window: 6916236
+  Worker 0: 1729059
+  Worker 1: 1729059
+  Worker 2: 1729059
+  Worker 3: 1729059
+  Min / Max: 1729059 / 1729059
+  Fairness ratio: 1.000
 
 
 
@@ -377,39 +932,40 @@ Finished building: ThreadMetricBenchmarkTaktOS_PreemptiveScheduling.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_PreemptiveScheduling.elf"
    text     data      bss      dec      hex  filename
-   5752       20    11520    17292     438c  ThreadMetricBenchmarkTaktOS_PreemptiveScheduling.elf
+   7276       28    16884    24188     5e7c  ThreadMetricBenchmarkTaktOS_PreemptiveScheduling.elf
 Finished building: ThreadMetricBenchmarkTaktOS_PreemptiveScheduling.siz
 
 
+
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 30
-Time Period Total:  5095945
+Time Period Total:  4793998
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 60
-Time Period Total:  5095925
+Time Period Total:  4793912
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 90
-Time Period Total:  5096033
+Time Period Total:  4793913
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 120
-Time Period Total:  5095927
+Time Period Total:  4793912
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 150
-Time Period Total:  5095925
+Time Period Total:  4793900
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 180
-Time Period Total:  5095926
+Time Period Total:  4793897
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 210
-Time Period Total:  5095926
+Time Period Total:  4793898
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 240
-Time Period Total:  5095926
+Time Period Total:  4793900
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 270
-Time Period Total:  5096032
+Time Period Total:  4793898
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 300
-Time Period Total:  5095926
+Time Period Total:  4793897
 
 
 
@@ -422,40 +978,40 @@ Finished building: ThreadMetricBenchmarkTaktOS_SynchronizationProcessing.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_SynchronizationProcessing.elf"
    text     data      bss      dec      hex  filename
-   5618       20    11520    17158     4306  ThreadMetricBenchmarkTaktOS_SynchronizationProcessing.elf
+   6102       24    16788    22914     5982  ThreadMetricBenchmarkTaktOS_SynchronizationProcessing.elf
 Finished building: ThreadMetricBenchmarkTaktOS_SynchronizationProcessing.siz
 
 
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 30
-Time Period Total:  21289997
+Time Period Total:  20381997
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 60
-Time Period Total:  21289905
+Time Period Total:  20381956
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 90
-Time Period Total:  21289906
+Time Period Total:  20381956
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 120
-Time Period Total:  21289906
+Time Period Total:  20381956
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 150
-Time Period Total:  21289904
+Time Period Total:  20381897
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 180
-Time Period Total:  21289905
+Time Period Total:  20381897
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 210
-Time Period Total:  21289905
+Time Period Total:  20381897
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 240
-Time Period Total:  21289904
+Time Period Total:  20381897
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 270
-Time Period Total:  21289905
+Time Period Total:  20381897
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 300
-Time Period Total:  21289905
+Time Period Total:  20381897
 
 
 
@@ -471,39 +1027,40 @@ Finished building: ThreadMetricBenchmarkThreadX_BasicProcessing.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_BasicProcessing.elf"
    text     data      bss      dec      hex  filename
-   5650       24    27368    33042     8112  ThreadMetricBenchmarkThreadX_BasicProcessing.elf
+   6074       28    27660    33762     83e2  ThreadMetricBenchmarkThreadX_BasicProcessing.elf
 Finished building: ThreadMetricBenchmarkThreadX_BasicProcessing.siz
 
 
+
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 30
-Time Period Total:  124701
+Time Period Total:  124641
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 60
-Time Period Total:  124702
+Time Period Total:  124641
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 90
-Time Period Total:  124702
+Time Period Total:  124641
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 120
-Time Period Total:  124702
+Time Period Total:  124641
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 150
-Time Period Total:  124701
+Time Period Total:  124641
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 180
-Time Period Total:  124702
+Time Period Total:  124641
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 210
-Time Period Total:  124701
+Time Period Total:  124641
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 240
-Time Period Total:  124702
+Time Period Total:  124641
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 270
-Time Period Total:  124701
+Time Period Total:  124641
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 300
-Time Period Total:  124702
+Time Period Total:  124641
 
 
 
@@ -516,39 +1073,42 @@ Finished building: ThreadMetricBenchmarkThreadX_CooperativeScheduling.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_CooperativeScheduling.elf"
    text     data      bss      dec      hex  filename
-   6492       24    23288    29804     746c  ThreadMetricBenchmarkThreadX_CooperativeScheduling.elf
+   7928       28    18892    26848     68e0  ThreadMetricBenchmarkThreadX_CooperativeScheduling.elf
 Finished building: ThreadMetricBenchmarkThreadX_CooperativeScheduling.siz
  
 
+
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 30
-Time Period Total:  10660792
+Time Period Total:  10498173
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 60
-Time Period Total:  10660793
+Time Period Total:  10497871
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 90
-Time Period Total:  10660794
+Time Period Total:  10497870
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 120
-Time Period Total:  10660794
+Time Period Total:  10497870
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 150
-Time Period Total:  10660764
+Time Period Total:  10498152
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 180
-Time Period Total:  10660764
+Time Period Total:  10497840
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 210
-Time Period Total:  10660764
+Time Period Total:  10497840
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 240
-Time Period Total:  10660764
+Time Period Total:  10497840
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 270
-Time Period Total:  10660765
+Time Period Total:  10498152
 
 **** Thread-Metric Cooperative Scheduling Test **** Relative Time: 300
-Time Period Total:  10660764
+Time Period Total:  10497840
+
+
 
 
 
@@ -560,40 +1120,308 @@ Finished building: ThreadMetricBenchmarkThreadX_MessageProcessing.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_MessageProcessing.elf"
    text     data      bss      dec      hex  filename
-   6802       24    12804    19630     4cae  ThreadMetricBenchmarkThreadX_MessageProcessing.elf
+   7234       28    35444    42706     a6d2  ThreadMetricBenchmarkThreadX_MessageProcessing.elf
 Finished building: ThreadMetricBenchmarkThreadX_MessageProcessing.siz
 
 
 **** Thread-Metric Message Processing Test **** Relative Time: 30
-Time Period Total:  6749274
+Time Period Total:  6564268
 
 **** Thread-Metric Message Processing Test **** Relative Time: 60
-Time Period Total:  6749153
+Time Period Total:  6564390
 
 **** Thread-Metric Message Processing Test **** Relative Time: 90
-Time Period Total:  6749153
+Time Period Total:  6564384
 
 **** Thread-Metric Message Processing Test **** Relative Time: 120
-Time Period Total:  6749153
+Time Period Total:  6564384
 
 **** Thread-Metric Message Processing Test **** Relative Time: 150
-Time Period Total:  6749359
+Time Period Total:  6564365
 
 **** Thread-Metric Message Processing Test **** Relative Time: 180
-Time Period Total:  6749360
+Time Period Total:  6564371
 
 **** Thread-Metric Message Processing Test **** Relative Time: 210
-Time Period Total:  6749360
+Time Period Total:  6564365
 
 **** Thread-Metric Message Processing Test **** Relative Time: 240
-Time Period Total:  6749359
+Time Period Total:  6564364
 
 **** Thread-Metric Message Processing Test **** Relative Time: 270
-Time Period Total:  6749360
+Time Period Total:  6564365
 
 **** Thread-Metric Message Processing Test **** Relative Time: 300
-Time Period Total:  6749360
+Time Period Total:  6564371
 
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkThreadX_MutexBargingTest.elf"  "ThreadMetricBenchmarkThreadX_MutexBargingTest.hex"
+Finished building: ThreadMetricBenchmarkThreadX_MutexBargingTest.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_MutexBargingTest.elf"
+   text     data      bss      dec      hex  filename
+  10661       28    35068    45757     b2bd  ThreadMetricBenchmarkThreadX_MutexBargingTest.elf
+Finished building: ThreadMetricBenchmarkThreadX_MutexBargingTest.siz
+
+
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 30
+Total ops this window : 3582145
+  Workers (total)     : 3462121
+  Interlopers (total) : 120024  (barge fraction: 0.033)
+  -- Workers --
+    Worker 0 (pri 10): 865531
+    Worker 1 (pri 10): 865530
+    Worker 2 (pri 10): 865530
+    Worker 3 (pri 10): 865530
+  -- Interlopers --
+    Interloper 0 (pri 3): 30006
+    Interloper 1 (pri 3): 30006
+    Interloper 2 (pri 3): 30006
+    Interloper 3 (pri 3): 30006
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 60
+Total ops this window : 3582270
+  Workers (total)     : 3462110
+  Interlopers (total) : 120160  (barge fraction: 0.033)
+  -- Workers --
+    Worker 0 (pri 10): 865527
+    Worker 1 (pri 10): 865528
+    Worker 2 (pri 10): 865528
+    Worker 3 (pri 10): 865527
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 90
+Total ops this window : 3582264
+  Workers (total)     : 3462104
+  Interlopers (total) : 120160  (barge fraction: 0.033)
+  -- Workers --
+    Worker 0 (pri 10): 865526
+    Worker 1 (pri 10): 865526
+    Worker 2 (pri 10): 865526
+    Worker 3 (pri 10): 865526
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 120
+Total ops this window : 3582270
+  Workers (total)     : 3462110
+  Interlopers (total) : 120160  (barge fraction: 0.033)
+  -- Workers --
+    Worker 0 (pri 10): 865528
+    Worker 1 (pri 10): 865527
+    Worker 2 (pri 10): 865527
+    Worker 3 (pri 10): 865528
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 150
+Total ops this window : 3582246
+  Workers (total)     : 3462086
+  Interlopers (total) : 120160  (barge fraction: 0.033)
+  -- Workers --
+    Worker 0 (pri 10): 865521
+    Worker 1 (pri 10): 865522
+    Worker 2 (pri 10): 865522
+    Worker 3 (pri 10): 865521
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 180
+Total ops this window : 3582246
+  Workers (total)     : 3462086
+  Interlopers (total) : 120160  (barge fraction: 0.033)
+  -- Workers --
+    Worker 0 (pri 10): 865522
+    Worker 1 (pri 10): 865521
+    Worker 2 (pri 10): 865521
+    Worker 3 (pri 10): 865522
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 210
+Total ops this window : 3582246
+  Workers (total)     : 3462086
+  Interlopers (total) : 120160  (barge fraction: 0.033)
+  -- Workers --
+    Worker 0 (pri 10): 865521
+    Worker 1 (pri 10): 865522
+    Worker 2 (pri 10): 865522
+    Worker 3 (pri 10): 865521
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 240
+Total ops this window : 3582246
+  Workers (total)     : 3462086
+  Interlopers (total) : 120160  (barge fraction: 0.033)
+  -- Workers --
+    Worker 0 (pri 10): 865522
+    Worker 1 (pri 10): 865521
+    Worker 2 (pri 10): 865521
+    Worker 3 (pri 10): 865522
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 270
+Total ops this window : 3582246
+  Workers (total)     : 3462086
+  Interlopers (total) : 120160  (barge fraction: 0.033)
+  -- Workers --
+    Worker 0 (pri 10): 865521
+    Worker 1 (pri 10): 865522
+    Worker 2 (pri 10): 865522
+    Worker 3 (pri 10): 865521
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 300
+Total ops this window : 3582246
+  Workers (total)     : 3462086
+  Interlopers (total) : 120160  (barge fraction: 0.033)
+  -- Workers --
+    Worker 0 (pri 10): 865522
+    Worker 1 (pri 10): 865521
+    Worker 2 (pri 10): 865521
+    Worker 3 (pri 10): 865522
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkThreadX_MutexProcessing.elf"  "ThreadMetricBenchmarkThreadX_MutexProcessing.hex"
+Finished building: ThreadMetricBenchmarkThreadX_MutexProcessing.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_MutexProcessing.elf"
+   text     data      bss      dec      hex  filename
+   9595       28    35036    44659     ae73  ThreadMetricBenchmarkThreadX_MutexProcessing.elf
+Finished building: ThreadMetricBenchmarkThreadX_MutexProcessing.siz
+
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 30
+Total ops this window: 3693263
+  Worker 0: 923316
+  Worker 1: 923316
+  Worker 2: 923316
+  Worker 3: 923315
+  Min / Max: 923315 / 923316
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 60
+Total ops this window: 3693291
+  Worker 0: 923323
+  Worker 1: 923323
+  Worker 2: 923322
+  Worker 3: 923323
+  Min / Max: 923322 / 923323
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 90
+Total ops this window: 3693292
+  Worker 0: 923323
+  Worker 1: 923323
+  Worker 2: 923323
+  Worker 3: 923323
+  Min / Max: 923323 / 923323
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 120
+Total ops this window: 3693292
+  Worker 0: 923323
+  Worker 1: 923323
+  Worker 2: 923323
+  Worker 3: 923323
+  Min / Max: 923323 / 923323
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 150
+Total ops this window: 3693281
+  Worker 0: 923320
+  Worker 1: 923320
+  Worker 2: 923321
+  Worker 3: 923320
+  Min / Max: 923320 / 923321
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 180
+Total ops this window: 3693281
+  Worker 0: 923320
+  Worker 1: 923320
+  Worker 2: 923320
+  Worker 3: 923321
+  Min / Max: 923320 / 923321
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 210
+Total ops this window: 3693281
+  Worker 0: 923321
+  Worker 1: 923320
+  Worker 2: 923320
+  Worker 3: 923320
+  Min / Max: 923320 / 923321
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 240
+Total ops this window: 3693307
+  Worker 0: 923326
+  Worker 1: 923327
+  Worker 2: 923327
+  Worker 3: 923327
+  Min / Max: 923326 / 923327
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 270
+Total ops this window: 3693307
+  Worker 0: 923327
+  Worker 1: 923327
+  Worker 2: 923327
+  Worker 3: 923326
+  Min / Max: 923326 / 923327
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 300
+Total ops this window: 3693281
+  Worker 0: 923320
+  Worker 1: 923320
+  Worker 2: 923320
+  Worker 3: 923321
+  Min / Max: 923320 / 923321
+  Fairness ratio: 0.999
 
 
 
@@ -605,42 +1433,40 @@ Finished building: ThreadMetricBenchmarkThreadX_PreemptiveScheduling.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_PreemptiveScheduling.elf"
    text     data      bss      dec      hex  filename
-   6553       24    23288    29865     74a9  ThreadMetricBenchmarkThreadX_PreemptiveScheduling.elf
+   7977       28    34972    42977     a7e1  ThreadMetricBenchmarkThreadX_PreemptiveScheduling.elf
 Finished building: ThreadMetricBenchmarkThreadX_PreemptiveScheduling.siz
  
 
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 30
-Time Period Total:  4396370
+Time Period Total:  4354417
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 60
-Time Period Total:  4396394
+Time Period Total:  4354388
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 90
-Time Period Total:  4396399
+Time Period Total:  4354384
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 120
-Time Period Total:  4396392
+Time Period Total:  4354383
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 150
-Time Period Total:  4396380
+Time Period Total:  4354381
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 180
-Time Period Total:  4396380
+Time Period Total:  4354376
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 210
-Time Period Total:  4396389
+Time Period Total:  4354371
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 240
-Time Period Total:  4396380
+Time Period Total:  4354370
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 270
-Time Period Total:  4396381
+Time Period Total:  4354380
 
 **** Thread-Metric Preemptive Scheduling Test **** Relative Time: 300
-Time Period Total:  4396380
-
-
+Time Period Total:  4354376
 
 
 
@@ -653,227 +1479,46 @@ Finished building: ThreadMetricBenchmarkThreadX_SynchronizationProcessing.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_SynchronizationProcessing.elf"
    text     data      bss      dec      hex  filename
-   6205       24    23304    29533     735d  ThreadMetricBenchmarkThreadX_SynchronizationProcessing.elf
+   6625       28    34980    41633     a2a1  ThreadMetricBenchmarkThreadX_SynchronizationProcessing.elf
 Finished building: ThreadMetricBenchmarkThreadX_SynchronizationProcessing.siz
 
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 30
-Time Period Total:  15334273
+Time Period Total:  14632104
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 60
-Time Period Total:  15334304
+Time Period Total:  14632464
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 90
-Time Period Total:  15334305
+Time Period Total:  14632464
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 120
-Time Period Total:  15334304
+Time Period Total:  14632464
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 150
-Time Period Total:  15334262
+Time Period Total:  14632422
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 180
-Time Period Total:  15334262
+Time Period Total:  14632266
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 210
-Time Period Total:  15334261
+Time Period Total:  14632422
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 240
-Time Period Total:  15334262
+Time Period Total:  14632421
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 270
-Time Period Total:  15334261
+Time Period Total:  14632422
 
 **** Thread-Metric Synchronization Processing Test **** Relative Time: 300
-Time Period Total:  15334262
+Time Period Total:  14632422
+
+
 
 
 ========================================================================
 
 
-Invoking: Cross ARM GNU Create Flash Image
-arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkPX5_BasicProcessing.elf"  "ThreadMetricBenchmarkPX5_BasicProcessing.hex"
-Finished building: ThreadMetricBenchmarkPX5_BasicProcessing.hex
- 
-Invoking: Cross ARM GNU Print Size
-arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkPX5_BasicProcessing.elf"
-   text     data      bss      dec      hex  filename
-   8436       24    34108    42568     a648  ThreadMetricBenchmarkPX5_BasicProcessing.elf
-Finished building: ThreadMetricBenchmarkPX5_BasicProcessing.siz
-
-
-**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 30
-Time Period Total:  116823
-
-**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 60
-Time Period Total:  116825
-
-**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 90
-Time Period Total:  116825
-
-**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 120
-Time Period Total:  116825
-
-**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 150
-Time Period Total:  116825
-
-**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 180
-Time Period Total:  116824
-
-**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 210
-Time Period Total:  116825
-
-**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 240
-Time Period Total:  116824
-
-**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 270
-Time Period Total:  116825
-
-**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 300
-Time Period Total:  116825
-
-
-
-Invoking: Cross ARM GNU Create Flash Image
-arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkPX5_CooperativeScheduling.elf"  "ThreadMetricBenchmarkPX5_CooperativeScheduling.hex"
-Finished building: ThreadMetricBenchmarkPX5_CooperativeScheduling.hex
- 
-Invoking: Cross ARM GNU Print Size
-arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkPX5_CooperativeScheduling.elf"
-   text     data      bss      dec      hex  filename
-   9184       24    30028    39236     9944  ThreadMetricBenchmarkPX5_CooperativeScheduling.elf
-Finished building: ThreadMetricBenchmarkPX5_CooperativeScheduling.siz
-
-
-**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 30
-Time Period Total:  15094377
-
-**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 60
-Time Period Total:  15095237
-
-**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 90
-Time Period Total:  15095116
-
-**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 120
-Time Period Total:  15095245
-
-**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 150
-Time Period Total:  15091378
-
-**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 180
-Time Period Total:  15091372
-
-**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 210
-Time Period Total:  15095068
-
-**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 240
-Time Period Total:  15091379
-
-**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 270
-Time Period Total:  15091373
-
-**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 300
-Time Period Total:  15095137
-
-
-
-Invoking: Cross ARM GNU Create Flash Image
-arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkPX5_MessageProcessing.elf"  "ThreadMetricBenchmarkPX5_MessageProcessing.hex"
-Finished building: ThreadMetricBenchmarkPX5_MessageProcessing.hex
- 
-Invoking: Cross ARM GNU Print Size
-arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkPX5_MessageProcessing.elf"
-   text     data      bss      dec      hex  filename
-   9756       24    30052    39832     9b98  ThreadMetricBenchmarkPX5_MessageProcessing.elf
-Finished building: ThreadMetricBenchmarkPX5_MessageProcessing.siz
-
-
-**** Thread-Metric Message Processing Test **** Relative Time: 30
-Time Period Total:  4454225
-
-**** Thread-Metric Message Processing Test **** Relative Time: 60
-Time Period Total:  4454081
-
-**** Thread-Metric Message Processing Test **** Relative Time: 90
-Time Period Total:  4454082
-
-**** Thread-Metric Message Processing Test **** Relative Time: 120
-Time Period Total:  4454081
-
-**** Thread-Metric Message Processing Test **** Relative Time: 150
-Time Period Total:  4454218
-
-**** Thread-Metric Message Processing Test **** Relative Time: 180
-Time Period Total:  4454218
-
-**** Thread-Metric Message Processing Test **** Relative Time: 210
-Time Period Total:  4454218
-
-**** Thread-Metric Message Processing Test **** Relative Time: 240
-Time Period Total:  4454218
-
-**** Thread-Metric Message Processing Test **** Relative Time: 270
-Time Period Total:  4454218
-
-**** Thread-Metric Message Processing Test **** Relative Time: 300
-Time Period Total:  4454218
-
-
-Invoking: Cross ARM GNU Create Flash Image
-arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkPX5_PreemptiveScheduling.elf"  "ThreadMetricBenchmarkPX5_PreemptiveScheduling.hex"
-Finished building: ThreadMetricBenchmarkPX5_PreemptiveScheduling.hex
- 
-Invoking: Cross ARM GNU Print Size
-arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkPX5_PreemptiveScheduling.elf"
-   text     data      bss      dec      hex  filename
-   9072       24    30108    39204     9924  ThreadMetricBenchmarkPX5_PreemptiveScheduling.elf
-Finished building: ThreadMetricBenchmarkPX5_PreemptiveScheduling.siz
-
-
-
-
-
-
-Invoking: Cross ARM GNU Create Flash Image
-arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkPX5_SynchronizationProcessing.elf"  "ThreadMetricBenchmarkPX5_SynchronizationProcessing.hex"
-Finished building: ThreadMetricBenchmarkPX5_SynchronizationProcessing.hex
- 
-Invoking: Cross ARM GNU Print Size
-arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkPX5_SynchronizationProcessing.elf"
-   text     data      bss      dec      hex  filename
-   9274       24    30100    39398     99e6  ThreadMetricBenchmarkPX5_SynchronizationProcessing.elf
-Finished building: ThreadMetricBenchmarkPX5_SynchronizationProcessing.siz
-
-
-**** Thread-Metric Synchronization Processing Test **** Relative Time: 30
-Time Period Total:  10080369
-
-**** Thread-Metric Synchronization Processing Test **** Relative Time: 60
-Time Period Total:  10080127
-
-**** Thread-Metric Synchronization Processing Test **** Relative Time: 90
-Time Period Total:  10080127
-
-**** Thread-Metric Synchronization Processing Test **** Relative Time: 120
-Time Period Total:  10080127
-
-**** Thread-Metric Synchronization Processing Test **** Relative Time: 150
-Time Period Total:  10080098
-
-**** Thread-Metric Synchronization Processing Test **** Relative Time: 180
-Time Period Total:  10080099
-
-**** Thread-Metric Synchronization Processing Test **** Relative Time: 210
-Time Period Total:  10080098
-
-**** Thread-Metric Synchronization Processing Test **** Relative Time: 240
-Time Period Total:  10080099
-
-**** Thread-Metric Synchronization Processing Test **** Relative Time: 270
-Time Period Total:  10080098
-
-**** Thread-Metric Synchronization Processing Test **** Relative Time: 300
-Time Period Total:  10080099
 
 
 

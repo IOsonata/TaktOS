@@ -56,14 +56,19 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
-			<name>src/tm_api.h</name>
+			<name>src/threadx_initialize_low_level.S</name>
 			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/src/tm_api.h</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/src/threadx_initialize_low_level.S</locationURI>
 		</link>
 		<link>
-			<name>src/tm_port.c</name>
+			<name>src/tm_api.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/tm_port.c</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/include/tm_api.h</locationURI>
+		</link>
+		<link>
+			<name>src/tm_port_threadx.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/src/tm_port_threadx.c</locationURI>
 		</link>
 		<link>
 			<name>src/tm_report.c</name>
@@ -71,14 +76,9 @@
 			<locationURI>PARENT-3-PROJECT_LOC/src/tm_report.c</locationURI>
 		</link>
 		<link>
-			<name>src/tx_initialize_low_level.S</name>
-			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/tx_initialize_low_level.S</locationURI>
-		</link>
-		<link>
 			<name>src/tx_user.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/src/tx_user.h</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/include/tx_user.h</locationURI>
 		</link>
 		<link>
 			<name>threadx_common_src/inc</name>
