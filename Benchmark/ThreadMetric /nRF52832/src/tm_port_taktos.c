@@ -228,7 +228,7 @@ void tm_initialize(void (*test_initialization_function)(void))
     g_kernel_started = false;
 
     tm_set_system_handler_priorities();
-    if (TaktOSInit(TM_TAKTOS_CORE_CLOCK_HZ, TM_TAKTOS_TICK_HZ, TAKTOS_TICK_CLOCK_PROCESSOR) != TAKTOS_OK) {
+    if (TaktOSInit(TM_TAKTOS_CORE_CLOCK_HZ, TM_TAKTOS_TICK_HZ, TAKTOS_TICK_CLOCK_PROCESSOR, 0) != TAKTOS_OK) {
         tm_check_fail("FATAL: TaktOSInit failed\n");
     }
 
