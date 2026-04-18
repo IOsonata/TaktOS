@@ -1,1 +1,0 @@
-Unpack or copy the FreeRTOS-Kernel source tree into this directory before importing/building.
