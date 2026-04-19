@@ -31,11 +31,6 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
-			<name>tm_port_freertos.c</name>
-			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/src/tm_port_freertos.c</locationURI>
-		</link>
-		<link>
 			<name>src/FreeRTOSConfig.h</name>
 			<type>1</type>
 			<locationURI>PARENT-1-PROJECT_LOC/src/FreeRTOSConfig.h</locationURI>
@@ -59,6 +54,11 @@
 			<name>src/tm_api.h</name>
 			<type>1</type>
 			<locationURI>PARENT-3-PROJECT_LOC/src/tm_api.h</locationURI>
+		</link>
+		<link>
+			<name>src/tm_port_freertos.c</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/src/tm_port_freertos.c</locationURI>
 		</link>
 		<link>
 			<name>src/tm_report.c</name>

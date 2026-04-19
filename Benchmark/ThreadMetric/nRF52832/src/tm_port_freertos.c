@@ -15,7 +15,7 @@
 // FreeRTOS port, but targets real Cortex-M4 hardware instead of POSIX/QEMU.
 // -----------------------------------------------------------------------------
 
-#define TM_FREERTOS_MAX_THREADS      15
+#define TM_FREERTOS_MAX_THREADS      12
 #define TM_FREERTOS_MAX_QUEUES       1
 #define TM_FREERTOS_MAX_SEMAPHORES   1
 #define TM_FREERTOS_MAX_MUTEXES      1
