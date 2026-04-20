@@ -274,7 +274,7 @@ MPU/PMP guard regions are library build options, not application defines.
 | **BlueSonata** | Bluetooth connectivity layer |
 | **IOcomposer** | System orchestration |
 
-Documented in *Beyond Blinky* by Nguyen Hoan Hoang.
+IOsonata architecture (the Land/Roots/Trees/Fruit orchard metaphor and `DevIntrf_t` driver model that TaktOS builds on) is documented in *Beyond Blinky* by Nguyen Hoan Hoang.
 
 ---
 
