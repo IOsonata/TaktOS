@@ -31,7 +31,7 @@ So the operational rule is: **immediate yield in normal Thread mode; deferred yi
 
 | | ARM Cortex-M |
 |---|---|
-| **Targets** | Cortex-M0/M0+, M4/M4F, M33, M55 |
+| **Targets** | Cortex-M0/M0+, M4/M4F, M7, M33, M55 |
 | **Context switch** | ~47 cycles ¹ |
 | **Interrupt model** | Application owns all IRQ vectors |
 | **Memory model** | Static allocation only — zero heap |
@@ -61,37 +61,50 @@ When the RV32 port is implemented, candidate first validation targets are:
 | Test | TaktOS | ThreadX | FreeRTOS | T / TX | T / FR |
 |---|---|---|---|---|---|
 | TM1  Basic Processing      |    374,404 |    374,403 |    374,303 | 1.00× | 1.00× |
-| TM2  Cooperative Scheduling | 39,161,183 | 26,466,010 | 26,291,926 | **1.48×** | **1.49×** |
-| TM3  Preemptive Scheduling  | 13,287,261 | 11,757,317 |  6,717,021 | **1.13×** | **1.98×** |
-| TM6  Message Processing     | 27,608,741 | 18,811,775 |  6,922,811 | **1.47×** | **3.99×** |
-| TM7  Synchronization        | 59,961,406 | 38,375,092 | 11,317,134 | **1.56×** | **5.30×** |
-| TM8  Mutex Processing       | 19,319,865 | 10,158,918 |  7,259,902 | **1.90×** | **2.66×** |
-| **Geometric mean (TM2–TM8)** | | | | **1.49×** | **2.78×** |
+| TM2  Cooperative Scheduling | 39,161,183 | 26,466,010 | 26,474,445 | **1.48×** | **1.48×** |
+| TM3  Preemptive Scheduling  | 13,287,261 | 11,757,316 |  6,721,773 | **1.13×** | **1.98×** |
+| TM6  Message Processing     | 27,608,741 | 19,092,528 |  6,947,836 | **1.45×** | **3.97×** |
+| TM7  Synchronization        | 59,961,406 | 38,375,092 | 11,555,762 | **1.56×** | **5.19×** |
+| TM8  Mutex Processing       | 19,679,521 | 10,105,427 |  7,259,902 | **1.95×** | **2.71×** |
+| **Geometric mean (TM2–TM8)** | | | | **1.49×** | **2.77×** |
 
 **TM1 note:** All three RTOSes score essentially the same on single-thread compute — no context switches occur during the TM1 window.
 
-**Binary size (TM7 Synchronization `.text`):**
+**Binary size — TM7 Synchronization `.text`** *(via `arm-none-eabi-size --format=berkeley` on the linked ELF; all three built with GCC 15.2.1, `-Os`, `--gc-sections`, same Thread-Metric harness)*:
 
 | RTOS | .text bytes | vs TaktOS |
 |---|---|---|
-| TaktOS   |  6,102 | — |
-| ThreadX  | 41,633 | +582% |
-| FreeRTOS | 75,092 | +1,131% |
+| TaktOS   |  6,494 | — |
+| ThreadX  |  7,239 | +11.5% |
+| FreeRTOS |  8,824 | +35.9% |
+
+`.data` and `.bss` are not shown: both are dominated by test-harness static allocations (thread stacks, message-queue buffers, and for FreeRTOS the `configTOTAL_HEAP_SIZE` pool in `heap_4.c`). Those are per-port harness choices, not kernel properties.
 
 ---
 
 ### nRF52832 · Cortex-M4 · 64 MHz · GCC 15.2.1 · `-Os` · 1 kHz tick
 
-PX5 included where available. FreeRTOS TM2 ⚠ — determinism error every window, value is informational only.
+FreeRTOS TM2 ⚠ — determinism error every window, value is informational only.
 
-| Test | TaktOS | ThreadX | FreeRTOS | PX5 | T / TX | T / FR |
-|---|---|---|---|---|---|---|
-| TM1  Basic Processing       |    143,765 |    124,641 |    124,608 |    116,825 | 1.15× | 1.15× |
-| TM2  Cooperative Scheduling | 13,823,020 | 10,497,840 |  8,369,345⚠ | 15,095,137 | 1.32× | 1.65× |
-| TM3  Preemptive Scheduling  |  4,793,897 |  4,354,376 |  2,380,390 |  4,354,376 | **1.10×** | **2.01×** |
-| TM6  Message Processing     |  8,952,189 |  6,564,371 |  2,158,116 |  4,454,218 | **1.36×** | **4.15×** |
-| TM7  Synchronization        | 20,381,897 | 14,632,422 |  3,910,892 | — | **1.39×** | **5.21×** |
-| TM8  Mutex Processing       |  6,916,236 |  3,693,281 |  2,421,976 | — | **1.87×** | **2.86×** |
+| Test | TaktOS | ThreadX | FreeRTOS | T / TX | T / FR |
+|---|---|---|---|---|---|
+| TM1  Basic Processing       |    143,765 |    124,641 |    124,608 | 1.15× | 1.15× |
+| TM2  Cooperative Scheduling | 13,823,020 | 10,497,840 |  8,369,345⚠ | 1.32× | 1.65× |
+| TM3  Preemptive Scheduling  |  4,793,897 |  4,354,376 |  2,380,390 | **1.10×** | **2.01×** |
+| TM6  Message Processing     |  8,952,189 |  6,564,371 |  2,158,116 | **1.36×** | **4.15×** |
+| TM7  Synchronization        | 20,381,897 | 14,632,422 |  3,910,892 | **1.39×** | **5.21×** |
+| TM8  Mutex Processing       |  6,916,236 |  3,693,281 |  2,421,976 | **1.87×** | **2.86×** |
+| **Geometric mean (TM2–TM8)** | | | | **1.39×** | **2.90×** |
+
+**Binary size — TM7 Synchronization `.text`:**
+
+| RTOS | .text bytes | vs TaktOS |
+|---|---|---|
+| TaktOS   |  6,102 | — |
+| ThreadX  |  6,625 | +8.6% |
+| FreeRTOS | 10,164 | +66.6% |
+
+**PX5 on nRF52832:** Eclipse projects for PX5 exist under `Benchmark/ThreadMetric/nRF52832/` but the committed `TestResults.txt` does not contain PX5 console logs for this MCU. PX5 numbers will be added once the raw logs are captured alongside the other RTOSes in the same run, so the full table is reproducible from one file.
 
 **TM4 and TM5 are not run.** TM4 requires a hardware timer IRQ owned by the test harness — TaktOS does not own application IRQs by design. TM5 measures dynamic memory allocation — TaktOS has no heap by design.
 
@@ -129,7 +142,8 @@ TaktOS/
 │   ├── src/systick.h         # IOsonata Land-layer: SysTick MMIO primitives
 │   ├── src/TaktKernelCM.cpp  # TaktOSTickInit() + TaktOSStackInit()
 │   ├── cm0/PendSV_M0.S       # SAFETY BOUNDARY — M0/M0+
-│   ├── cm4/PendSV_M4.S       # SAFETY BOUNDARY — M4/M7
+│   ├── cm4/PendSV_M4.S       # SAFETY BOUNDARY — M4/M4F
+│   ├── cm7/PendSV_M7.S       # SAFETY BOUNDARY — M7
 │   ├── cm33/PendSV_M33.S     # SAFETY BOUNDARY — M33
 │   └── cm55/PendSV_M55.S     # SAFETY BOUNDARY — M55
 ├── RISCV/                    # EXPERIMENTAL — placeholder RV32 work, not functional
@@ -229,9 +243,11 @@ If you prefer to manage toolchains yourself:
 
 | Target | Prefix | ISA flags |
 |---|---|---|
-| ARM Cortex-M4/M7 | `arm-none-eabi-` | `-mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard` |
-| ARM Cortex-M33/M55 | `arm-none-eabi-` | `-mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard` |
 | ARM Cortex-M0/M0+ | `arm-none-eabi-` | `-mcpu=cortex-m0plus` |
+| ARM Cortex-M4/M4F | `arm-none-eabi-` | `-mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard` |
+| ARM Cortex-M7 | `arm-none-eabi-` | `-mcpu=cortex-m7 -mfpu=fpv5-sp-d16 -mfloat-abi=hard` |
+| ARM Cortex-M33 | `arm-none-eabi-` | `-mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard` |
+| ARM Cortex-M55 | `arm-none-eabi-` | `-mcpu=cortex-m55 -mfpu=fpv5-sp-d16 -mfloat-abi=hard` |
 
 All targets: `-std=gnu++23 -fno-exceptions -fno-rtti -Os`
 
@@ -265,10 +281,13 @@ Documented in *Beyond Blinky* by Nguyen Hoan Hoang.
 ## Status
 
 - [x] ARM Cortex-M0/M0+ port
-- [x] ARM Cortex-M4/M7/M33/M55 port — Thread-Metric validated on nRF52832 and nRF54L15
+- [x] ARM Cortex-M4/M4F port — Thread-Metric validated on nRF52832
+- [x] ARM Cortex-M7 port — functional, no Thread-Metric run yet
+- [x] ARM Cortex-M33 port — Thread-Metric validated on nRF54L15
+- [x] ARM Cortex-M55 port — functional, no Thread-Metric run yet
 - [x] POSIX PSE51 layer (pthread, sem, mqueue, timer)
 - [x] Thread-Metric TM1/TM2/TM3/TM6/TM7/TM8 — TaktOS, FreeRTOS, ThreadX on nRF52832 and nRF54L15
-- [x] PX5 measured on nRF52832 (TM1/TM2/TM3/TM6/TM7)
+- [ ] PX5 on nRF52832 — Eclipse projects built; raw console logs pending capture into `TestResults.txt`
 - [ ] RISC-V RV32IMAC port — **planned, not implemented.** `RISCV/` directory contains experimental placeholder only.
 - [ ] MC/DC coverage run (`test/unit/`)
 - [ ] IEC 61508 SIL 2 certification campaign
