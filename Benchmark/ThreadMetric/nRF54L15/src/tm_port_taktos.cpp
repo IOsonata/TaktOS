@@ -65,7 +65,7 @@ typedef struct TmThreadDesc_s {
     void          (*entry)(void);
     bool            materialized;
     TaktOSThread    thread;
-    uint8_t         mem[TAKTOS_THREAD_STACK_SIZE(TM_TAKTOS_STACK_BYTES)] __attribute__((aligned(4)));
+    uint8_t         mem[TAKTOS_THREAD_MEM_SIZE(TM_TAKTOS_STACK_BYTES)] __attribute__((aligned(4)));
 } TmThreadDesc_t;
 #pragma pack(pop)
 
