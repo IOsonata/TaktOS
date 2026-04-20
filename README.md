@@ -104,7 +104,7 @@ FreeRTOS TM2 ⚠ — determinism error every window, value is informational only
 | ThreadX  |  6,625 | +8.6% |
 | FreeRTOS | 10,164 | +66.6% |
 
-**PX5 on nRF52832:** Eclipse projects for PX5 exist under `Benchmark/ThreadMetric/nRF52832/` but the committed `TestResults.txt` does not contain PX5 console logs for this MCU. PX5 numbers will be added once the raw logs are captured alongside the other RTOSes in the same run, so the full table is reproducible from one file.
+**PX5 on nRF52832:** Eclipse projects for PX5 exist under `Benchmark/ThreadMetric/nRF52832/` but no PX5 number is published in this repo. The PX5 demo package cannot be configured the same way TaktOS, FreeRTOS, and ThreadX are tuned for this benchmark (optimization level, inlining, kernel options), so running it against them would violate the apples-to-apples methodology used throughout this work. Published PX5 numbers (Beningo, 2024) are cited separately in the engineering benchmark report where relevant, but are not re-run or presented as our measurement.
 
 **TM4 and TM5 are not run.** TM4 requires a hardware timer IRQ owned by the test harness — TaktOS does not own application IRQs by design. TM5 measures dynamic memory allocation — TaktOS has no heap by design.
 
@@ -239,6 +239,36 @@ If you prefer to manage toolchains yourself:
 
 ## Build
 
+### How TaktOS integrates with your firmware
+
+The TaktOS kernel **builds to a static library**, one `.a` per architecture
+variant. Your firmware is a **separate application project** that links
+against that library. Nothing from the kernel is merged into your source
+tree — no `taktos_config.h` to edit, no kernel generator, no devicetree.
+
+Kernel library builds live under `ARM/<arch>/Eclipse/<config>/`. Example:
+`ARM/cm4/Eclipse/ReleaseFPU/` builds to `libTaktOS_M4.a` — the Cortex-M4
++ FPU hard-float, size-optimized kernel. Build it by importing
+`ARM/cm4/Eclipse/` as an Eclipse project and hitting build; the `.a`
+lands in the `ReleaseFPU/` output folder.
+
+In your firmware's `.cproject` (or Makefile), link as:
+
+    -L .../ARM/cm4/Eclipse/ReleaseFPU
+    -lTaktOS_M4
+    -I .../include          # public API: TaktOS.h, TaktOSThread.h, ...
+    -I .../ARM/include      # arch types: TAKTOS_THREAD_STACK_LAYOUT_OVERHEAD
+
+The Thread-Metric projects under `Benchmark/ThreadMetric/` are worked
+examples of this model on five different MCUs.
+
+**Why a library rather than source-in-tree:**
+- Clean certification boundary — the library is the SEooC; your app is not.
+- No config drift across projects — all tunables are runtime arguments to
+  `TaktOSInit()`.
+- Same kernel binary on every project targeting the same core — MC/DC
+  coverage runs once, not per firmware.
+
 ### Toolchains
 
 | Target | Prefix | ISA flags |
@@ -253,7 +283,6 @@ All targets: `-std=gnu++23 -fno-exceptions -fno-rtti -Os`
 
 ### Configuration
 
-TaktOS ships as a precompiled static library per architecture variant.
 There is no user config header. All kernel parameters are passed at runtime:
 
 ```c
@@ -272,7 +301,7 @@ MPU/PMP guard regions are library build options, not application defines.
 | **TaktOS** | Deterministic kernel — bare-metal RTOS (this repo) |
 | **IOsonata** | Driver/interface framework (`DevIntrf_t` bus injection) |
 | **BlueSonata** | Bluetooth connectivity layer |
-| **IOcomposer** | System orchestration |
+| **IOcomposer** | AI-assisted embedded IDE / development environment |
 
 IOsonata architecture (the Land/Roots/Trees/Fruit orchard metaphor and `DevIntrf_t` driver model that TaktOS builds on) is documented in *Beyond Blinky* by Nguyen Hoan Hoang.
 
@@ -287,7 +316,6 @@ IOsonata architecture (the Land/Roots/Trees/Fruit orchard metaphor and `DevIntrf
 - [x] ARM Cortex-M55 port — functional, no Thread-Metric run yet
 - [x] POSIX PSE51 layer (pthread, sem, mqueue, timer)
 - [x] Thread-Metric TM1/TM2/TM3/TM6/TM7/TM8 — TaktOS, FreeRTOS, ThreadX on nRF52832 and nRF54L15
-- [ ] PX5 on nRF52832 — Eclipse projects built; raw console logs pending capture into `TestResults.txt`
 - [ ] RISC-V RV32IMAC port — **planned, not implemented.** `RISCV/` directory contains experimental placeholder only.
 - [ ] MC/DC coverage run (`test/unit/`)
 - [ ] IEC 61508 SIL 2 certification campaign
@@ -296,4 +324,4 @@ TM4 and TM5 are not planned: TM4 requires kernel-owned IRQs (TaktOS does not hav
 
 ---
 
-*TaktOS · Rev 3.3 · April 2026 · I-SYST inc.*
+Copyright (c) 2026 I-SYST Inc. TaktOS is released under the MIT License — see [LICENSE](LICENSE).
