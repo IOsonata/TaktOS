@@ -40,7 +40,7 @@ So the operational rule is: **immediate yield in normal Thread mode; deferred yi
 | **Certification target** | IEC 61508 SIL 2 → ASIL D (SEooC) |
 | **Platform integration** | IOsonata Land-layer primitives |
 
-¹ llvm-mca cycle budget. DWT on-target validation pending.
+¹ Design target from llvm-mca cycle budget. Measured performance via Thread-Metric on real hardware (nRF52832 M4, nRF54L15 M33).
 
 **RISC-V RV32 port:** planned. The `RISCV/` directory in this repository contains early experimental work only; nothing there is functional or ready for use. No RISC-V Thread-Metric results are published. Do not treat anything under `RISCV/` as a working port.
 
@@ -177,7 +177,7 @@ TaktOS is supplied as an **IEC 61508 Safety Element out of Context (SEooC)** wit
 Evidence artifacts provided with TaktOS are intended to support the integrator's safety case:
 
 - MC/DC coverage reports (portable kernel modules, run on x86 host)
-- Branch/line coverage reports for per-variant assembly (on-target via DWT)
+- Branch/line coverage reports for per-variant assembly
 - Requirements traceability between engineering specification, source, and tests
 - Unit test suite (host-native, Google Test, no arch dependency)
 - FMEA worksheets and development process documentation
@@ -269,7 +269,6 @@ Documented in *Beyond Blinky* by Nguyen Hoan Hoang.
 - [x] POSIX PSE51 layer (pthread, sem, mqueue, timer)
 - [x] Thread-Metric TM1/TM2/TM3/TM6/TM7/TM8 — TaktOS, FreeRTOS, ThreadX on nRF52832 and nRF54L15
 - [x] PX5 measured on nRF52832 (TM1/TM2/TM3/TM6/TM7)
-- [ ] DWT validation on STM32F407 — **required before cycle-count publication**
 - [ ] RISC-V RV32IMAC port — **planned, not implemented.** `RISCV/` directory contains experimental placeholder only.
 - [ ] MC/DC coverage run (`test/unit/`)
 - [ ] IEC 61508 SIL 2 certification campaign

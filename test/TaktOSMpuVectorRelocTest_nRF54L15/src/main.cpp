@@ -102,11 +102,11 @@ SOFTWARE.
 static uint32_t gRamVectorTable[APP_VECTOR_WORD_COUNT]
     __attribute__((aligned(APP_VECTOR_ALIGN_BYTES)));
 
-static uint8_t gProducerThreadMem[TAKTOS_THREAD_STACK_SIZE(512u)]
+static uint8_t gProducerThreadMem[TAKTOS_THREAD_MEM_SIZE(512u)]
     __attribute__((aligned(TAKTOS_STACK_GUARD_ALIGN)));
-static uint8_t gConsumerThreadMem[TAKTOS_THREAD_STACK_SIZE(512u)]
+static uint8_t gConsumerThreadMem[TAKTOS_THREAD_MEM_SIZE(512u)]
     __attribute__((aligned(TAKTOS_STACK_GUARD_ALIGN)));
-static uint8_t gFaultThreadMem[TAKTOS_THREAD_STACK_SIZE(512u)]
+static uint8_t gFaultThreadMem[TAKTOS_THREAD_MEM_SIZE(512u)]
     __attribute__((aligned(TAKTOS_STACK_GUARD_ALIGN)));
 
 static TaktOSSem_t gSem;
