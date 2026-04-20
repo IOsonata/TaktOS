@@ -1,6 +1,6 @@
 # TaktOS
 
-**Deterministic kernel for ARM Cortex-M and RISC-V RV32**
+**Deterministic kernel for ARM Cortex-M**  *(RISC-V RV32 port planned)*
 
 [![IEC 61508 SIL 2 target](https://img.shields.io/badge/IEC%2061508-SIL%202%20target-blue)](docs/)
 [![ISO 26262 ASIL D path](https://img.shields.io/badge/ISO%2026262-ASIL%20D%20path-blue)](docs/)
@@ -29,65 +29,84 @@ So the operational rule is: **immediate yield in normal Thread mode; deferred yi
 
 ## At a glance
 
-| | ARM Cortex-M | RISC-V RV32IMAC |
-|---|---|---|
-| **Targets** | Cortex-M0/M0+, M4/M4F, M33, M55 | RV32IMAC machine mode (Zbb recommended) |
-| **Context switch** | ~47 cycles ¹ | ~88 cycles Zbb / ~98 no-Zbb ¹ |
-| **Interrupt model** | Application owns all IRQ vectors | same |
-| **Memory model** | Static allocation only — zero heap | same |
-| **Scheduler core** | ~590 LOC portable C++23 | same |
-| **Public API** | POSIX PSE51 (`pthread`, `sem_t`, `mq`, `timer`) + native C/C++ | same |
-| **Certification target** | IEC 61508 SIL 2 → ASIL D (SEooC) | separate arch port |
-| **Platform integration** | IOsonata Land-layer primitives | same model |
+| | ARM Cortex-M |
+|---|---|
+| **Targets** | Cortex-M0/M0+, M4/M4F, M33, M55 |
+| **Context switch** | ~47 cycles ¹ |
+| **Interrupt model** | Application owns all IRQ vectors |
+| **Memory model** | Static allocation only — zero heap |
+| **Scheduler core** | ~590 LOC portable C++23 |
+| **Public API** | POSIX PSE51 (`pthread`, `sem_t`, `mq`, `timer`) + native C/C++ |
+| **Certification target** | IEC 61508 SIL 2 → ASIL D (SEooC) |
+| **Platform integration** | IOsonata Land-layer primitives |
 
-¹ Design targets from llvm-mca cycle budget. DWT (ARM) and mcycle (RISC-V) on-target validation pending.
+¹ llvm-mca cycle budget. DWT on-target validation pending.
+
+**RISC-V RV32 port:** planned. The `RISCV/` directory in this repository contains early experimental work only; nothing there is functional or ready for use. No RISC-V Thread-Metric results are published. Do not treat anything under `RISCV/` as a working port.
+
+When the RV32 port is implemented, candidate first validation targets are:
+
+- **CV32E40P on FPGA** (Digilent Arty A7). Open-core IP from OpenHW Group, upstream OpenOCD, `riscv-none-elf-` toolchain — fully open workflow.
+- **Renesas R9A02G021** (Andes N22, RV32IMAC). Requires a specific workflow: **both TaktOS and IOsonata must be built inside Renesas e² studio** for source-level debug to work. The E2 Lite probe protocol and the Andes debug-module variant on this part are not supported by mainline OpenOCD, so debug is only available through the Renesas GDB server bundled with e² studio. Integrators who do not need debug can build the application with any `riscv-none-elf-` toolchain of their choice and flash the resulting image using Renesas Flash Programmer — build-and-flash without debug.
 
 ---
 
 ## On-target benchmark results — Thread-Metric
 
-**Platform:** nRF54L15 · Cortex-M33 · 128 MHz · arm-none-eabi-gcc 15.2.1 · `-Os` · 1 kHz tick  
-**Suite:** eclipse-threadx/threadx Thread-Metric (MIT) · steady-state 300-second iteration counts (higher = better)  
-**Build:** All three RTOSes built with identical flags on the same MCU. ThreadX tested with source code.
+**Suite:** eclipse-threadx/threadx Thread-Metric (MIT) — steady-state iteration counts, higher = better.  
+**Build:** All RTOSes compiled with identical flags on the same MCU. ThreadX tested with source code.
+
+### nRF54L15 · Cortex-M33 · 128 MHz · GCC 15.2.1 · `-Os` · 1 kHz tick
 
 | Test | TaktOS | ThreadX | FreeRTOS | T / TX | T / FR |
 |---|---|---|---|---|---|
-| TM1  Basic Processing | 374,422 | 374,403 | 374,303 | 1.00× | 1.00× |
-| TM2  Cooperative Scheduling | 42,176,813 | 26,466,010 | 26,474,445 | **1.59×** | **1.59×** |
-| TM3  Preemptive Scheduling | 13,362,618 | 11,757,316 | 6,721,773 | **1.14×** | **1.99×** |
-| TM6  Message Processing | 27,609,742 | 19,092,528 | 6,947,836 | **1.45×** | **3.97×** |
-| TM7  Synchronization | 59,964,325 | 38,375,092 | 11,555,762 | **1.56×** | **5.19×** |
-| **Geometric mean (TM2–TM7)** | | | | **1.42×** | **2.84×** |
+| TM1  Basic Processing      |    374,404 |    374,403 |    374,303 | 1.00× | 1.00× |
+| TM2  Cooperative Scheduling | 39,161,183 | 26,466,010 | 26,291,926 | **1.48×** | **1.49×** |
+| TM3  Preemptive Scheduling  | 13,287,261 | 11,757,317 |  6,717,021 | **1.13×** | **1.98×** |
+| TM6  Message Processing     | 27,608,741 | 18,811,775 |  6,922,811 | **1.47×** | **3.99×** |
+| TM7  Synchronization        | 59,961,406 | 38,375,092 | 11,317,134 | **1.56×** | **5.30×** |
+| TM8  Mutex Processing       | 19,319,865 | 10,158,918 |  7,259,902 | **1.90×** | **2.66×** |
+| **Geometric mean (TM2–TM8)** | | | | **1.49×** | **2.78×** |
 
-TaktOS, ThreadX, and FreeRTOS all produced stable steady-state windows in these runs.
+**TM1 note:** All three RTOSes score essentially the same on single-thread compute — no context switches occur during the TM1 window.
 
-**TM1 note:** All three RTOSes score essentially the same on single-thread compute. No context switches occur during the TM1 window — the result reflects compiler output, not RTOS scheduling performance.
-
-**TM4 and TM5 are not run.** TM4 requires a hardware timer IRQ owned by the test harness — TaktOS does not own application IRQs by design. TM5 measures dynamic memory allocation — TaktOS has no heap by design.
-
-**Binary size (TM7 Synchronization .text):**
+**Binary size (TM7 Synchronization `.text`):**
 
 | RTOS | .text bytes | vs TaktOS |
 |---|---|---|
-| TaktOS | 6,446 | — |
-| ThreadX | 7,239 | +12% |
-| FreeRTOS | 8,824 | +37% |
+| TaktOS   |  6,102 | — |
+| ThreadX  | 41,633 | +582% |
+| FreeRTOS | 75,092 | +1,131% |
 
 ---
 
-## Why TaktOS is faster
+### nRF52832 · Cortex-M4 · 64 MHz · GCC 15.2.1 · `-Os` · 1 kHz tick
 
-### vs FreeRTOS (2.84× geometric mean, directly measured)
+PX5 included where available. FreeRTOS TM2 ⚠ — determinism error every window, value is informational only.
 
-1. **CLZ priority bitmap** — `__builtin_clz` on a 32-bit bitmap gives O(1) highest-priority lookup in the scheduler. Updated at event time; the context switch handler reads one precomputed pointer.
-2. **PRIMASK critical sections** — `MRS` + `CPSID` / `MSR`: 2 instructions, no pipeline flush. FreeRTOS `BASEPRI` requires `DSB` + `ISB` after every write (~8 cy penalty per boundary on Cortex-M4).
-3. **Inlined semaphore fast path** — `TaktOSSemGive` and `TaktOSSemTake` are `always_inline` static functions in `TaktOSSem.h`. The uncontended fast path executes with zero function-call overhead — the dominant gain on TM7.
-4. **Direct-pointer queue** — `writePtr`/`readPtr` are direct buffer addresses. Slot address is one load — no index multiply, no modulo. `TaktQueueFastCopy` uses switch-unrolled word assignments for 1–8 word messages.
-5. **Short switch path** — the context-switch hot path stays compact, minimizing front-end overhead and helping the scheduler scale cleanly as event frequency rises.
+| Test | TaktOS | ThreadX | FreeRTOS | PX5 | T / TX | T / FR |
+|---|---|---|---|---|---|---|
+| TM1  Basic Processing       |    143,765 |    124,641 |    124,608 |    116,825 | 1.15× | 1.15× |
+| TM2  Cooperative Scheduling | 13,823,020 | 10,497,840 |  8,369,345⚠ | 15,095,137 | 1.32× | 1.65× |
+| TM3  Preemptive Scheduling  |  4,793,897 |  4,354,376 |  2,380,390 |  4,354,376 | **1.10×** | **2.01×** |
+| TM6  Message Processing     |  8,952,189 |  6,564,371 |  2,158,116 |  4,454,218 | **1.36×** | **4.15×** |
+| TM7  Synchronization        | 20,381,897 | 14,632,422 |  3,910,892 | — | **1.39×** | **5.21×** |
+| TM8  Mutex Processing       |  6,916,236 |  3,693,281 |  2,421,976 | — | **1.87×** | **2.86×** |
 
-### vs ThreadX (1.42× geometric mean, directly measured, source-tuned)
+**TM4 and TM5 are not run.** TM4 requires a hardware timer IRQ owned by the test harness — TaktOS does not own application IRQs by design. TM5 measures dynamic memory allocation — TaktOS has no heap by design.
 
-ThreadX uses a precomputed `execute_ptr` updated on every ready/block operation — the same approach as TaktOS. The gap is smaller than vs FreeRTOS, but still material on nRF54L15. TaktOS leads most strongly on TM2 cooperative (1.59×) and TM7 synchronization (1.56×), where the tighter semaphore and yield paths show the clearest advantage.
+---
+
+### Effect of `TAKT_INLINE_OPTIMIZATION`
+
+`TAKT_INLINE_OPTIMIZATION` forces `TAKT_ALWAYS_INLINE` on the semaphore, mutex, and queue fast paths. Removing the define reverts those to regular function calls.
+
+| Test | nRF52832 M4  with | without | M4 Δ | nRF54L15 M33  with | without | M33 Δ |
+|---|---|---|---|---|---|---|
+| TM6 Message         |  8,952,189 |  7,663,774 | −14.4% | 27,608,741 | 22,310,845 | −19.2% |
+| TM7 Synchronization | 20,381,897 | 15,203,494 | −25.4% | 59,961,406 | 43,116,795 | −28.1% |
+
+TM7 is affected more than TM6 on both boards — the entire workload is semaphore give/take. The M33 takes a larger penalty than the M4: its instruction cache eliminates flash wait states, making BL/BX call overhead proportionally more expensive. For certification builds where `TAKT_ALWAYS_INLINE` is disabled, the *without* column is the expected performance baseline.
 
 ---
 
@@ -113,14 +132,8 @@ TaktOS/
 │   ├── cm4/PendSV_M4.S       # SAFETY BOUNDARY — M4/M7
 │   ├── cm33/PendSV_M33.S     # SAFETY BOUNDARY — M33
 │   └── cm55/PendSV_M55.S     # SAFETY BOUNDARY — M55
-├── RISCV/
-│   ├── rv32/                 # GD32VF103 / FE310 (CLINT)
-│   │   ├── arch_hal_riscv.h  # SAFETY BOUNDARY — RV32 arch-specific
-│   │   ├── ctx_switch.S      # SAFETY BOUNDARY — ~60 LOC
-│   │   └── clint.cpp         # TaktOSTickInit() — CLINT mtime/mtimecmp/MSIP
-│   └── esp32c3/              # ESP32-C3 / ESP32-C6 (SYSTIMER + interrupt matrix)
-│       ├── ctx_switch_rv32.S # SAFETY BOUNDARY
-│       └── src/TaktKernelRV32_esp32c3.cpp
+├── RISCV/                    # EXPERIMENTAL — placeholder RV32 work, not functional
+│   └── rv32/                 # skeleton files only; do not use
 ├── src/
 │   ├── taktos.cpp            # scheduler, init
 │   ├── taktos_sem.cpp        # semaphore slow paths
@@ -150,7 +163,7 @@ void *TaktOSStackInit (void *stackTop, void (*entry)(void*), void *arg);
 |---|---|---|---|
 | Land | `TaktOSCriticalSection.h`, `systick.h` | ~80 per arch | Arch files only |
 | Roots | scheduler, semaphore, mutex, queue, task | ~760 portable C++23 | None |
-| Arch port | `ARM/cm*/PendSV_*.S`, `TaktKernelCM.cpp`; `RISCV/*/ctx_switch*.S`, port cpps | ~200–300 per arch | Yes |
+| Arch port | `ARM/cm*/PendSV_*.S`, `TaktKernelCM.cpp` | ~200–300 | ARM only (RISC-V planned) |
 | Fruit | POSIX PSE51 (pthread, sem_t, mqueue, timer) | ~1,800 | None |
 
 **Safety boundary total: ~1,454 LOC** (ARM + portable C++23).
@@ -159,15 +172,17 @@ void *TaktOSStackInit (void *stackTop, void (*entry)(void*), void *arg);
 
 ## Certification strategy
 
-| Phase | Timeline | Cost estimate |
-|---|---|---|
-| IEC 61508 SIL 2 (portable kernel) | ~6 months | |
-| IEC 61508 SIL 2 (ARM arch port) | ~3 months parallel | |
-| IEC 61508 SIL 2 (RISC-V arch port) | ~3 months parallel | |
-| **Total SIL 2 (dual-arch)** | **~9–12 months** | **$600K–$1.0M** |
-| ASIL D uplift | +6 months | +$300K–$500K |
+TaktOS is supplied as an **IEC 61508 Safety Element out of Context (SEooC)** with supporting evidence artifacts. Assessment and certification of the integrated product are performed by the integrator's own assessor during product safety qualification — I-SYST does not pay for or represent that TaktOS is itself certified.
 
-~590 LOC scheduler core = minimal MC/DC burden. Static allocation, zero heap, clean safety boundary. Certifying company owns the IP.
+Evidence artifacts provided with TaktOS are intended to support the integrator's safety case:
+
+- MC/DC coverage reports (portable kernel modules, run on x86 host)
+- Branch/line coverage reports for per-variant assembly (on-target via DWT)
+- Requirements traceability between engineering specification, source, and tests
+- Unit test suite (host-native, Google Test, no arch dependency)
+- FMEA worksheets and development process documentation
+
+The small safety boundary (~1,500 LOC) is designed to keep the integrator's MC/DC tractability burden within reach. Static allocation, zero heap, application-owned IRQs, and a single critical-section mechanism are the design choices that make the boundary small — they are correct by design, not trimmed for cost.
 
 ---
 
@@ -175,7 +190,7 @@ void *TaktOSStackInit (void *stackTop, void (*entry)(void*), void *arg);
 
 The fastest way to get a working embedded toolchain is **IOcomposer** —
 an AI-assisted IDE for embedded development. One script installs the
-complete environment: IDE, GCC ARM and RISC-V toolchains, OpenOCD, and
+complete environment: IDE, GCC ARM toolchain, OpenOCD, and
 SDK paths. Typical setup time: ~15 minutes.
 
 See [iocomposer.io](https://iocomposer.io) for a 3-minute demo and full documentation.
@@ -204,7 +219,6 @@ After installing, open IOcomposer and load a TaktOS project:
 If you prefer to manage toolchains yourself:
 
 - **ARM:** [xPack GNU Arm Embedded GCC](https://github.com/xpack-dev-tools/arm-none-eabi-gcc-xpack)
-- **RISC-V:** [xPack GNU RISC-V Embedded GCC](https://github.com/xpack-dev-tools/riscv-none-elf-gcc-xpack)
 - **Debug:** [xPack OpenOCD](https://github.com/xpack-dev-tools/openocd-xpack) or SEGGER J-Link
 
 ---
@@ -218,9 +232,6 @@ If you prefer to manage toolchains yourself:
 | ARM Cortex-M4/M7 | `arm-none-eabi-` | `-mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard` |
 | ARM Cortex-M33/M55 | `arm-none-eabi-` | `-mcpu=cortex-m33 -mfpu=fpv5-sp-d16 -mfloat-abi=hard` |
 | ARM Cortex-M0/M0+ | `arm-none-eabi-` | `-mcpu=cortex-m0plus` |
-| RISC-V GD32VF103 | `riscv32-unknown-elf-` | `-march=rv32imac_zbb -mabi=ilp32` |
-| RISC-V ESP32-C3 | `riscv32-unknown-elf-` | `-march=rv32imc -mabi=ilp32` |
-| RISC-V ESP32-C6 | `riscv32-unknown-elf-` | `-march=rv32imafc_zbb -mabi=ilp32f` |
 
 All targets: `-std=gnu++23 -fno-exceptions -fno-rtti -Os`
 
@@ -230,7 +241,7 @@ TaktOS ships as a precompiled static library per architecture variant.
 There is no user config header. All kernel parameters are passed at runtime:
 
 ```c
-TaktOSInit(64000000u, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR);   // tick input Hz, tick rate Hz, tick clock source
+TaktOSInit(64000000u, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR, 0u);   // tick input Hz, tick rate Hz, tick clock source, handler base
 ```
 
 Stack overflow detection (paint+check guard word) is always active.
@@ -254,13 +265,12 @@ Documented in *Beyond Blinky* by Nguyen Hoan Hoang.
 ## Status
 
 - [x] ARM Cortex-M0/M0+ port
-- [x] ARM Cortex-M4/M7/M33/M55 port — Thread-Metric validated on nRF54L15
-- [x] RISC-V RV32IMAC port (GD32VF103 / CLINT)
-- [x] RISC-V ESP32-C3 / ESP32-C6 port (SYSTIMER + interrupt matrix)
+- [x] ARM Cortex-M4/M7/M33/M55 port — Thread-Metric validated on nRF52832 and nRF54L15
 - [x] POSIX PSE51 layer (pthread, sem, mqueue, timer)
-- [x] Thread-Metric TM1/TM2/TM3/TM6/TM7 — TaktOS, FreeRTOS, ThreadX measured on nRF54L15
+- [x] Thread-Metric TM1/TM2/TM3/TM6/TM7/TM8 — TaktOS, FreeRTOS, ThreadX on nRF52832 and nRF54L15
+- [x] PX5 measured on nRF52832 (TM1/TM2/TM3/TM6/TM7)
 - [ ] DWT validation on STM32F407 — **required before cycle-count publication**
-- [ ] mcycle validation on GD32VF103
+- [ ] RISC-V RV32IMAC port — **planned, not implemented.** `RISCV/` directory contains experimental placeholder only.
 - [ ] MC/DC coverage run (`test/unit/`)
 - [ ] IEC 61508 SIL 2 certification campaign
 
@@ -268,4 +278,4 @@ TM4 and TM5 are not planned: TM4 requires kernel-owned IRQs (TaktOS does not hav
 
 ---
 
-*TaktOS · Rev 3.2 · April 2026 · I-SYST inc.*
+*TaktOS · Rev 3.3 · April 2026 · I-SYST inc.*
