@@ -96,14 +96,14 @@
 			<locationURI>PARENT-3-PROJECT_LOC/include/tcb.h</locationURI>
 		</link>
 		<link>
-			<name>src/context.cpp</name>
+			<name>src/PendSV_M7.S</name>
 			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/src/context.cpp</locationURI>
+			<locationURI>PARENT-1-PROJECT_LOC/PendSV_M7.S</locationURI>
 		</link>
 		<link>
-			<name>src/mutex.cpp</name>
+			<name>src/TaktKernelCM.cpp</name>
 			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/src/mutex.cpp</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/src/TaktKernelCM.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/posix</name>
@@ -111,19 +111,9 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
-			<name>src/queue.cpp</name>
+			<name>src/systick.h</name>
 			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/src/queue.cpp</locationURI>
-		</link>
-		<link>
-			<name>src/scheduler.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/src/scheduler.cpp</locationURI>
-		</link>
-		<link>
-			<name>src/semaphore.cpp</name>
-			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/src/semaphore.cpp</locationURI>
+			<locationURI>PARENT-2-PROJECT_LOC/src/systick.h</locationURI>
 		</link>
 		<link>
 			<name>src/taktos.cpp</name>
@@ -131,14 +121,24 @@
 			<locationURI>PARENT-3-PROJECT_LOC/src/taktos.cpp</locationURI>
 		</link>
 		<link>
-			<name>src/tcb.cpp</name>
+			<name>src/taktos_mutex.cpp</name>
 			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/src/tcb.cpp</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/src/taktos_mutex.cpp</locationURI>
 		</link>
 		<link>
-			<name>src/tick.cpp</name>
+			<name>src/taktos_queue.cpp</name>
 			<type>1</type>
-			<locationURI>PARENT-3-PROJECT_LOC/src/tick.cpp</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/src/taktos_queue.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/taktos_sem.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/src/taktos_sem.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/taktos_thread.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/src/taktos_thread.cpp</locationURI>
 		</link>
 		<link>
 			<name>ARM/cm7/pendsv.s</name>
