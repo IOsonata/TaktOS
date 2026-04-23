@@ -1,0 +1,20 @@
+{
+  "folders": [
+    {
+      "path": "."
+    }
+  ],
+  "settings": {
+    "C_Cpp.errorSquiggles": "Disabled",
+    "nrf-connect.applications": [
+      "${workspaceFolder}/ThreadMetricBenchmarkZephyr_BasicProcessing_nRF54L15",
+      "${workspaceFolder}/ThreadMetricBenchmarkZephyr_CooperativeScheduling_nRF54L15",
+      "${workspaceFolder}/ThreadMetricBenchmarkZephyr_InterruptProcessing_nRF54L15",
+      "${workspaceFolder}/ThreadMetricBenchmarkZephyr_InterruptPreemptionProcessing_nRF54L15",
+      "${workspaceFolder}/ThreadMetricBenchmarkZephyr_MemoryAllocation_nRF54L15",
+      "${workspaceFolder}/ThreadMetricBenchmarkZephyr_MessageProcessing_nRF54L15",
+      "${workspaceFolder}/ThreadMetricBenchmarkZephyr_PreemptiveScheduling_nRF54L15",
+      "${workspaceFolder}/ThreadMetricBenchmarkZephyr_SynchronizationProcessing_nRF54L15"
+    ]
+  }
+}

@@ -1,0 +1,1510 @@
+Compiler : arm-none-eabi-gcc-15.2.1
+Optimization -Os
+Tick rate 1000Hz
+MCU : STM32L475VG
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_BasicProcessing_STM32L475VG.elf"  "ThreadMetricBenchmarkFreeRTOS_BasicProcessing_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkFreeRTOS_BasicProcessing_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_BasicProcessing_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   6300	     12	  23168	  29480	   7328	ThreadMetricBenchmarkFreeRTOS_BasicProcessing_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkFreeRTOS_BasicProcessing_STM32L475VG.siz
+
+
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 30
+Time Period Total:  212552
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 60
+Time Period Total:  212553
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 90
+Time Period Total:  212552
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 120
+Time Period Total:  212553
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 150
+Time Period Total:  212552
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 180
+Time Period Total:  212552
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 210
+Time Period Total:  212553
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 240
+Time Period Total:  212552
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 270
+Time Period Total:  212552
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 300
+Time Period Total:  212552
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_STM32L475VG.elf"  "ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   8068	     12	  19104	  27184	   6a30	ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_STM32L475VG.siz
+
+
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 30
+Time Period Total:  13101165
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 60
+Time Period Total:  13100950
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 90
+Time Period Total:  13100951
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 120
+Time Period Total:  13100950
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 150
+Time Period Total:  13100912
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 180
+Time Period Total:  13100912
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 210
+Time Period Total:  13100912
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 240
+Time Period Total:  13100913
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 270
+Time Period Total:  13100912
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 300
+ERROR: Invalid counter value(s). Cooperative counters should not be more than 1 different than the average!
+Time Period Total:  13100912
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_MessageProcessing_STM32L475VG.elf"  "ThreadMetricBenchmarkFreeRTOS_MessageProcessing_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkFreeRTOS_MessageProcessing_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_MessageProcessing_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   8324	     12	  19336	  27672	   6c18	ThreadMetricBenchmarkFreeRTOS_MessageProcessing_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkFreeRTOS_MessageProcessing_STM32L475VG.siz
+
+
+
+**** Thread-Metric Message Processing Test **** Relative Time: 30
+Time Period Total:  3344997
+
+**** Thread-Metric Message Processing Test **** Relative Time: 60
+Time Period Total:  3344991
+
+**** Thread-Metric Message Processing Test **** Relative Time: 90
+Time Period Total:  3344990
+
+**** Thread-Metric Message Processing Test **** Relative Time: 120
+Time Period Total:  3344991
+
+**** Thread-Metric Message Processing Test **** Relative Time: 150
+Time Period Total:  3344980
+
+**** Thread-Metric Message Processing Test **** Relative Time: 180
+Time Period Total:  3344981
+
+**** Thread-Metric Message Processing Test **** Relative Time: 210
+Time Period Total:  3344981
+
+**** Thread-Metric Message Processing Test **** Relative Time: 240
+Time Period Total:  3344981
+
+**** Thread-Metric Message Processing Test **** Relative Time: 270
+Time Period Total:  3344981
+
+**** Thread-Metric Message Processing Test **** Relative Time: 300
+Time Period Total:  3344981
+
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_MutexBargingTest_STM32L475VG.elf"  "ThreadMetricBenchmarkFreeRTOS_MutexBargingTest_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkFreeRTOS_MutexBargingTest_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_MutexBargingTest_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+  11716	     12	  19208	  30936	   78d8	ThreadMetricBenchmarkFreeRTOS_MutexBargingTest_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkFreeRTOS_MutexBargingTest_STM32L475VG.siz
+
+
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 30
+Total ops this window : 2577733
+  Workers (total)     : 2457709
+  Interlopers (total) : 120024  (barge fraction: 0.046)
+  -- Workers --
+    Worker 0 (pri 10): 612699
+    Worker 1 (pri 10): 615003
+    Worker 2 (pri 10): 610392
+    Worker 3 (pri 10): 619615
+  -- Interlopers --
+    Interloper 0 (pri 3): 30006
+    Interloper 1 (pri 3): 30006
+    Interloper 2 (pri 3): 30006
+    Interloper 3 (pri 3): 30006
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 60
+Total ops this window : 2577965
+  Workers (total)     : 2457805
+  Interlopers (total) : 120160  (barge fraction: 0.046)
+  -- Workers --
+    Worker 0 (pri 10): 612719
+    Worker 1 (pri 10): 615029
+    Worker 2 (pri 10): 610413
+    Worker 3 (pri 10): 619644
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 90
+Total ops this window : 2577981
+  Workers (total)     : 2457821
+  Interlopers (total) : 120160  (barge fraction: 0.046)
+  -- Workers --
+    Worker 0 (pri 10): 615034
+    Worker 1 (pri 10): 612725
+    Worker 2 (pri 10): 610417
+    Worker 3 (pri 10): 619645
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 120
+Total ops this window : 2590286
+  Workers (total)     : 2470126
+  Interlopers (total) : 120160  (barge fraction: 0.046)
+  -- Workers --
+    Worker 0 (pri 10): 620028
+    Worker 1 (pri 10): 620033
+    Worker 2 (pri 10): 615034
+    Worker 3 (pri 10): 615031
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 150
+Total ops this window : 2590262
+  Workers (total)     : 2470102
+  Interlopers (total) : 120160  (barge fraction: 0.046)
+  -- Workers --
+    Worker 0 (pri 10): 620027
+    Worker 1 (pri 10): 620025
+    Worker 2 (pri 10): 615026
+    Worker 3 (pri 10): 615024
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 180
+Total ops this window : 2606742
+  Workers (total)     : 2486582
+  Interlopers (total) : 120160  (barge fraction: 0.046)
+  -- Workers --
+    Worker 0 (pri 10): 619440
+    Worker 1 (pri 10): 619438
+    Worker 2 (pri 10): 626498
+    Worker 3 (pri 10): 621206
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 210
+Total ops this window : 2606741
+  Workers (total)     : 2486581
+  Interlopers (total) : 120160  (barge fraction: 0.046)
+  -- Workers --
+    Worker 0 (pri 10): 619438
+    Worker 1 (pri 10): 619441
+    Worker 2 (pri 10): 626498
+    Worker 3 (pri 10): 621204
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 240
+Total ops this window : 2577974
+  Workers (total)     : 2457814
+  Interlopers (total) : 120160  (barge fraction: 0.046)
+  -- Workers --
+    Worker 0 (pri 10): 615032
+    Worker 1 (pri 10): 612722
+    Worker 2 (pri 10): 610416
+    Worker 3 (pri 10): 619644
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 270
+Total ops this window : 2577956
+  Workers (total)     : 2457796
+  Interlopers (total) : 120160  (barge fraction: 0.046)
+  -- Workers --
+    Worker 0 (pri 10): 612724
+    Worker 1 (pri 10): 615021
+    Worker 2 (pri 10): 610414
+    Worker 3 (pri 10): 619637
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 300
+Total ops this window : 2577948
+  Workers (total)     : 2457788
+  Interlopers (total) : 120160  (barge fraction: 0.046)
+  -- Workers --
+    Worker 0 (pri 10): 612724
+    Worker 1 (pri 10): 615020
+    Worker 2 (pri 10): 610413
+    Worker 3 (pri 10): 619631
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_MutexProcessing_STM32L475VG.elf"  "ThreadMetricBenchmarkFreeRTOS_MutexProcessing_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkFreeRTOS_MutexProcessing_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_MutexProcessing_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+  10648	     12	  19176	  29836	   748c	ThreadMetricBenchmarkFreeRTOS_MutexProcessing_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkFreeRTOS_MutexProcessing_STM32L475VG.siz
+ 
+
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 30
+Total ops this window: 2800004
+  Worker 0: 700001
+  Worker 1: 700001
+  Worker 2: 700001
+  Worker 3: 700001
+  Min / Max: 700001 / 700001
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 60
+Total ops this window: 2799984
+  Worker 0: 699996
+  Worker 1: 699996
+  Worker 2: 699996
+  Worker 3: 699996
+  Min / Max: 699996 / 699996
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 90
+Total ops this window: 2799984
+  Worker 0: 699996
+  Worker 1: 699996
+  Worker 2: 699996
+  Worker 3: 699996
+  Min / Max: 699996 / 699996
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 120
+Total ops this window: 2799984
+  Worker 0: 699996
+  Worker 1: 699996
+  Worker 2: 699996
+  Worker 3: 699996
+  Min / Max: 699996 / 699996
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 150
+Total ops this window: 2799974
+  Worker 0: 699993
+  Worker 1: 699994
+  Worker 2: 699994
+  Worker 3: 699993
+  Min / Max: 699993 / 699994
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 180
+Total ops this window: 2799975
+  Worker 0: 699994
+  Worker 1: 699993
+  Worker 2: 699994
+  Worker 3: 699994
+  Min / Max: 699993 / 699994
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 210
+Total ops this window: 2799975
+  Worker 0: 699994
+  Worker 1: 699994
+  Worker 2: 699993
+  Worker 3: 699994
+  Min / Max: 699993 / 699994
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 240
+Total ops this window: 2799974
+  Worker 0: 699993
+  Worker 1: 699994
+  Worker 2: 699994
+  Worker 3: 699993
+  Min / Max: 699993 / 699994
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 270
+Total ops this window: 2799975
+  Worker 0: 699994
+  Worker 1: 699993
+  Worker 2: 699994
+  Worker 3: 699994
+  Min / Max: 699993 / 699994
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 300
+Total ops this window: 2799975
+  Worker 0: 699994
+  Worker 1: 699994
+  Worker 2: 699993
+  Worker 3: 699994
+  Min / Max: 699993 / 699994
+  Fairness ratio: 0.999
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling_STM32L475VG.elf"  "ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   7896	     12	  19104	  27012	   6984	ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkFreeRTOS_PreemptiveScheduling_STM32L475VG.siz
+
+
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 30
+Time Period Total:  3468180
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 60
+Time Period Total:  3468140
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 90
+Time Period Total:  3468143
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 120
+Time Period Total:  3468142
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 150
+Time Period Total:  3468132
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 180
+Time Period Total:  3468133
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 210
+Time Period Total:  3468130
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 240
+Time Period Total:  3468133
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 270
+Time Period Total:  3468132
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 300
+Time Period Total:  3468131
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing_STM32L475VG.elf"  "ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   8912	     12	  19144	  28068	   6da4	ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkFreeRTOS_SynchronizationProcessing_STM32L475VG.siz
+
+
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 30
+Time Period Total:  7122349
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 60
+Time Period Total:  7122167
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 90
+Time Period Total:  7122168
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 120
+Time Period Total:  7122167
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 150
+Time Period Total:  7122147
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 180
+Time Period Total:  7122147
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 210
+Time Period Total:  7122147
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 240
+Time Period Total:  7122146
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 270
+Time Period Total:  7122147
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 300
+Time Period Total:  7122147
+
+
+
+
+========================================================================
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkTaktOS_BasicProcessing_STM32L475VG.elf"  "ThreadMetricBenchmarkTaktOS_BasicProcessing_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkTaktOS_BasicProcessing_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_BasicProcessing_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   4788	     12	  23744	  28544	   6f80	ThreadMetricBenchmarkTaktOS_BasicProcessing_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkTaktOS_BasicProcessing_STM32L475VG.siz
+
+
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 30
+Time Period Total:  212501
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 60
+Time Period Total:  212503
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 90
+Time Period Total:  212502
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 120
+Time Period Total:  212502
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 150
+Time Period Total:  212502
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 180
+Time Period Total:  212501
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 210
+Time Period Total:  212502
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 240
+Time Period Total:  212501
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 270
+Time Period Total:  212502
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 300
+Time Period Total:  212502
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkTaktOS_CooperativeScheduling_STM32L475VG.elf"  "ThreadMetricBenchmarkTaktOS_CooperativeScheduling_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkTaktOS_CooperativeScheduling_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_CooperativeScheduling_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   6628	     12	  19680	  26320	   66d0	ThreadMetricBenchmarkTaktOS_CooperativeScheduling_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkTaktOS_CooperativeScheduling_STM32L475VG.siz
+
+
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 30
+Time Period Total:  20841809
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 60
+Time Period Total:  20841463
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 90
+Time Period Total:  20841463
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 120
+Time Period Total:  20841463
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 150
+Time Period Total:  20841403
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 180
+Time Period Total:  20841403
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 210
+Time Period Total:  20841403
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 240
+Time Period Total:  20841403
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 270
+Time Period Total:  20841402
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 300
+Time Period Total:  20841403
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkTaktOS_MessageProcessing_STM32L475VG.elf"  "ThreadMetricBenchmarkTaktOS_MessageProcessing_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkTaktOS_MessageProcessing_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_MessageProcessing_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   6392	     12	  19880	  26284	   66ac	ThreadMetricBenchmarkTaktOS_MessageProcessing_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkTaktOS_MessageProcessing_STM32L475VG.siz
+
+
+
+**** Thread-Metric Message Processing Test **** Relative Time: 30
+Time Period Total:  11805880
+
+**** Thread-Metric Message Processing Test **** Relative Time: 60
+Time Period Total:  11805817
+
+**** Thread-Metric Message Processing Test **** Relative Time: 90
+Time Period Total:  11805818
+
+**** Thread-Metric Message Processing Test **** Relative Time: 120
+Time Period Total:  11805818
+
+**** Thread-Metric Message Processing Test **** Relative Time: 150
+Time Period Total:  11805784
+
+**** Thread-Metric Message Processing Test **** Relative Time: 180
+Time Period Total:  11805784
+
+**** Thread-Metric Message Processing Test **** Relative Time: 210
+Time Period Total:  11805784
+
+**** Thread-Metric Message Processing Test **** Relative Time: 240
+Time Period Total:  11805784
+
+**** Thread-Metric Message Processing Test **** Relative Time: 270
+Time Period Total:  11805784
+
+**** Thread-Metric Message Processing Test **** Relative Time: 300
+Time Period Total:  11805784
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkTaktOS_MutexBargingTest_STM32L475VG.elf"  "ThreadMetricBenchmarkTaktOS_MutexBargingTest_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkTaktOS_MutexBargingTest_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_MutexBargingTest_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   8400	     12	  19728	  28140	   6dec	ThreadMetricBenchmarkTaktOS_MutexBargingTest_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkTaktOS_MutexBargingTest_STM32L475VG.siz
+
+
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 30
+Total ops this window : 10440018
+  Workers (total)     : 10319994
+  Interlopers (total) : 120024  (barge fraction: 0.011)
+  -- Workers --
+    Worker 0 (pri 10): 2579999
+    Worker 1 (pri 10): 2579999
+    Worker 2 (pri 10): 2579998
+    Worker 3 (pri 10): 2579998
+  -- Interlopers --
+    Interloper 0 (pri 3): 30006
+    Interloper 1 (pri 3): 30006
+    Interloper 2 (pri 3): 30006
+    Interloper 3 (pri 3): 30006
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 60
+Total ops this window : 10439876
+  Workers (total)     : 10319716
+  Interlopers (total) : 120160  (barge fraction: 0.011)
+  -- Workers --
+    Worker 0 (pri 10): 2579929
+    Worker 1 (pri 10): 2579929
+    Worker 2 (pri 10): 2579929
+    Worker 3 (pri 10): 2579929
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 90
+Total ops this window : 10439882
+  Workers (total)     : 10319722
+  Interlopers (total) : 120160  (barge fraction: 0.011)
+  -- Workers --
+    Worker 0 (pri 10): 2579930
+    Worker 1 (pri 10): 2579930
+    Worker 2 (pri 10): 2579931
+    Worker 3 (pri 10): 2579931
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 120
+Total ops this window : 10439882
+  Workers (total)     : 10319722
+  Interlopers (total) : 120160  (barge fraction: 0.011)
+  -- Workers --
+    Worker 0 (pri 10): 2579931
+    Worker 1 (pri 10): 2579931
+    Worker 2 (pri 10): 2579930
+    Worker 3 (pri 10): 2579930
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 150
+Total ops this window : 10439845
+  Workers (total)     : 10319685
+  Interlopers (total) : 120160  (barge fraction: 0.011)
+  -- Workers --
+    Worker 0 (pri 10): 2579921
+    Worker 1 (pri 10): 2579921
+    Worker 2 (pri 10): 2579922
+    Worker 3 (pri 10): 2579921
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 180
+Total ops this window : 10439851
+  Workers (total)     : 10319691
+  Interlopers (total) : 120160  (barge fraction: 0.011)
+  -- Workers --
+    Worker 0 (pri 10): 2579923
+    Worker 1 (pri 10): 2579923
+    Worker 2 (pri 10): 2579922
+    Worker 3 (pri 10): 2579923
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 210
+Total ops this window : 10439845
+  Workers (total)     : 10319685
+  Interlopers (total) : 120160  (barge fraction: 0.011)
+  -- Workers --
+    Worker 0 (pri 10): 2579921
+    Worker 1 (pri 10): 2579921
+    Worker 2 (pri 10): 2579922
+    Worker 3 (pri 10): 2579921
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 240
+Total ops this window : 10439851
+  Workers (total)     : 10319691
+  Interlopers (total) : 120160  (barge fraction: 0.011)
+  -- Workers --
+    Worker 0 (pri 10): 2579923
+    Worker 1 (pri 10): 2579923
+    Worker 2 (pri 10): 2579922
+    Worker 3 (pri 10): 2579923
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 270
+Total ops this window : 10439845
+  Workers (total)     : 10319685
+  Interlopers (total) : 120160  (barge fraction: 0.011)
+  -- Workers --
+    Worker 0 (pri 10): 2579921
+    Worker 1 (pri 10): 2579921
+    Worker 2 (pri 10): 2579922
+    Worker 3 (pri 10): 2579921
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 300
+Total ops this window : 10439851
+  Workers (total)     : 10319691
+  Interlopers (total) : 120160  (barge fraction: 0.011)
+  -- Workers --
+    Worker 0 (pri 10): 2579923
+    Worker 1 (pri 10): 2579923
+    Worker 2 (pri 10): 2579922
+    Worker 3 (pri 10): 2579923
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkTaktOS_MutexProcessing_STM32L475VG.elf"  "ThreadMetricBenchmarkTaktOS_MutexProcessing_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkTaktOS_MutexProcessing_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_MutexProcessing_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   7328	     12	  19696	  27036	   699c	ThreadMetricBenchmarkTaktOS_MutexProcessing_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkTaktOS_MutexProcessing_STM32L475VG.siz
+
+
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 30
+Total ops this window: 10645385
+  Worker 0: 2661347
+  Worker 1: 2661346
+  Worker 2: 2661346
+  Worker 3: 2661346
+  Min / Max: 2661346 / 2661347
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 60
+Total ops this window: 10645104
+  Worker 0: 2661276
+  Worker 1: 2661276
+  Worker 2: 2661276
+  Worker 3: 2661276
+  Min / Max: 2661276 / 2661276
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 90
+Total ops this window: 10645104
+  Worker 0: 2661276
+  Worker 1: 2661276
+  Worker 2: 2661276
+  Worker 3: 2661276
+  Min / Max: 2661276 / 2661276
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 120
+Total ops this window: 10645104
+  Worker 0: 2661276
+  Worker 1: 2661276
+  Worker 2: 2661276
+  Worker 3: 2661276
+  Min / Max: 2661276 / 2661276
+  Fairness ratio: 1.000
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 150
+Total ops this window: 10645073
+  Worker 0: 2661268
+  Worker 1: 2661269
+  Worker 2: 2661268
+  Worker 3: 2661268
+  Min / Max: 2661268 / 2661269
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 180
+Total ops this window: 10645073
+  Worker 0: 2661268
+  Worker 1: 2661268
+  Worker 2: 2661269
+  Worker 3: 2661268
+  Min / Max: 2661268 / 2661269
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 210
+Total ops this window: 10645073
+  Worker 0: 2661268
+  Worker 1: 2661268
+  Worker 2: 2661268
+  Worker 3: 2661269
+  Min / Max: 2661268 / 2661269
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 240
+Total ops this window: 10645073
+  Worker 0: 2661269
+  Worker 1: 2661268
+  Worker 2: 2661268
+  Worker 3: 2661268
+  Min / Max: 2661268 / 2661269
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 270
+Total ops this window: 10645073
+  Worker 0: 2661268
+  Worker 1: 2661269
+  Worker 2: 2661268
+  Worker 3: 2661268
+  Min / Max: 2661268 / 2661269
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 300
+Total ops this window: 10645073
+  Worker 0: 2661268
+  Worker 1: 2661268
+  Worker 2: 2661269
+  Worker 3: 2661268
+  Min / Max: 2661268 / 2661269
+  Fairness ratio: 0.999
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_STM32L475VG.elf"  "ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   6408	     12	  19680	  26100	   65f4	ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_STM32L475VG.siz
+
+
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 30
+Time Period Total:  7559998
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 60
+Time Period Total:  7559915
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 90
+Time Period Total:  7559915
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 120
+Time Period Total:  7559915
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 150
+Time Period Total:  7559892
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 180
+Time Period Total:  7559895
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 210
+Time Period Total:  7559893
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 240
+Time Period Total:  7559892
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 270
+Time Period Total:  7559895
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 300
+Time Period Total:  7559893
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_STM32L475VG.elf"  "ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   5316	     12	  19664	  24992	   61a0	ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_STM32L475VG.siz
+
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 30
+Time Period Total:  23044281
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 60
+Time Period Total:  23043626
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 90
+Time Period Total:  23043627
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 120
+Time Period Total:  23043627
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 150
+Time Period Total:  23043560
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 180
+Time Period Total:  23043560
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 210
+Time Period Total:  23043559
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 240
+Time Period Total:  23043560
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 270
+Time Period Total:  23043560
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 300
+Time Period Total:  23043560
+
+
+
+========================================================================
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkThreadX_BasicProcessing_STM32L475VG.elf"  "ThreadMetricBenchmarkThreadX_BasicProcessing_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkThreadX_BasicProcessing_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_BasicProcessing_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   6108	     12	  23552	  29672	   73e8	ThreadMetricBenchmarkThreadX_BasicProcessing_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkThreadX_BasicProcessing_STM32L475VG.siz
+
+
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 30
+Time Period Total:  212586
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 60
+Time Period Total:  212589
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 90
+Time Period Total:  212589
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 120
+Time Period Total:  212588
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 150
+Time Period Total:  212588
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 180
+Time Period Total:  212588
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 210
+Time Period Total:  212588
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 240
+Time Period Total:  212588
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 270
+Time Period Total:  212588
+
+**** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 300
+Time Period Total:  212587
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkThreadX_CooperativeScheduling_STM32L475VG.elf"  "ThreadMetricBenchmarkThreadX_CooperativeScheduling_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkThreadX_CooperativeScheduling_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_CooperativeScheduling_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   8176	     12	  19488	  27676	   6c1c	ThreadMetricBenchmarkThreadX_CooperativeScheduling_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkThreadX_CooperativeScheduling_STM32L475VG.siz
+
+
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 30
+Time Period Total:  10289136
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 60
+Time Period Total:  10289177
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 90
+Time Period Total:  10289178
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 120
+Time Period Total:  10289178
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 150
+Time Period Total:  10289168
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 180
+Time Period Total:  10289147
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 210
+Time Period Total:  10289148
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 240
+Time Period Total:  10289148
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 270
+Time Period Total:  10289167
+
+**** Thread-Metric Cooperative Scheduling Test **** Relative Time: 300
+Time Period Total:  10289148
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkThreadX_MessageProcessing_STM32L475VG.elf"  "ThreadMetricBenchmarkThreadX_MessageProcessing_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkThreadX_MessageProcessing_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_MessageProcessing_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   7272	     12	  19712	  26996	   6974	ThreadMetricBenchmarkThreadX_MessageProcessing_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkThreadX_MessageProcessing_STM32L475VG.siz
+
+
+
+**** Thread-Metric Message Processing Test **** Relative Time: 30
+Time Period Total:  10848525
+
+**** Thread-Metric Message Processing Test **** Relative Time: 60
+Time Period Total:  10848554
+
+**** Thread-Metric Message Processing Test **** Relative Time: 90
+Time Period Total:  10848554
+
+**** Thread-Metric Message Processing Test **** Relative Time: 120
+Time Period Total:  10848554
+
+**** Thread-Metric Message Processing Test **** Relative Time: 150
+Time Period Total:  10848522
+
+**** Thread-Metric Message Processing Test **** Relative Time: 180
+Time Period Total:  10848523
+
+**** Thread-Metric Message Processing Test **** Relative Time: 210
+Time Period Total:  10848522
+
+**** Thread-Metric Message Processing Test **** Relative Time: 240
+Time Period Total:  10848523
+
+**** Thread-Metric Message Processing Test **** Relative Time: 270
+Time Period Total:  10848522
+
+**** Thread-Metric Message Processing Test **** Relative Time: 300
+Time Period Total:  10848523
+
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkThreadX_MutexBargingTest_STM32L475VG.elf"  "ThreadMetricBenchmarkThreadX_MutexBargingTest_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkThreadX_MutexBargingTest_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_MutexBargingTest_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+  10908	     12	  19576	  30496	   7720	ThreadMetricBenchmarkThreadX_MutexBargingTest_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkThreadX_MutexBargingTest_STM32L475VG.siz
+
+
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 30
+Total ops this window : 3105095
+  Workers (total)     : 2985071
+  Interlopers (total) : 120024  (barge fraction: 0.038)
+  -- Workers --
+    Worker 0 (pri 10): 746268
+    Worker 1 (pri 10): 746268
+    Worker 2 (pri 10): 746268
+    Worker 3 (pri 10): 746267
+  -- Interlopers --
+    Interloper 0 (pri 3): 30006
+    Interloper 1 (pri 3): 30006
+    Interloper 2 (pri 3): 30006
+    Interloper 3 (pri 3): 30006
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 60
+Total ops this window : 3105188
+  Workers (total)     : 2985028
+  Interlopers (total) : 120160  (barge fraction: 0.038)
+  -- Workers --
+    Worker 0 (pri 10): 746257
+    Worker 1 (pri 10): 746257
+    Worker 2 (pri 10): 746257
+    Worker 3 (pri 10): 746257
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 90
+Total ops this window : 3105177
+  Workers (total)     : 2985017
+  Interlopers (total) : 120160  (barge fraction: 0.038)
+  -- Workers --
+    Worker 0 (pri 10): 746254
+    Worker 1 (pri 10): 746254
+    Worker 2 (pri 10): 746254
+    Worker 3 (pri 10): 746255
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 120
+Total ops this window : 3105199
+  Workers (total)     : 2985039
+  Interlopers (total) : 120160  (barge fraction: 0.038)
+  -- Workers --
+    Worker 0 (pri 10): 746260
+    Worker 1 (pri 10): 746260
+    Worker 2 (pri 10): 746260
+    Worker 3 (pri 10): 746259
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 150
+Total ops this window : 3105124
+  Workers (total)     : 2984964
+  Interlopers (total) : 120160  (barge fraction: 0.038)
+  -- Workers --
+    Worker 0 (pri 10): 746241
+    Worker 1 (pri 10): 746241
+    Worker 2 (pri 10): 746241
+    Worker 3 (pri 10): 746241
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 180
+Total ops this window : 3105179
+  Workers (total)     : 2985019
+  Interlopers (total) : 120160  (barge fraction: 0.038)
+  -- Workers --
+    Worker 0 (pri 10): 746255
+    Worker 1 (pri 10): 746255
+    Worker 2 (pri 10): 746254
+    Worker 3 (pri 10): 746255
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 210
+Total ops this window : 3105162
+  Workers (total)     : 2985002
+  Interlopers (total) : 120160  (barge fraction: 0.038)
+  -- Workers --
+    Worker 0 (pri 10): 746250
+    Worker 1 (pri 10): 746250
+    Worker 2 (pri 10): 746251
+    Worker 3 (pri 10): 746251
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 240
+Total ops this window : 3105130
+  Workers (total)     : 2984970
+  Interlopers (total) : 120160  (barge fraction: 0.038)
+  -- Workers --
+    Worker 0 (pri 10): 746243
+    Worker 1 (pri 10): 746243
+    Worker 2 (pri 10): 746242
+    Worker 3 (pri 10): 746242
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 270
+Total ops this window : 3105162
+  Workers (total)     : 2985002
+  Interlopers (total) : 120160  (barge fraction: 0.038)
+  -- Workers --
+    Worker 0 (pri 10): 746250
+    Worker 1 (pri 10): 746250
+    Worker 2 (pri 10): 746251
+    Worker 3 (pri 10): 746251
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 300
+Total ops this window : 3105130
+  Workers (total)     : 2984970
+  Interlopers (total) : 120160  (barge fraction: 0.038)
+  -- Workers --
+    Worker 0 (pri 10): 746243
+    Worker 1 (pri 10): 746243
+    Worker 2 (pri 10): 746242
+    Worker 3 (pri 10): 746242
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkThreadX_MutexProcessing_STM32L475VG.elf"  "ThreadMetricBenchmarkThreadX_MutexProcessing_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkThreadX_MutexProcessing_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_MutexProcessing_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   8408	     12	  19536	  27956	   6d34	ThreadMetricBenchmarkThreadX_MutexProcessing_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkThreadX_MutexProcessing_STM32L475VG.siz
+
+
+**** Thread-Metric Mutex Barging Test **** Relative Time: 330
+Total ops this window : 3105162
+  Workers (total)     : 2985002
+  Interlopers (total) : 120160  (barge fraction: 0.038)
+  -- Workers --
+    Worker 0 (pri 10): 746250
+    Worker 1 (pri 10): 746250
+    Worker 2 (pri 10): 746251
+    Worker 3 (pri 10): 746251
+  -- Interlopers --
+    Interloper 0 (pri 3): 30040
+    Interloper 1 (pri 3): 30040
+    Interloper 2 (pri 3): 30040
+    Interloper 3 (pri 3): 30040
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 30
+Total ops this window: 3260094
+  Worker 0: 815024
+  Worker 1: 815024
+  Worker 2: 815023
+  Worker 3: 815023
+  Min / Max: 815023 / 815024
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 60
+Total ops this window: 3259707
+  Worker 0: 814927
+  Worker 1: 814926
+  Worker 2: 814927
+  Worker 3: 814927
+  Min / Max: 814926 / 814927
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 90
+Total ops this window: 3259705
+  Worker 0: 814926
+  Worker 1: 814927
+  Worker 2: 814926
+  Worker 3: 814926
+  Min / Max: 814926 / 814927
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 120
+Total ops this window: 3259707
+  Worker 0: 814927
+  Worker 1: 814926
+  Worker 2: 814927
+  Worker 3: 814927
+  Min / Max: 814926 / 814927
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 150
+Total ops this window: 3260125
+  Worker 0: 815031
+  Worker 1: 815032
+  Worker 2: 815031
+  Worker 3: 815031
+  Min / Max: 815031 / 815032
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 180
+Total ops this window: 3259697
+  Worker 0: 814924
+  Worker 1: 814924
+  Worker 2: 814925
+  Worker 3: 814924
+  Min / Max: 814924 / 814925
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 210
+Total ops this window: 3259698
+  Worker 0: 814925
+  Worker 1: 814924
+  Worker 2: 814924
+  Worker 3: 814925
+  Min / Max: 814924 / 814925
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 240
+Total ops this window: 3259697
+  Worker 0: 814924
+  Worker 1: 814925
+  Worker 2: 814924
+  Worker 3: 814924
+  Min / Max: 814924 / 814925
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 270
+Total ops this window: 3260122
+  Worker 0: 815030
+  Worker 1: 815030
+  Worker 2: 815031
+  Worker 3: 815031
+  Min / Max: 815030 / 815031
+  Fairness ratio: 0.999
+
+**** Thread-Metric Mutex Fairness Test **** Relative Time: 300
+Total ops this window: 3259696
+  Worker 0: 814924
+  Worker 1: 814924
+  Worker 2: 814924
+  Worker 3: 814924
+  Min / Max: 814924 / 814924
+  Fairness ratio: 1.000
+
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkThreadX_PreemptiveScheduling_STM32L475VG.elf"  "ThreadMetricBenchmarkThreadX_PreemptiveScheduling_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkThreadX_PreemptiveScheduling_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_PreemptiveScheduling_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   8220	     12	  19488	  27720	   6c48	ThreadMetricBenchmarkThreadX_PreemptiveScheduling_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkThreadX_PreemptiveScheduling_STM32L475VG.siz
+
+
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 30
+Time Period Total:  4799895
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 60
+Time Period Total:  4799945
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 90
+Time Period Total:  4799945
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 120
+Time Period Total:  4799945
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 150
+Time Period Total:  4799930
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 180
+Time Period Total:  4799930
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 210
+Time Period Total:  4799930
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 240
+Time Period Total:  4799930
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 270
+Time Period Total:  4799930
+
+**** Thread-Metric Preemptive Scheduling Test **** Relative Time: 300
+Time Period Total:  4799930
+
+
+
+Invoking: Cross ARM GNU Create Flash Image
+arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkThreadX_SynchronizationProcessing_STM32L475VG.elf"  "ThreadMetricBenchmarkThreadX_SynchronizationProcessing_STM32L475VG.hex"
+Finished building: ThreadMetricBenchmarkThreadX_SynchronizationProcessing_STM32L475VG.hex
+ 
+Invoking: Cross ARM GNU Print Size
+arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkThreadX_SynchronizationProcessing_STM32L475VG.elf"
+   text	   data	    bss	    dec	    hex	filename
+   6660	     12	  19488	  26160	   6630	ThreadMetricBenchmarkThreadX_SynchronizationProcessing_STM32L475VG.elf
+Finished building: ThreadMetricBenchmarkThreadX_SynchronizationProcessing_STM32L475VG.siz
+ 
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 30
+Time Period Total:  23053404
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 60
+Time Period Total:  23052771
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 90
+Time Period Total:  23052772
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 120
+Time Period Total:  23052835
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 150
+Time Period Total:  23052862
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 180
+Time Period Total:  23052706
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 210
+Time Period Total:  23052705
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 240
+Time Period Total:  23052769
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 270
+Time Period Total:  23052861
+
+**** Thread-Metric Synchronization Processing Test **** Relative Time: 300
+Time Period Total:  23052706
+
+
+

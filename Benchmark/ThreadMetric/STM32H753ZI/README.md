@@ -1,16 +1,95 @@
-# Thread-Metric on NUCLEO-H753ZI (TaktOS port)
+# Thread-Metric on NUCLEO-H753ZI (TaktOS, FreeRTOS, ThreadX)
 
-This directory contains seven Eclipse projects that run the official
-Eclipse ThreadX [Thread-Metric][tm] benchmark suite on a
-**NUCLEO-H753ZI** board (STM32H753ZI, Arm Cortex-M7 + double-precision FPU
-+ I/D cache + MPU, 2 MB Flash, 1 MB+ multi-region SRAM).
+This directory contains **21 Eclipse projects** that run the official Eclipse
+ThreadX [Thread-Metric][tm] benchmark suite on a **NUCLEO-H753ZI** board
+(STM32H753ZI, Arm Cortex-M7 + double-precision FPU + I/D cache + MPU, 2 MB
+Flash, 1 MB+ multi-region SRAM).
 
-The kernel under test is **TaktOS**, linked in from the `TaktOS_M7` static
-library produced by `ARM/cm7/Eclipse/`.
+Three RTOSes run side-by-side under identical clock / memory / UART
+configuration so the numbers are directly comparable:
+
+| RTOS      | Projects | Kernel source                                                |
+|-----------|---------:|--------------------------------------------------------------|
+| TaktOS    |        7 | `TaktOS_M7` static library from `ARM/cm7/Eclipse/{Debug,Release}` |
+| FreeRTOS  |        7 | `IOCOMPOSER_HOME/external/FreeRTOS-Kernel` (ARM_CM7/r0p1 port) |
+| ThreadX   |        7 | `IOCOMPOSER_HOME/external/threadx` (cortex_m7/gnu port)      |
+
+All 21 projects share one `src/` folder with startup, clock config, linker
+script, and UART console. Each RTOS contributes only its own `tm_port_*`
+file plus its kernel configuration header. Vector-table arbitration:
+
+| Vector              | TaktOS owner              | FreeRTOS owner             | ThreadX owner                     |
+|---------------------|---------------------------|----------------------------|-----------------------------------|
+| `PendSV_Handler`    | `libTaktOS_M7.a`          | `port.c` (CM7 r0p1)        | `tx_thread_schedule.S`            |
+| `SVC_Handler`       | `libTaktOS_M7.a`          | `port.c` (CM7 r0p1)        | `threadx_initialize_low_level.S`  |
+| `SysTick_Handler`   | `libTaktOS_M7.a`          | `port.c` (CM7 r0p1)        | `threadx_initialize_low_level.S`  |
+| `TIM7_IRQHandler`   | `tm_port_taktos.cpp`      | `tm_port_freertos.c`       | `tm_port_threadx.c`               |
+
+`startup_stm32h753.S` declares all four as weak aliases of `Default_Handler`;
+strong symbols from each RTOS's port code win at link time.
 
 [tm]: https://github.com/eclipse-threadx/threadx/tree/master/utility/benchmark_application/thread_metric
 
 ---
+
+## Benchmark fairness — canonical metrics
+
+All three RTOSes run with identical port-layer resource limits so Thread-Metric
+numbers are directly comparable across TaktOS, FreeRTOS, and ThreadX on this
+board. Any difference in measured throughput is attributable to the kernel
+being tested, not to how the port was sized.
+
+| Resource                      | Value                                       |
+|-------------------------------|---------------------------------------------|
+| Max threads                   | 9 (matches the worst-case Thread-Metric test, `mutex_barging_test`, which uses thread IDs 0..8) |
+| Stack per thread              | 2048 bytes (512 × 32-bit words)             |
+| Queue depth × message size    | 10 × 16 bytes                               |
+| Semaphores                    | 1 (binary)                                  |
+| Mutexes                       | 1 (with priority inheritance where available) |
+| Memory pool                   | 2048 bytes / 128-byte blocks                |
+| Tick rate                     | 1000 Hz                                     |
+| PendSV priority               | `0xF0` (lowest) — all three                 |
+| SW-IRQ (`TIM7_IRQn`) priority | `0xC0` — all three                          |
+| CPU clock                     | 64 MHz (HSI reset default, no PLL bring-up) |
+| Toolchain flags               | same for all (from the shared `.cproject`)  |
+
+`SysTick` priority differs by RTOS architecture and is not a tuning knob:
+TaktOS and FreeRTOS place `SysTick` at `0xF0` alongside PendSV; ThreadX places
+it at `0x40` (higher priority than PendSV) as a deliberate design choice in
+`threadx_initialize_low_level.S` so tick processing preempts context switches.
+Leaving it alone preserves ThreadX's intended timer semantics.
+
+## Compile-time feature parity
+
+All three RTOSes are built with the same kernel-level safety features
+enabled so each RTOS does equivalent work per API call. Without this, a
+faster "ThreadX-with-no-error-checking" or "FreeRTOS-with-no-stack-check"
+number would be comparing different product shapes, not different kernel
+performance.
+
+| Feature                         | TaktOS            | FreeRTOS                                      | ThreadX                                  |
+|---------------------------------|-------------------|-----------------------------------------------|------------------------------------------|
+| FPU instructions compiled in    | `-mfpu=fpv5-sp-d16 -mfloat-abi=hard`    | `-mfpu=fpv5-sp-d16 -mfloat-abi=hard`                                | `-mfpu=fpv5-sp-d16 -mfloat-abi=hard`                           |
+| FPU context save at RTOS level  | built-in          | `vPortEnableVFP()` in `ARM_CM4F`/`ARM_CM7` port | `TX_ENABLE_FPU_SUPPORT`                |
+| Stack overflow check            | built-in          | `configCHECK_FOR_STACK_OVERFLOW = 2` (fill+check) + `vApplicationStackOverflowHook` | `TX_ENABLE_STACK_CHECKING`              |
+| Null pointer parameter check    | built-in          | `configASSERT` with panic hook                | minimal (via `_tx_*` internals)          |
+| Full parameter validation       | off               | off (default)                                 | off (`TX_DISABLE_ERROR_CHECKING` in port) |
+
+All three compile with the same FPU flag (`-mfpu=fpv5-sp-d16 -mfloat-abi=hard`) inherited from
+the shared TaktOS `.cproject` template. The three FPU-context-save
+mechanisms look different on paper but give each RTOS a functionally
+equivalent "FPU-task allowed" capability. Cortex-M4F / Cortex-M7 hardware
+lazy-stacks S0–S15 on exception entry regardless of RTOS, so per-task FPU
+use has the same hardware cost in all three.
+
+Full parameter validation is deliberately off in all three. TaktOS does
+null pointer checks only (not exhaustive parameter validation); FreeRTOS's
+`configASSERT` catches similar error conditions; ThreadX routes API calls
+through `_tx_*` entry points (via `TX_DISABLE_ERROR_CHECKING` defined in
+`tm_port_threadx.c`) which skip the `_txe_*` full-validation wrappers. If
+`TX_DISABLE_ERROR_CHECKING` were removed, ThreadX would do substantially
+more per-call validation than either of the other two and the numbers
+would no longer be comparable.
 
 ## Tests included
 

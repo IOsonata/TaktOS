@@ -46,6 +46,7 @@
 /*  This is the authoritative STM32H753 vector map (CMSIS stm32h753xx).       */
 /* ========================================================================= */
     .section .isr_vector,"a",%progbits
+    .global g_pfnVectors
     .type   g_pfnVectors, %object
 
 g_pfnVectors:

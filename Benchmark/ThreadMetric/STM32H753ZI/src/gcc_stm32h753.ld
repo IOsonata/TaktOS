@@ -128,6 +128,17 @@ SECTIONS
         . = ALIGN(8);
     } > RAM
 
+    /* ThreadX port compatibility aliases.
+     * threadx_initialize_low_level.S uses CMSIS/Nordic-style symbol names:
+     *   __data_end__  - end of initialised-data + BSS, i.e. first free RAM
+     *   __Vectors     - vector table base symbol
+     * Our tree uses _ebss and g_pfnVectors. Aliases via PROVIDE so the
+     * ThreadX init assembly resolves without modifying startup or the
+     * ThreadX init source. PROVIDE is conditional, so the TaktOS build
+     * (which never references these names) is unaffected.               */
+    PROVIDE ( __data_end__ = _ebss );
+    PROVIDE ( __Vectors    = g_pfnVectors );
+
     /DISCARD/ :
     {
         libc.a ( * )

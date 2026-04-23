@@ -1,0 +1,10 @@
+Origin of vendored common sources:
+
+Zephyr Project repository:
+tests/benchmarks/thread_metric/
+
+Files in common/src retain their original upstream license headers.
+Zephyr's licensing documentation identifies the Thread-Metric source files in this area as
+originating from ThreadX and distributed under the MIT License.
+
+This bundle adds only thin standalone-app wrappers and helper scripts.
