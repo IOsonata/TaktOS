@@ -1,0 +1,160 @@
+<div style="padding: 1.25rem; max-width: 800px; box-sizing: border-box;">
+
+<div style="margin-bottom: 1.25rem;">
+  <span style="font-size: 12px; font-weight: 500; color: #534AB7; letter-spacing: 0.06em; text-transform: uppercase;">TaktOS · Open-source RTOS</span>
+  <p style="font-size: 21px; font-weight: 500; color: var(--color-text-primary); margin: 4px 0 4px; line-height: 1.3;">Thread-Metric on the nRF54L15 — TaktOS vs FreeRTOS, ThreadX, Zephyr</p>
+  <p style="font-size: 13px; color: var(--color-text-secondary); margin: 0;">Cortex-M33 @ 128 MHz · arm-none-eabi-gcc 12.2.1 <code style="font-size: 11px; background: var(--color-background-secondary); padding: 1px 5px; border-radius: 4px;">-Os</code> · MPU off · FPU on · software stack canary on · 1 kHz tick</p>
+</div>
+
+<div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; margin-bottom: 12px;">
+  <p style="font-size: 11px; color: var(--color-text-secondary); margin: 0 0 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">Operations per 30 s window — higher is better</p>
+  <div style="display: flex; gap: 16px; margin-bottom: 10px; font-size: 11px; flex-wrap: wrap;">
+    <span style="display:flex;align-items:center;gap:5px;color:var(--color-text-secondary);"><span style="width:10px;height:10px;border-radius:2px;background:#534AB7;display:inline-block;"></span>TaktOS</span>
+    <span style="display:flex;align-items:center;gap:5px;color:var(--color-text-secondary);"><span style="width:10px;height:10px;border-radius:2px;background:#888780;display:inline-block;"></span>ThreadX</span>
+    <span style="display:flex;align-items:center;gap:5px;color:var(--color-text-secondary);"><span style="width:10px;height:10px;border-radius:2px;background:#185FA5;display:inline-block;"></span>Zephyr</span>
+    <span style="display:flex;align-items:center;gap:5px;color:var(--color-text-secondary);"><span style="width:10px;height:10px;border-radius:2px;background:#D85A30;display:inline-block;"></span>FreeRTOS</span>
+  </div>
+  <div style="position: relative; width: 100%; height: 260px;">
+    <canvas id="tmChart" role="img" aria-label="Grouped bar chart of six Thread-Metric tests across four RTOSes on nRF54L15 Cortex-M33.">Per-test ops/window for TaktOS, ThreadX, Zephyr, FreeRTOS on six Thread-Metric tests on Cortex-M33.</canvas>
+  </div>
+</div>
+
+<div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; margin-bottom: 12px;">
+  <p style="font-size: 11px; color: var(--color-text-secondary); margin: 0 0 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">Full results · ops per 30 s window @ 300 s</p>
+  <table style="width: 100%; border-collapse: collapse; font-size: 12px; table-layout: fixed;">
+    <thead>
+      <tr style="border-bottom: 0.5px solid var(--color-border-tertiary);">
+        <th style="text-align: left; padding: 6px 8px; color: var(--color-text-secondary); font-weight: 500; width: 24%;">Test</th>
+        <th style="text-align: right; padding: 6px 8px; color: #534AB7; font-weight: 500;">TaktOS</th>
+        <th style="text-align: right; padding: 6px 8px; color: #888780; font-weight: 500;">ThreadX</th>
+        <th style="text-align: right; padding: 6px 8px; color: #185FA5; font-weight: 500;">Zephyr</th>
+        <th style="text-align: right; padding: 6px 8px; color: #D85A30; font-weight: 500;">FreeRTOS</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr><td style="padding: 5px 8px; color: var(--color-text-primary);">TM2 cooperative</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono);">35,534,146</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">17,523,327</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">15,882,166</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">21,557,088 ⚠</td></tr>
+      <tr style="background: var(--color-background-secondary);"><td style="padding: 5px 8px; color: var(--color-text-primary);">TM3 preemptive</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono);">14,448,300</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">8,161,573</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">10,431,589</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">6,311,101</td></tr>
+      <tr><td style="padding: 5px 8px; color: var(--color-text-primary);">TM6 message</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono);">23,257,291</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">21,681,056</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">9,372,502</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">7,251,900</td></tr>
+      <tr style="background: var(--color-background-secondary);"><td style="padding: 5px 8px; color: var(--color-text-primary);">TM7 synchronization</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono);">49,836,941</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">40,824,799</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">38,178,957</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">12,142,194</td></tr>
+      <tr><td style="padding: 5px 8px; color: var(--color-text-primary);">TM8 mutex</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono);">20,091,357</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">8,392,311</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">9,968,531</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">7,075,918</td></tr>
+      <tr style="background: var(--color-background-secondary);"><td style="padding: 5px 8px; color: var(--color-text-primary);">Mutex barging</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono);">19,787,106</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">8,202,441</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">9,948,338</td><td style="text-align: right; padding: 5px 8px; font-family: var(--font-mono); color: var(--color-text-secondary);">6,880,779</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size: 10px; color: var(--color-text-secondary); margin: 8px 0 0;">⚠ FreeRTOS TM2 reported round-robin invariant errors after 150 s. TaktOS, ThreadX and Zephyr ran clean for the full 300 s. TM1 (no kernel calls) excluded — all four RTOSes agree to within 0.5%.</p>
+</div>
+
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+
+  <div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; display: flex; flex-direction: column;">
+    <p style="font-size: 11px; color: var(--color-text-secondary); margin: 0 0 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">Flash used · TM2 cooperative</p>
+    <div style="position: relative; height: 130px;">
+      <canvas id="szCanvas" role="img" aria-label="Horizontal bars of binary flash size on TM2 cooperative test on nRF54L15.">Flash bytes per RTOS for the TM2 binary on nRF54L15.</canvas>
+    </div>
+    <div style="display: flex; flex-direction: column; gap: 4px; margin-top: auto; padding-top: 10px;">
+      <div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 8px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);">
+        <span style="color:var(--color-text-secondary);">vs FreeRTOS</span><span style="font-weight:500;color:#534AB7;">−1%</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 8px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);">
+        <span style="color:var(--color-text-secondary);">vs ThreadX</span><span style="font-weight:500;color:#534AB7;">−6%</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;padding:3px 8px;background:var(--color-background-secondary);border-radius:var(--border-radius-md);">
+        <span style="color:var(--color-text-secondary);">vs Zephyr</span><span style="font-weight:500;color:#534AB7;">−57%</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; gap: 8px;">
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+      <p style="font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin: 0;">4.1×</p>
+      <p style="font-size: 11px; color: var(--color-text-secondary); margin: 4px 0 0; line-height: 1.3;">vs FreeRTOS<br>TM7 synchronization</p>
+    </div>
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+      <p style="font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin: 0;">2.4×</p>
+      <p style="font-size: 11px; color: var(--color-text-secondary); margin: 4px 0 0; line-height: 1.3;">vs ThreadX<br>Mutex barging</p>
+    </div>
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+      <p style="font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin: 0;">2.5×</p>
+      <p style="font-size: 11px; color: var(--color-text-secondary); margin: 4px 0 0; line-height: 1.3;">vs Zephyr<br>TM6 message</p>
+    </div>
+    <div style="background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 0.75rem; text-align: center; display: flex; flex-direction: column; justify-content: center;">
+      <p style="font-size: 22px; font-weight: 500; color: var(--color-text-primary); margin: 0;">590</p>
+      <p style="font-size: 11px; color: var(--color-text-secondary); margin: 4px 0 0; line-height: 1.3;">LOC auditable<br>cert boundary</p>
+    </div>
+  </div>
+
+</div>
+
+<div style="background: var(--color-background-primary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-lg); padding: 1rem; margin-bottom: 12px;">
+  <p style="font-size: 11px; color: var(--color-text-secondary); margin: 0 0 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.05em;">Application code — any board, no DTS, no Kconfig</p>
+  <pre style="margin: 0; font-size: 11px; line-height: 1.6; font-family: var(--font-mono); color: var(--color-text-primary); background: var(--color-background-secondary); border-radius: var(--border-radius-md); padding: 10px 12px; overflow-x: auto; white-space: pre;"><span style="color:#888780;">// nRF54L15 · static allocation · always-on stack guard + null check</span>
+<span style="color:#534AB7;">static</span> uint8_t gStack[TAKTOS_THREAD_MEM_SIZE(<span style="color:#0F6E56;">512</span>)];
+<span style="color:#534AB7;">static</span> TaktOSSem_t gSem;
+
+<span style="color:#534AB7;">void</span> <span style="color:#185FA5;">sensorTask</span>(<span style="color:#534AB7;">void</span> *) {
+    <span style="color:#534AB7;">for</span> (;;) {
+        TaktOSSemTake(&amp;gSem, <span style="color:#534AB7;">true</span>, TAKTOS_WAIT_FOREVER);
+        process();
+    }
+}
+
+<span style="color:#534AB7;">int</span> <span style="color:#185FA5;">main</span>() {
+    TaktOSInit(<span style="color:#0F6E56;">128'000'000</span>, <span style="color:#0F6E56;">1000</span>, TAKTOS_TICK_CLOCK_PROCESSOR, <span style="color:#0F6E56;">0</span>);
+    TaktOSSemInit(&amp;gSem, <span style="color:#0F6E56;">0</span>, <span style="color:#0F6E56;">1</span>);
+    TaktOSThreadCreate(gStack, <span style="color:#534AB7;">sizeof</span>(gStack), sensorTask, <span style="color:#534AB7;">nullptr</span>, <span style="color:#0F6E56;">16</span>);
+    TaktOSStart(); <span style="color:#888780;">// never returns</span>
+}</pre>
+</div>
+
+<div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; border-top: 0.5px solid var(--color-border-tertiary); padding-top: 10px;">
+  <div style="display: flex; gap: 6px; flex-wrap: wrap;">
+    <span style="font-size: 11px; background: var(--color-background-secondary); color: var(--color-text-secondary); padding: 3px 8px; border-radius: 20px;">Cortex-M33 · nRF54L15</span>
+    <span style="font-size: 11px; background: var(--color-background-secondary); color: var(--color-text-secondary); padding: 3px 8px; border-radius: 20px;">C++23 freestanding</span>
+    <span style="font-size: 11px; background: var(--color-background-secondary); color: var(--color-text-secondary); padding: 3px 8px; border-radius: 20px;">IEC 61508 SIL 2 target</span>
+    <span style="font-size: 11px; background: var(--color-background-secondary); color: var(--color-text-secondary); padding: 3px 8px; border-radius: 20px;">MIT license</span>
+  </div>
+  <a href="https://github.com/IOsonata/TaktOS" style="font-size: 11px; color: var(--color-text-secondary); text-decoration: none;">github.com/IOsonata/TaktOS</a>
+</div>
+
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+function fmtM(v) { return (v/1e6).toFixed(1)+'M'; }
+
+new Chart(document.getElementById('tmChart'), {
+  type: 'bar',
+  data: {
+    labels: ['TM2 cooperative', 'TM3 preemptive', 'TM6 message', 'TM7 sync', 'TM8 mutex', 'Mutex barging'],
+    datasets: [
+      { label:'TaktOS',   data:[35534146,14448300,23257291,49836941,20091357,19787106], backgroundColor:'#534AB7', borderRadius:3, borderSkipped:false },
+      { label:'ThreadX',  data:[17523327, 8161573,21681056,40824799, 8392311, 8202441], backgroundColor:'#888780', borderRadius:3, borderSkipped:false },
+      { label:'Zephyr',   data:[15882166,10431589, 9372502,38178957, 9968531, 9948338], backgroundColor:'#185FA5', borderRadius:3, borderSkipped:false },
+      { label:'FreeRTOS', data:[21557088, 6311101, 7251900,12142194, 7075918, 6880779], backgroundColor:'#D85A30', borderRadius:3, borderSkipped:false }
+    ]
+  },
+  options: {
+    responsive:true, maintainAspectRatio:false,
+    plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: ctx=>' '+ctx.dataset.label+': '+fmtM(ctx.raw) } } },
+    scales: {
+      x: { grid:{display:false}, ticks:{color:'#888780',font:{size:11},autoSkip:false,maxRotation:0}, border:{display:false} },
+      y: { grid:{color:'rgba(128,128,120,0.12)'}, border:{display:false}, ticks:{color:'#888780',font:{size:11},callback:v=>fmtM(v)} }
+    }
+  }
+});
+
+new Chart(document.getElementById('szCanvas'), {
+  type:'bar',
+  data: {
+    labels:['TaktOS','FreeRTOS','ThreadX','Zephyr'],
+    datasets:[{ data:[15611,15847,16583,36480], backgroundColor:['#534AB7','#D85A30','#888780','#185FA5'], borderRadius:3, borderSkipped:false }]
+  },
+  options: {
+    indexAxis:'y', responsive:true, maintainAspectRatio:false,
+    plugins: { legend:{display:false}, tooltip:{ callbacks:{ label: ctx=>' '+ctx.raw.toLocaleString()+' bytes' } } },
+    scales: {
+      x: { grid:{color:'rgba(128,128,120,0.12)'}, border:{display:false}, ticks:{color:'#888780',font:{size:10},callback:v=>(v/1024).toFixed(0)+' KB'} },
+      y: { grid:{display:false}, border:{display:false}, ticks:{color:'#888780',font:{size:11}} }
+    }
+  }
+});
+</script>

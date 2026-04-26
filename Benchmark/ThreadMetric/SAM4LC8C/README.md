@@ -1,125 +1,141 @@
 # Thread-Metric — TaktOS on ATSAM4LC8C
 
-Cortex-M4 @ 48 MHz, no FPU, soft-float ABI. Mirrors the nRF52832 / nRF54L15
-benchmark suites in structure; uses the same Thread-Metric sources under
-`Benchmark/ThreadMetric/src/` and the same shared `tm_report.c`.
+Cortex-M4 @ 48 MHz, no FPU, soft-float ABI. Mirrors the nRF52832 /
+nRF54L15 benchmark suites in structure: every project links the same
+shared sources from `Benchmark/ThreadMetric/src/` and the same shared
+headers from `Benchmark/ThreadMetric/include/`. The SAM4L-specific
+pieces — UART pins, core clock, SW IRQ, NVIC priority setup — live in
+a single `include/board.h` that the shared `main.cpp` and
+`tm_port_taktos.cpp` consume through `#include "board.h"`.
 
 ## Tests included
 
-Same six TaktOS tests as the nRF52832 port — MemoryAllocation is intentionally
-excluded (TaktOS has no heap; `tm_memory_pool_*` runs on a static free-list
-inside `tm_port_taktos`):
+Same six TaktOS scheduling/object tests as the nRF52832 port, plus the
+TaktOS mutex-barging extension. MemoryAllocation is intentionally
+excluded: TaktOS has no heap, and the official TM5 cannot be benchmarked
+fairly through a static free-list.
 
-- `ThreadMetricBenchmarkTaktOS_BasicProcessing_SAM4LC8C`
-- `ThreadMetricBenchmarkTaktOS_CooperativeScheduling_SAM4LC8C`
-- `ThreadMetricBenchmarkTaktOS_MessageProcessing_SAM4LC8C`
-- `ThreadMetricBenchmarkTaktOS_MutexProcessing_SAM4LC8C`
-- `ThreadMetricBenchmarkTaktOS_PreemptiveScheduling_SAM4LC8C`
-- `ThreadMetricBenchmarkTaktOS_SynchronizationProcessing_SAM4LC8C`
-
-## Eclipse project settings (both Debug and Release configs)
-
-- **MCU**: `-mcpu=cortex-m4 -mthumb`
-- **FPU / float ABI**: `-mfloat-abi=soft`, FPU Type = *none* — SAM4L has no FPU
-- **C++ standard**: `-std=gnu++23`
-- **Defined symbols**: `__SAM4LC8C__`, `__PROGRAM_START`, `TAKT_INLINE_OPTIMIZATION`
-- **Linker script**: `${iosonata_loc}/IOsonata/ARM/Microchip/SAM4L/ldscript/gcc_sam4lx8.ld`
-- **Libraries**: `TaktOS_M4`, `IOsonata_SAM4LCxC`
-- **Library search paths**: `${iosonata_loc}/IOsonata/ARM/Microchip/SAM4L/SAM4LCxC/lib/Eclipse/<Debug|Release>`
-  plus the local `ARM/cm4/Eclipse/<config>` for `libTaktOS_M4.a`
-
-If your IOsonata tree places the compiled SAM4L library at a different path,
-edit that single `listOptionValue` in `.cproject`.
-
-## Port-layer design (`src/tm_port_taktos.cpp`)
-
-- **Scheduler / tick / priorities**: 1000 Hz tick via TaktOS, PendSV and SysTick
-  set to 0xFF (lowest priority), SW IRQ set to 0xC0 so it preempts tasks and
-  PendSV tail-chains to complete any scheduling work.
-- **Core clock**: 48 MHz expected after IOsonata's `SystemInit`.
-  Change `TM_TAKTOS_CORE_CLOCK_HZ` if different.
-- **`tm_cause_interrupt`**: SAM4L has no STIR and no dedicated SWI peripheral.
-  The port borrows the TRNG NVIC line (IRQ **73**) and pends it via `NVIC_ISPR`.
-  The TRNG peripheral itself is never clocked or configured — only its NVIC
-  slot is used. The handler is installed by weak-aliasing `TRNG_Handler` to
-  `tm_irq_vector_handler`, so it drops into the IOsonata CMSIS startup vector
-  table without edits.
-
-## Console output: you must provide tm_putchar + tm_hw_console_init
-
-**This is the one piece of glue you need to add to each project.** The port
-layer ships with weak no-op fallbacks for `tm_putchar()` and
-`tm_hw_console_init()`, so the benchmark itself will run to completion on any
-SAM4L board regardless of UART wiring — but the Thread-Metric report text
-needs a working UART to actually appear on your terminal.
-
-**Why it's not hardwired:** the SAM4L peripheral memory map and PM clock
-unlock sequence differ from SAM3/4S/4N/4E. Accessing a clock-disabled
-peripheral on SAM4L hangs the core hard. IOsonata's `UARTDev_t` driver
-already handles clock gating, pin-muxing, baud calculation, and polling
-correctly — reusing that is much safer than duplicating the register-level
-work in the port layer.
-
-### Drop-in template (SAM4L8 Xplained Pro)
-
-A ready-made example is in `tm_console_iosonata_sam4l8xpro.cpp` at the top of
-this folder, pre-configured for the **SAM4L8 Xplained Pro** EDBG Virtual COM
-Port wiring:
-
-- **USART1**
-- **PC27** -> USART1 TXD  (SAM4L8 TX line out of the MCU)
-- **PC26** -> USART1 RXD  (SAM4L8 RX line into the MCU)
-
-Source: *Atmel SAM4L8 Xplained Pro User Guide* (Atmel-42103B), Section 4.3.2.
-Note this is different from the SAM4L-EK wiring (USART2 on PC11/PC12).
-
-**Known caveat — peripheral mux function letter:** the `PINOP` field selects
-which of the 8 peripheral functions (A-H = 0-7) maps the pin to USART1. The
-template defaults to `0` (function A), which is the primary mapping for most
-SAM4L pins. If output still does not appear after wiring the right USART and
-pins, try `UART_CFG_TX_PINOP = 1` (B), then 2 (C), etc. The definitive value
-is in Table 3-1 "GPIO Controller Function Multiplexing - 100-pin Package" of
-the SAM4L datasheet, or in the ASF board file
-`sam/boards/sam4l8_xplained_pro/sam4l8_xplained_pro.h` as `COM_PORT_PIN_TX_MUX`.
-
-To use the template:
-
-1. Copy that file into one project's `src/` folder (next to `main.cpp`).
-2. Edit the `UART_CFG_*` defines at the top to match your board's UART and
-   pin wiring.
-3. Rebuild. The strong symbols defined in the override file automatically
-   take precedence over the weak no-op fallbacks at link time.
-
-Repeat per project, or add it as a linked resource across all six projects
-the same way `tm_port_taktos.cpp` is linked.
-
-### Advanced: direct register access (not recommended)
-
-If you really want the port to drive the USART directly without IOsonata,
-define `TM_SAM4L_ENABLE_DIRECT_UART=1` as a project symbol. The register
-addresses, PBA clock mask bit, and pin-mux selectors in `tm_port_taktos.cpp`
-have **NOT** been verified against the SAM4L datasheet — they were reasoned
-from SAM3/4S conventions and may not be correct. Expect to step through with
-a debugger and fix any mismatched base addresses, offsets, or bit positions
-against the SAM4L datasheet memory map before this path will work.
-
-The included `tm_putchar` under this path has a 1,000,000-iteration safety
-timeout so it won't hang the whole benchmark if the USART doesn't come up.
+- `TaktOS_SAM4LC8C_BasicProcessing` — TM1
+- `TaktOS_SAM4LC8C_CooperativeScheduling` — TM2
+- `TaktOS_SAM4LC8C_PreemptiveScheduling` — TM3
+- `TaktOS_SAM4LC8C_MessageProcessing` — TM6
+- `TaktOS_SAM4LC8C_SynchronizationProcessing` — TM7
+- `TaktOS_SAM4LC8C_MutexProcessing` — TM8 (TaktOS extension)
+- `TaktOS_SAM4LC8C_MutexBargingTest` — TaktOS extension
 
 ## File layout
 
 ```
 Benchmark/ThreadMetric/SAM4LC8C/
-├── README.md
-├── tm_console_iosonata_sam4l8xpro.cpp    (copy into each project's src/)
+├── README.md                                  (this file)
+├── include/
+│   └── board.h                                SAM4L pin / clock / SW IRQ macros
 ├── src/
-│   ├── tm_port_taktos.c                (excluded from build, kept for reference)
-│   └── tm_port_taktos.cpp              (the active port)
-└── ThreadMetricBenchmarkTaktOS_<test>_SAM4LC8C/
-    ├── src/main.cpp                    (tiny shim: hw init -> tm_main)
+│   └── legacy/                                pre-shared-scheme port files (reference only)
+└── TaktOS_SAM4LC8C_<TestName>/
     └── Eclipse/
-        ├── .project                    (links shared port + test source)
-        ├── .cproject                   (M4 / soft-float / IOsonata_SAM4LCxC)
+        ├── .project                           links shared main.cpp / tm_port_taktos.cpp /
+        │                                      tm_report.cpp / tm_api.h plus the per-test source
+        ├── .cproject                          M4 / soft-float / IOsonata_SAM4LCxC + TaktOS_M4
         ├── .gitignore
         └── .settings/language.settings.xml
 ```
+
+There is intentionally no per-project `src/` directory anymore — every
+source file each project compiles is linked from
+`Benchmark/ThreadMetric/src/` or `Benchmark/ThreadMetric/include/` via
+`PARENT-3-PROJECT_LOC` references in `.project`.
+
+## Eclipse project settings (Debug and Release)
+
+- **MCU**: `-mcpu=cortex-m4 -mthumb`
+- **FPU / float ABI**: `-mfloat-abi=soft`, FPU Type = *none* — SAM4L (C
+  variant) has no FPU
+- **C++ standard**: `-std=gnu++23`, no RTTI, no exceptions
+- **Defined symbols**: `__SAM4LC8C__`, `__PROGRAM_START`
+- **Linker script**:
+  `${iosonata_loc}/IOsonata/ARM/Microchip/SAM4L/ldscript/gcc_sam4lx8.ld`
+- **Libraries**: `TaktOS_M4`, `IOsonata_SAM4LCxC`
+- **Library search paths**:
+  `${iosonata_loc}/IOsonata/ARM/Microchip/SAM4L/SAM4LCxC/lib/Eclipse/<Debug|Release>`
+  plus the local `ARM/cm4/Eclipse/<Debug|Release>` for `libTaktOS_M4.a`
+
+If your IOsonata tree places the compiled SAM4L library at a different
+path, edit the matching `listOptionValue` in each `.cproject`.
+
+## board.h — what it supplies
+
+`include/board.h` exposes a small, fixed set of macros and inline
+helpers that the shared sources rely on. It is the only SAM4L-specific
+glue in this directory.
+
+| Macro / inline                | Purpose                                                              |
+|-------------------------------|----------------------------------------------------------------------|
+| `TM_CORE_CLOCK_HZ`            | 48 000 000 — CPU clock after IOsonata `SystemInit`                   |
+| `UART_DEVNO`                  | 1 — IOsonata DevNo for USART1                                        |
+| `UART_TX_PORT/PIN/PINOP`      | PortC=2, PC27, function B (PINOP=1) — USART1 TXD                     |
+| `UART_RX_PORT/PIN/PINOP`      | PortC=2, PC26, function B (PINOP=1) — USART1 RXD                     |
+| `TM_SW_IRQn`                  | `73` — borrowed NVIC line (TRNG slot) for `tm_cause_interrupt`       |
+| `TM_SW_IRQ_VECTOR`            | `TRNG_Handler` — symmetry with the other ports; not used by these seven tests |
+| `TmCauseInterrupt()`          | inline — pends the SW IRQ via a direct write to NVIC `ISPR`          |
+| `TmSetKernelPriorities()`     | inline — drops PendSV / SysTick to lowest NVIC priority              |
+| `TmEnableSoftwareInterrupt()` | inline — sets the borrowed-IRQ priority and enables it               |
+
+Because none of the seven tests exercises `tm_cause_interrupt`, the
+TRNG vector itself is left at the IOsonata weak default. The TRNG
+peripheral is never clocked or configured. Only the NVIC slot's
+priority/pending bits are touched, and only at `tm_initialize()`.
+
+## board.h is self-contained — no SAM4L CMSIS dependency
+
+`board.h` does **not** include any SAM4L device header. The NVIC and
+System Control Block live at fixed architectural addresses defined by
+the ARM ARM v7-M, so `TmCauseInterrupt` / `TmSetKernelPriorities` /
+`TmEnableSoftwareInterrupt` go straight to those addresses (`NVIC_ISPR`
+at `0xE000E200`, `NVIC_IPR` at `0xE000E400`, `NVIC_ISER` at
+`0xE000E100`, `SCB_SHPR3` at `0xE000ED20`). The previous SAM4L port
+(in `src/legacy/`) used the same approach, and the IOsonata
+`libIOsonata_SAM4LCxC.a` continues to handle every other peripheral
+register access through its own driver layer — `board.h` only deals
+with the four ARM-defined system registers.
+
+This means `board.h` builds cleanly without any IOsonata SAM4L CMSIS
+include path, regardless of where (or whether) your IOsonata tree
+keeps device-pack headers.
+
+## UART pin caveat — PINOP function letter
+
+`UART_TX_PINOP = 1` (function B) is the starting guess based on the
+Atmel SAM4L8 Xplained Pro User Guide (Atmel-42103B, §4.3.2) and the
+ASF board file
+`sam/boards/sam4l8_xplained_pro/sam4l8_xplained_pro.h`. The `PINOP`
+field selects which of the eight peripheral functions (A–H = 0–7) maps
+PC26/PC27 to USART1.
+
+If output does not appear after flashing:
+
+1. First check the wiring — the EDBG VCOM is on USART1 PC26/PC27 only
+   on the SAM4L8 Xplained Pro. The SAM4L-EK uses USART2 on PC11/PC12.
+2. If wiring is correct, try `UART_TX_PINOP = 0` (function A), then 2
+   (C), and so on. The definitive value is in Table 3-1 "GPIO
+   Controller Function Multiplexing — 100-pin Package" of the SAM4L
+   datasheet. Whatever value works for TX, mirror it on `UART_RX_PINOP`.
+
+## What changed from the previous SAM4L port
+
+The pre-shared-scheme SAM4L port (now in `src/legacy/`) hard-coded the
+SAM4L PM unlock sequence, GPIO multiplexer registers, USART register
+offsets, NVIC SHPR3, and STIR-via-ISPR fallback inside a single
+`tm_port_taktos.cpp`. That port worked, but it duplicated work that
+IOsonata's `UART` driver already does correctly (clock gating, pin-mux,
+baud calc, FIFO/DMA), and it had a different API surface than the
+nRF52832 / nRF54L15 ports — making cross-MCU comparisons harder than
+they needed to be.
+
+The new scheme keeps every line of SAM4L specifics in `include/board.h`
+(no register pokes — only CMSIS calls), reuses the shared
+`tm_port_taktos.cpp` and `tm_report.cpp` from
+`Benchmark/ThreadMetric/src/`, and reuses the shared `main.cpp` that
+brings up the IOsonata `UART` console. The result is one numerical set
+generated by exactly the same C++ source as the other targets, modulo
+the M4 soft-float ABI and SAM4L-specific BSP library link.

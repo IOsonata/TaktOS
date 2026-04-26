@@ -54,6 +54,8 @@ SOFTWARE.
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "TaktCompiler.h"
+
 #define TAKTOS_WAIT_FOREVER     0xFFFFFFFFu
 #define TAKTOS_NO_WAIT          0u
 
@@ -73,7 +75,7 @@ typedef enum {
 
 //--- Thread states ---------------------------------------
 
-typedef enum : uint8_t {
+typedef enum {
     TAKTOS_READY = 0,
     TAKTOS_RUNNING,     // Reserved for future use.
                         // In the current implementation, the active thread's
@@ -89,6 +91,8 @@ typedef enum : uint8_t {
     TAKTOS_DEAD,    // handle is a tombstone  thread has been destroyed
 } TaktOSState_t;
 
+// Lock the byte-size guarantee that the C23 ': uint8_t' annotation gave us.
+TAKT_STATIC_ASSERT(TAKTOS_DEAD <= 0xFFu, "TaktOSState_t must fit in uint8_t");
 
 //--- Tick clock source ---------------------------------
 // Selects which clock path drives the kernel tick source when the target

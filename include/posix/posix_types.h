@@ -193,7 +193,7 @@ static inline uint32_t takt_timespec_to_ticks(const struct timespec* abs_timeout
     }
     uint64_t delta = abs_ticks - now_ticks;
     return (delta > 0xFFFFFFFEu) ? 0xFFFFFFFFu
-                                 : static_cast<uint32_t>(delta);
+                                 : (uint32_t)delta;
 }
 
 

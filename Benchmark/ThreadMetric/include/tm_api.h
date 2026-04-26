@@ -24,6 +24,7 @@ extern "C" {
 extern int tm_test_duration;
 extern int tm_test_cycles;
 
+void tm_main(void);
 void tm_report_init(void);
 void tm_report_init_argv(int argc, char **argv);
 void tm_report_finish(void);

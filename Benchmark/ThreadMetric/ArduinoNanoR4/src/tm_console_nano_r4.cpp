@@ -2,16 +2,27 @@
 // Thread-Metric console driver — SCI2 polling mode on Arduino Nano R4.
 // =============================================================================
 // The Arduino Nano R4 routes RA4M1 SCI2 to the D0 / D1 header pins via:
-//   D1 (TX)  = P301 / TXD2   — SCI2 transmit data
-//   D0 (RX)  = P302 / RXD2   — SCI2 receive data (not used here)
+//   D1 (TX)  = P302 / TXD2   — SCI2 transmit data (what we drive)
+//   D0 (RX)  = P301 / RXD2   — SCI2 receive data (not used here)
+//
+// Verified against the official Nano R4 schematic (ABX00142) net labels
+// P302_SCI2_TXD and P301_SCI2_RXD, and against variants/NANOR4/variant.cpp
+// in ArduinoCore-renesas which maps D1 → BSP_IO_PORT_03_PIN_02 (P302).
 //
 // This is the same SCI channel that Arduino calls "Serial1" on the UNO R4
 // Minima and Nano R4. The Nano R4's native USB (Serial over USB-C) is
 // driven by the RA4M1 on-chip USBFS peripheral and would require a USB-CDC
 // stack — deliberately out of scope for a bare-metal benchmark port.
 //
-// To view benchmark output, connect an external USB-UART adapter (CP2102,
-// FTDI, CH340, etc.) to D1 (adapter RX) and GND. Baud 115200 8N1.
+// IMPORTANT — 5V I/O: the Nano R4 runs the RA4M1 at 5 V VCC (within its
+// 5.5 V abs max), so D1 drives 5 V TTL directly with no level shifters on
+// the board. The USB-serial adapter you connect MUST be 5V-tolerant on
+// its RX input. FT232RL, CP2102N, and CH340G are all 5V-tolerant. Purely
+// 3.3V adapters either clamp the signal or risk damage — use a 2k2/3k3
+// resistor divider on the TX line, or buy a 5V-capable adapter.
+//
+// To view benchmark output, connect adapter RX to D1, adapter GND to GND.
+// Baud 115200 8N1.
 //
 // Registers are accessed directly — no Renesas FSP or Arduino BSP
 // dependency. PCLKB feeds SCI, and after SystemInit() PCLKB = ICLK = 48 MHz
@@ -111,37 +122,82 @@ static inline uint8_t tm_sci_brr(uint32_t pclkb_hz, uint32_t baud)
 // its stubs weak so this file wins at link time.
 // -----------------------------------------------------------------------------
 
+// Register write protection — MSTPCRB is protected by PRCR.PRC1.
+// Without unlocking it, the MSTPCRB write is silently discarded and the
+// subsequent SCI2 access BusFaults on an unclocked peripheral.
+#define PRCR_ADDR           0x4001E3FEUL
+#define PRCR                (*(volatile uint16_t*)PRCR_ADDR)
+#define PRCR_KEY            (0xA500U)
+#define PRCR_PRC1           (1U << 1)
+
+// Helper: data-memory barrier — ensure the preceding store has left the CPU
+// write buffer and the peripheral has observed it before we proceed.
+#define DMB_DSB()   __asm__ volatile ("dsb" ::: "memory")
+
 extern "C" void tm_hw_console_init(void)
 {
-    // Release SCI2 from module-stop.
-    MSTPCRB &= ~MSTPCRB_MSTPB29;
+    // ── Unlock PRC1 so we can write MSTPCRB. ─────────────────────────────
+    PRCR = PRCR_KEY | PRCR_PRC1;
+    DMB_DSB();
 
-    // Unlock the PFS registers (PWPR: clear B0WI first, then set PFSWE).
-    PWPR  = 0x00u;          // clear B0WI
-    PWPR  = PWPR_PFSWE;     // enable PFS writes
+    // ── Release SCI2 from module-stop. ──────────────────────────────────
+    // Read-modify-write MSTPCRB with PRC1 unlocked.
+    uint32_t mstp = MSTPCRB;
+    mstp &= ~MSTPCRB_MSTPB29;
+    MSTPCRB = mstp;
+    DMB_DSB();
 
-    // Route P301 -> TXD2 (PSEL = 0x04), and P302 -> RXD2 for completeness.
-    // Set PMR=1 (peripheral mode) in the same write.
-    P301PFS = PFS_PSEL_SCI | PFS_PMR | PFS_DSCR_HIGH;
-    P302PFS = PFS_PSEL_SCI | PFS_PMR;
+    // Dummy read: forces the CPU to stall until the MSTPCRB write reaches
+    // the peripheral bus, AND gives SCI2 its first clocked cycle before we
+    // access any of its registers. Required on Renesas RA/RX/RZ parts.
+    volatile uint32_t dummy = MSTPCRB;
+    (void)dummy;
+    DMB_DSB();
 
-    // Relock PFS.
+    // ── Relock PRC1. ────────────────────────────────────────────────────
+    PRCR = PRCR_KEY;
+    DMB_DSB();
+
+    // ── Unlock the PFS registers (PWPR: clear B0WI first, then set PFSWE). ──
+    PWPR  = 0x00u;
+    DMB_DSB();
+    PWPR  = PWPR_PFSWE;
+    DMB_DSB();
+
+    // ── Route P301 / P302 to SCI2. ──────────────────────────────────────
+    // Renesas pattern: set PSEL with PMR=0 first, THEN set PMR=1 in a
+    // separate write. When PMR is already 1, writes to PSEL are locked
+    // out. Since PMR is 0 after reset we could do it in one write, but
+    // splitting matches the documented sequence and is more robust.
+    P301PFS = PFS_PSEL_SCI | PFS_DSCR_HIGH;          // PSEL=4, PMR=0
+    DMB_DSB();
+    P301PFS = PFS_PSEL_SCI | PFS_DSCR_HIGH | PFS_PMR; // now assert PMR=1
+    DMB_DSB();
+
+    P302PFS = PFS_PSEL_SCI;                           // PSEL=4, PMR=0
+    DMB_DSB();
+    P302PFS = PFS_PSEL_SCI | PFS_PMR;                 // now assert PMR=1
+    DMB_DSB();
+
+    // ── Relock PFS. ─────────────────────────────────────────────────────
     PWPR  = PWPR_B0WI;
+    DMB_DSB();
 
-    // Configure SCI2 async 8N1, no interrupts, TX-only enabled at the end.
-    SCI2_SCR  = 0x00u;                              // disable everything first
-    while ((SCI2_SCR & (SCR_TE | SCR_RE)) != 0u) {} // ensure quiescent
+    // ── Configure SCI2 async 8N1. ───────────────────────────────────────
+    SCI2_SCR  = 0x00u;
+    DMB_DSB();
+    while ((SCI2_SCR & (SCR_TE | SCR_RE)) != 0u) {}
     SCI2_SCMR = SCMR_DEFAULT;
     SCI2_SEMR = SEMR_DEFAULT;
-    SCI2_SMR  = 0x00u;                              // async, 8-bit, 1 stop, no parity, CKS=0
+    SCI2_SMR  = 0x00u;
     SCI2_BRR  = tm_sci_brr(SystemCoreClock, UART_BAUDRATE);
+    DMB_DSB();
 
-    // Small delay >= one bit time before enabling TE, per the RA4M1
-    // reference manual's SCI init sequence. At 115200 baud one bit is
-    // ~8.7 us — burn a few hundred cycles.
-    for (volatile uint32_t i = 0; i < 1000u; ++i) { __asm__ volatile ("nop"); }
+    // ── Bit-time delay before enabling TE, per the SCI init sequence. ──
+    for (uint32_t i = 0; i < 1000u; ++i) { __asm__ volatile ("nop"); }
 
-    SCI2_SCR  = SCR_TE;                             // TX enable, RX disabled
+    SCI2_SCR  = SCR_TE;
+    DMB_DSB();
 }
 
 extern "C" void tm_putchar(int c)

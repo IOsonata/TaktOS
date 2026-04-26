@@ -1,26 +1,20 @@
 /**
  * @file    startup_ra4m1.S
- * @brief   Startup + interrupt vector table for Renesas RA4M1 (Cortex-M4F).
+ * @brief   Diagnostic LED patterns, fault traps, and _init/_fini stubs.
  *
- * Target:  Arduino Nano R4 (RA4M1 @ 48 MHz, 256 KB flash, 32 KB SRAM, FPU).
+ * The vector table and Reset entry are now in vector_ra4m1.c and
+ * ResetEntry.c (IOsonata pattern — direct reset vector, no asm Reset_Handler).
  *
- * On reset:
- *   1. MSP is initialised from the first word of the vector table.
- *   2. Reset_Handler copies .data from flash to RAM.
- *   3. .bss is zeroed.
- *   4. SystemInit() selects HOCO @ 48 MHz as ICLK and brings clocks up.
- *   5. FPU (CP10/CP11) is enabled in CPACR before static ctors run.
- *   6. __libc_init_array() runs C++ static ctors / init_array entries.
- *   7. main() is called.
- *
- * TaktOS's PendSV_Handler, SysTick_Handler, and SVC_Handler are strong
- * symbols in the linked TaktOS_M4 ReleaseFPU static library; they override
- * the weak aliases defined here at link time.
- *
- * The RA4M1 ICU feeds 32 NVIC IRQs (IRQ 0..31) via IELSRn event-link
- * registers (n = IELSR slot). The vector table below reserves 32 IELn_IRQHandler
- * slots. tm_port_taktos.cpp uses slot 31 (IELSR31) for tm_cause_interrupt()
- * with no peripheral event assigned — only the NVIC pending bit is pulsed.
+ * What remains here:
+ *   - pattern_short / pattern_long / pattern_fast_blink / pattern_steady
+ *     (LED milestone feedback — called from SystemInit and from
+ *     ResetEntry during debug runs)
+ *   - HardFault_Handler / MemManage_Handler / BusFault_Handler /
+ *     UsageFault_Handler : STRONG overrides of the weak aliases in
+ *     vector_ra4m1.c, each branching to fault_trap which lights the LED
+ *     solid-on and spins.
+ *   - _init / _fini empty stubs (not used now that __libc_init_array is
+ *     skipped, but kept so any stray reference does not break the link).
  */
 
     .syntax unified
@@ -28,133 +22,201 @@
     .fpu    fpv4-sp-d16
     .thumb
 
-    .extern _sidata
-    .extern _sdata
-    .extern _edata
-    .extern _sbss
-    .extern _ebss
-    .extern _estack
-
-    .extern SystemInit
-    .extern main
-    .extern __libc_init_array
+    /* PORT2 registers — for the earliest-possible boot LED sign. */
+    .equ    PORT2_PDR,      0x40040040
+    .equ    PORT2_PODR,     0x40040042
+    .equ    LED_MASK,       (1 << 4)        /* P204 */
 
 /* ========================================================================= */
-/*  Vector table                                                              */
+/*  LED milestone patterns. All at 48 MHz HOCO (bootloader leaves it on).   */
+/*                                                                            */
+/*    pattern_short      = one 0.3-s pulse then 1-s dark                    */
+/*    pattern_long       = one 1.5-s pulse then 1-s dark                    */
+/*    pattern_fast_blink = three 0.1-s pulses, spaced 0.1 s, then 1-s dark */
+/*    pattern_steady     = NEVER RETURNS; 1-s on / 1-s off forever          */
 /* ========================================================================= */
-    .section .isr_vector,"a",%progbits
-    .type   g_pfnVectors, %object
+    .section .text.debug_led_post, "ax", %progbits
+    .thumb
 
-g_pfnVectors:
-    .word   _estack                 /*  0: Initial MSP                     */
-    .word   Reset_Handler           /*  1: Reset                           */
-    .word   NMI_Handler             /*  2: NMI                             */
-    .word   HardFault_Handler       /*  3: HardFault                       */
-    .word   MemManage_Handler       /*  4: MemManage                       */
-    .word   BusFault_Handler        /*  5: BusFault                        */
-    .word   UsageFault_Handler      /*  6: UsageFault                      */
-    .word   0                       /*  7 reserved                         */
-    .word   0                       /*  8 reserved                         */
-    .word   0                       /*  9 reserved                         */
-    .word   0                       /* 10 reserved                         */
-    .word   SVC_Handler             /* 11: SVCall                          */
-    .word   DebugMon_Handler        /* 12: DebugMonitor                    */
-    .word   0                       /* 13 reserved                         */
-    .word   PendSV_Handler          /* 14: PendSV                          */
-    .word   SysTick_Handler         /* 15: SysTick                         */
+    .thumb_func
+    .type   pattern_short, %function
+    .global pattern_short
+pattern_short:
+    push    {r4, lr}
+    ldr     r1, =PORT2_PODR
+    ldrh    r2, [r1]
+    orr     r2, r2, #LED_MASK
+    strh    r2, [r1]
+    ldr     r3, =4800000              /* ~0.3 s @ 48 MHz (2 cy/iter) */
+1:  subs    r3, r3, #1
+    bne     1b
+    ldr     r1, =PORT2_PODR
+    ldrh    r2, [r1]
+    bic     r2, r2, #LED_MASK
+    strh    r2, [r1]
+    ldr     r3, =24000000             /* ~1 s dark gap */
+2:  subs    r3, r3, #1
+    bne     2b
+    pop     {r4, pc}
 
-    /* RA4M1 ICU event-link IRQs 0..31 (fed by IELSR0..IELSR31) */
-    .word   IEL0_IRQHandler
-    .word   IEL1_IRQHandler
-    .word   IEL2_IRQHandler
-    .word   IEL3_IRQHandler
-    .word   IEL4_IRQHandler
-    .word   IEL5_IRQHandler
-    .word   IEL6_IRQHandler
-    .word   IEL7_IRQHandler
-    .word   IEL8_IRQHandler
-    .word   IEL9_IRQHandler
-    .word   IEL10_IRQHandler
-    .word   IEL11_IRQHandler
-    .word   IEL12_IRQHandler
-    .word   IEL13_IRQHandler
-    .word   IEL14_IRQHandler
-    .word   IEL15_IRQHandler
-    .word   IEL16_IRQHandler
-    .word   IEL17_IRQHandler
-    .word   IEL18_IRQHandler
-    .word   IEL19_IRQHandler
-    .word   IEL20_IRQHandler
-    .word   IEL21_IRQHandler
-    .word   IEL22_IRQHandler
-    .word   IEL23_IRQHandler
-    .word   IEL24_IRQHandler
-    .word   IEL25_IRQHandler
-    .word   IEL26_IRQHandler
-    .word   IEL27_IRQHandler
-    .word   IEL28_IRQHandler
-    .word   IEL29_IRQHandler
-    .word   IEL30_IRQHandler
-    .word   IEL31_IRQHandler        /* used by tm_cause_interrupt() */
+    .thumb_func
+    .type   pattern_long, %function
+    .global pattern_long
+pattern_long:
+    push    {r4, lr}
+    ldr     r1, =PORT2_PODR
+    ldrh    r2, [r1]
+    orr     r2, r2, #LED_MASK
+    strh    r2, [r1]
+    ldr     r3, =36000000             /* ~1.5 s @ 48 MHz */
+3:  subs    r3, r3, #1
+    bne     3b
+    ldr     r1, =PORT2_PODR
+    ldrh    r2, [r1]
+    bic     r2, r2, #LED_MASK
+    strh    r2, [r1]
+    ldr     r3, =24000000             /* ~1 s dark gap */
+4:  subs    r3, r3, #1
+    bne     4b
+    pop     {r4, pc}
 
-    .size g_pfnVectors, .-g_pfnVectors
+    .thumb_func
+    .type   pattern_fast_blink, %function
+    .global pattern_fast_blink
+pattern_fast_blink:
+    push    {r4, r5, lr}
+    movs    r4, #3                    /* 3 quick flashes */
+pfb_loop:
+    ldr     r1, =PORT2_PODR
+    ldrh    r2, [r1]
+    orr     r2, r2, #LED_MASK
+    strh    r2, [r1]
+    ldr     r5, =2400000              /* ~0.1 s on */
+5:  subs    r5, r5, #1
+    bne     5b
+    ldr     r1, =PORT2_PODR
+    ldrh    r2, [r1]
+    bic     r2, r2, #LED_MASK
+    strh    r2, [r1]
+    ldr     r5, =2400000              /* ~0.1 s off */
+6:  subs    r5, r5, #1
+    bne     6b
+    subs    r4, r4, #1
+    bne     pfb_loop
+    /* Final 1-s dark gap. */
+    ldr     r5, =24000000
+7:  subs    r5, r5, #1
+    bne     7b
+    pop     {r4, r5, pc}
+
+    .thumb_func
+    .type   pattern_steady, %function
+    .global pattern_steady
+pattern_steady:
+    /* Forever: 1 s on, 1 s off. Never returns. */
+ps_loop:
+    ldr     r1, =PORT2_PODR
+    ldrh    r2, [r1]
+    orr     r2, r2, #LED_MASK
+    strh    r2, [r1]
+    ldr     r3, =24000000             /* ~1 s on */
+8:  subs    r3, r3, #1
+    bne     8b
+    ldr     r1, =PORT2_PODR
+    ldrh    r2, [r1]
+    bic     r2, r2, #LED_MASK
+    strh    r2, [r1]
+    ldr     r3, =24000000             /* ~1 s off */
+9:  subs    r3, r3, #1
+    bne     9b
+    b       ps_loop
+
+    /* Legacy symbols kept as no-ops to avoid linker errors from stale
+     * .o files that might still reference them. */
+    .thumb_func
+    .type   debug_led_blink_6, %function
+    .type   debug_led_blink_7, %function
+    .type   debug_led_blink_8, %function
+    .type   debug_led_blink_9, %function
+    .global debug_led_blink_6
+    .global debug_led_blink_7
+    .global debug_led_blink_8
+    .global debug_led_blink_9
+debug_led_blink_6:
+debug_led_blink_7:
+debug_led_blink_8:
+debug_led_blink_9:
+    bx      lr
 
 /* ========================================================================= */
-/*  Reset_Handler                                                             */
+/*  Fault traps — DISTINCT LED patterns per fault type so that "solid-on"   */
+/*  tells us WHICH fault fired instead of being a single opaque state.      */
+/*                                                                            */
+/*    HardFault    : 1 long pulse,  then solid on                            */
+/*    MemManage    : 2 short pulses, then solid on                           */
+/*    BusFault     : 3 short pulses, then solid on                           */
+/*    UsageFault   : 4 short pulses, then solid on   (FPU faults land here) */
+/*                                                                            */
+/*  All end in a tight ft_spin so the LED stays lit as unambiguous evidence. */
 /* ========================================================================= */
-    .section .text.Reset_Handler
-    .weak   Reset_Handler
-    .type   Reset_Handler, %function
+    .section .text.fault_trap, "ax", %progbits
+    .thumb
 
-Reset_Handler:
-    ldr     r0, =_estack
-    mov     sp, r0
+    /* Common tail: LED solid on + infinite spin. */
+    .thumb_func
+    .type   fault_hold, %function
+fault_hold:
+    ldr     r0, =PORT2_PDR
+    ldrh    r1, [r0]
+    orr     r1, r1, #LED_MASK
+    strh    r1, [r0]
+    ldr     r0, =PORT2_PODR
+    ldrh    r1, [r0]
+    orr     r1, r1, #LED_MASK
+    strh    r1, [r0]
+ft_spin:
+    b       ft_spin
 
-    /* Copy .data: [_sidata ..) in flash -> [_sdata .. _edata) in RAM.
-     * Canonical form: advance dest (r1) and source (r3) together one word
-     * at a time. Do not reintroduce any dual-increment form — that corrupts
-     * the copy stride and leaves .data uninitialised past the first word. */
-    ldr     r1, =_sdata
-    ldr     r2, =_edata
-    ldr     r3, =_sidata
-1:  cmp     r1, r2
-    bhs     2f
-    ldr     r0, [r3], #4
-    str     r0, [r1], #4
-    b       1b
-2:
+    .thumb_func
+    .type   HardFault_Handler, %function
+    .global HardFault_Handler
+HardFault_Handler:
+    bl      pattern_long         /* 1 long pulse */
+    b       fault_hold
 
-    /* Zero .bss */
-    ldr     r1, =_sbss
-    ldr     r2, =_ebss
-    movs    r0, #0
-3:  cmp     r1, r2
-    bhs     4f
-    str     r0, [r1], #4
-    b       3b
-4:
+    .thumb_func
+    .type   MemManage_Handler, %function
+    .global MemManage_Handler
+MemManage_Handler:
+    bl      pattern_short        /* 2 short pulses */
+    bl      pattern_short
+    b       fault_hold
 
-    /* Enable FPU (CPACR: CP10 full access, CP11 full access) BEFORE any C
-     * code runs. Required because the TaktOS_M4 ReleaseFPU library and
-     * any -mfloat-abi=hard code will execute VFP instructions. */
-    ldr     r0, =0xE000ED88         /* CPACR */
-    ldr     r1, [r0]
-    orr     r1, r1, #(0xF << 20)    /* CP10 + CP11 full access */
-    str     r1, [r0]
-    dsb
-    isb
+    .thumb_func
+    .type   BusFault_Handler, %function
+    .global BusFault_Handler
+BusFault_Handler:
+    bl      pattern_short        /* 3 short pulses */
+    bl      pattern_short
+    bl      pattern_short
+    b       fault_hold
 
-    bl      SystemInit
-    bl      __libc_init_array
-    bl      main
-
-5:  b       5b
-    .size   Reset_Handler, .-Reset_Handler
+    .thumb_func
+    .type   UsageFault_Handler, %function
+    .global UsageFault_Handler
+UsageFault_Handler:
+    bl      pattern_short        /* 4 short pulses — FPU faults come here */
+    bl      pattern_short
+    bl      pattern_short
+    bl      pattern_short
+    b       fault_hold
 
 /* ========================================================================= */
-/*  Empty _init / _fini required by __libc_init_array.                       */
+/*  Empty _init / _fini.  Not called now that ResetEntry skips              */
+/*  __libc_init_array, but kept weak in case any TU still references them. */
 /* ========================================================================= */
     .section .text._init, "ax", %progbits
+    .thumb
     .weak   _init
     .type   _init, %function
 _init:
@@ -162,72 +224,11 @@ _init:
     .size   _init, .-_init
 
     .section .text._fini, "ax", %progbits
+    .thumb
     .weak   _fini
     .type   _fini, %function
 _fini:
     bx      lr
     .size   _fini, .-_fini
-
-/* ========================================================================= */
-/*  Default_Handler — catch-all for unimplemented IRQs.                      */
-/* ========================================================================= */
-    .section .text.Default_Handler, "ax", %progbits
-    .type   Default_Handler, %function
-Default_Handler:
-    b       Default_Handler
-    .size   Default_Handler, .-Default_Handler
-
-/* ========================================================================= */
-/*  Weak aliases — overridden by strong symbols in the TaktOS_M4 library     */
-/*  (PendSV_Handler, SysTick_Handler, SVC_Handler) and by the tm_port        */
-/*  layer (IEL31_IRQHandler for tm_cause_interrupt()).                       */
-/* ========================================================================= */
-    .macro  def_weak_handler name
-    .weak   \name
-    .thumb_set \name, Default_Handler
-    .endm
-
-    def_weak_handler    NMI_Handler
-    def_weak_handler    HardFault_Handler
-    def_weak_handler    MemManage_Handler
-    def_weak_handler    BusFault_Handler
-    def_weak_handler    UsageFault_Handler
-    def_weak_handler    SVC_Handler
-    def_weak_handler    DebugMon_Handler
-    def_weak_handler    PendSV_Handler
-    def_weak_handler    SysTick_Handler
-
-    def_weak_handler    IEL0_IRQHandler
-    def_weak_handler    IEL1_IRQHandler
-    def_weak_handler    IEL2_IRQHandler
-    def_weak_handler    IEL3_IRQHandler
-    def_weak_handler    IEL4_IRQHandler
-    def_weak_handler    IEL5_IRQHandler
-    def_weak_handler    IEL6_IRQHandler
-    def_weak_handler    IEL7_IRQHandler
-    def_weak_handler    IEL8_IRQHandler
-    def_weak_handler    IEL9_IRQHandler
-    def_weak_handler    IEL10_IRQHandler
-    def_weak_handler    IEL11_IRQHandler
-    def_weak_handler    IEL12_IRQHandler
-    def_weak_handler    IEL13_IRQHandler
-    def_weak_handler    IEL14_IRQHandler
-    def_weak_handler    IEL15_IRQHandler
-    def_weak_handler    IEL16_IRQHandler
-    def_weak_handler    IEL17_IRQHandler
-    def_weak_handler    IEL18_IRQHandler
-    def_weak_handler    IEL19_IRQHandler
-    def_weak_handler    IEL20_IRQHandler
-    def_weak_handler    IEL21_IRQHandler
-    def_weak_handler    IEL22_IRQHandler
-    def_weak_handler    IEL23_IRQHandler
-    def_weak_handler    IEL24_IRQHandler
-    def_weak_handler    IEL25_IRQHandler
-    def_weak_handler    IEL26_IRQHandler
-    def_weak_handler    IEL27_IRQHandler
-    def_weak_handler    IEL28_IRQHandler
-    def_weak_handler    IEL29_IRQHandler
-    def_weak_handler    IEL30_IRQHandler
-    def_weak_handler    IEL31_IRQHandler
 
     .end

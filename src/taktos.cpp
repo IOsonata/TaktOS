@@ -56,23 +56,10 @@ SOFTWARE.
 #include "TaktCompiler.h"
 #include "TaktKernelTick.h"
 
-//--- Run queue  32-bit priority bitmap --------------------------
-//
-//  head[pri] = TAIL of circular list.
-//  head[pri]->next = FRONT = thread that runs next.
-//  O(1) insert: new node becomes new tail.
-//  O(1) yield:  current moves from front to back (new tail).
-//  O(n) block:  find predecessor  unavoidable with singly-linked.
-
-typedef struct {
-    uint32_t        Bitmap;
-    uint8_t         TopPri;                 // cached highest ready priority
-    TaktOSThread_t  *pHead[TAKTOS_MAX_PRI];	// head[pri] = TAIL of queue
-} TaktRunQueue_t;
-
+//--- Run queue  definition is in TaktKernel.h (inline primitives) ---
 
 uint32_t g_TickCount;
-static TaktRunQueue_t s_RunQueue;
+TaktRunQueue_t g_TaktRunQueue;
 static uint32_t s_KernClockHz;		// Tick peripheral input clock in Hz
 static uint32_t s_TickFreq;			// Tick freq in Hz
 static TaktOSTickClockSrc_t s_TickClockSrc;	// Selected tick clock path
@@ -137,100 +124,19 @@ extern "C" TAKT_WEAK bool TaktKernelHandlerAssign(uintptr_t HandlerBaseAddr)
 }
 
 
-//--- Bitmap helpers ----------------------------------------------
+//--- Scheduler primitives  inline in TaktKernel.h --------------
+// TaktPrioBitmapSet/Clear/Top, TaktUpdateNextThread, TaktReadyTask,
+// TaktForceNextThread are all defined as static TAKT_ALWAYS_INLINE in
+// TaktKernel.h so every caller gets the body folded at the call site.
+//
+// TaktBlockTask is kept out-of-line here because its body (~120 bytes)
+// includes the O(n) predecessor-walk loop. Inlining that loop at every
+// call site would cost ~600 bytes across the kernel for code whose loop
+// is never taken in TM3/TM2 (every priority is singleton there).
 
 /**
- * @brief	Mark a priority level as having at least one ready thread.
- *
- * @param	Prio : Priority level (0TAKTOS_MAX_PRI-1).
- */
-static inline void PrioBitmapSet(uint8_t Prio)
-{
-	s_RunQueue.Bitmap |= (1u << Prio);
-}
-
-/**
- * @brief	Clear a priority level's ready bit when its run queue becomes empty.
- *
- * @param	Prio : Priority level (0TAKTOS_MAX_PRI-1).
- */
-static inline void PrioBitmapClear(uint8_t Prio)
-{
-	s_RunQueue.Bitmap &= ~(1u << Prio);
-}
-
-/**
- * @brief	Return the highest priority level that has at least one ready thread.
- *
- * Uses TAKT_CLZ for O(1) lookup.  The idle thread at priority 0 is always
- * ready so the bitmap is never zero in normal operation; a zero bitmap returns
- * 0 as a safe fallback.
- *
- * @return	Highest set priority level (0TAKTOS_MAX_PRI-1).
- */
-static inline uint8_t PrioBitmapTop(void)
-{
-    // Guard: CLZ(0) == 32 on ARM; 31-32 wraps to 0xFF -> head[255] OOB.
-    // Idle thread (priority 0) is always ready so bitmap should never
-    // be zero in normal operation, but defend against it unconditionally.
-    uint32_t bm = s_RunQueue.Bitmap;
-    if (bm == 0u)
-    {
-        return 0u;
-    }
-    return (uint8_t)(31u - (uint32_t)TAKT_CLZ(bm));
-}
-
-//--- UpdateNextThread  cached-top fast path ---------------------
-/*
- * g_rq.TopPri tracks the highest ready priority, so next_thread update is
- * one head[] lookup  no CLZ in the hot path.  Recompute of TopPri is only
- * needed when the last thread at the current top priority leaves the run queue.
- */
-TAKT_ALWAYS_INLINE void UpdateNextThread(void)
-{
-	g_TaktosCtx.pNextThread = s_RunQueue.pHead[s_RunQueue.TopPri]->pNext;  // front = tail->next
-}
-
-//--- TaktReadyTask  O(1) insert at tail -------------------------
-/*
- * Incremental next_thread maintenance:
- *   - higher priority inserted  -> becomes new top, update next_thread
- *   - same/lower priority insert -> front of current top queue unchanged
- *                                  in the common case, so no global update
- *   - initialization path       -> next_thread may still be null
- */
-void TaktReadyTask(TaktOSThread_t *pThread)
-{
-    uint8_t pri = pThread->Priority;
-
-    if (s_RunQueue.pHead[pri] == nullptr)
-    {
-    	pThread->pNext = pThread;             // singleton: tail->next = front = itself
-        s_RunQueue.pHead[pri] = pThread;
-    }
-    else
-    {
-    	pThread->pNext = s_RunQueue.pHead[pri]->pNext;  // new->next = old front
-        s_RunQueue.pHead[pri]->pNext = pThread;                      // old tail->next = new
-        s_RunQueue.pHead[pri] = pThread;                      // new tail = new node
-    }
-
-    PrioBitmapSet(pri);
-
-    if (g_TaktosCtx.pNextThread == nullptr || pri > s_RunQueue.TopPri)
-    {
-    	s_RunQueue.TopPri = pri;
-        g_TaktosCtx.pNextThread = s_RunQueue.pHead[pri]->pNext;
-    }
-}
-
-//--- TaktBlockTask  O(n) splice ---------------------------------
-/*
- * Incremental next_thread maintenance:
- *   - removing non-top priority thread: no change
- *   - removing current front of top queue: next front becomes next_thread
- *   - removing the last thread at top priority: recompute TopPri once
+ * @brief	Remove a thread from the READY run queue and mark it BLOCKED.
+ *          See TaktKernel.h for the full contract.
  */
 void TaktBlockTask(TaktOSThread_t *pThread)
 {
@@ -238,20 +144,20 @@ void TaktBlockTask(TaktOSThread_t *pThread)
 
     if (pThread->pNext == pThread)
     {
-        // only thread at this priority
-    	s_RunQueue.pHead[pri] = nullptr;
-        PrioBitmapClear(pri);
+        // only thread at this priority  fast path
+        g_TaktRunQueue.pHead[pri] = nullptr;
+        TaktPrioBitmapClear(pri);
 
-        if (pri == s_RunQueue.TopPri)
+        if (pri == g_TaktRunQueue.TopPri)
         {
-        	s_RunQueue.TopPri = PrioBitmapTop();
-            UpdateNextThread();
+            g_TaktRunQueue.TopPri = TaktPrioBitmapTop();
+            TaktUpdateNextThread();
         }
     }
     else
     {
         // find predecessor  start from tail (wraps to front on first step)
-        TaktOSThread_t *prev = s_RunQueue.pHead[pri];
+        TaktOSThread_t *prev = g_TaktRunQueue.pHead[pri];
 
         while (prev->pNext != pThread)
         {
@@ -259,39 +165,18 @@ void TaktBlockTask(TaktOSThread_t *pThread)
         }
         prev->pNext = pThread->pNext;
 
-        if (s_RunQueue.pHead[pri] == pThread)
+        if (g_TaktRunQueue.pHead[pri] == pThread)
         {
-        	s_RunQueue.pHead[pri] = prev;   // t was tail  prev becomes new tail
+            g_TaktRunQueue.pHead[pri] = prev;   // t was tail  prev becomes new tail
         }
 
-        if (pri == s_RunQueue.TopPri && g_TaktosCtx.pNextThread == pThread)
+        if (pri == g_TaktRunQueue.TopPri && g_TaktosCtx.pNextThread == pThread)
         {
-        	g_TaktosCtx.pNextThread = pThread->pNext;  // next front already known
+            g_TaktosCtx.pNextThread = pThread->pNext;  // next front already known
         }
     }
 
     pThread->pNext = nullptr;
-}
-
-//--- TaktForceNextThread  HandOff delivery guarantee 
-/*
- * After TaktReadyTask(hNext) + TaktBlockTask(cur), pNextThread points to
- * the front of the highest-priority ready queue  which may not be hNext
- * (inserted at tail, same priority) or may be a different thread (already
- * at higher priority).
- *
- * Force pNextThread = hNext only when hNext->Priority >= TopPri, i.e. no
- * strictly higher-priority thread is already waiting.  That case is correct
- * priority scheduling, not a violation, so we leave it untouched.
- *
- * Must be called from within a critical section.
- */
-void TaktForceNextThread(TaktOSThread_t *pThread)
-{
-    if (pThread->Priority >= s_RunQueue.TopPri)
-    {
-        g_TaktosCtx.pNextThread = pThread;
-    }
 }
 
 
@@ -397,10 +282,10 @@ void TaktOSThreadYield(void)
     // thread and have Yield() overwrite it with the same-priority peer, losing
     // an immediate preemption decision.  Critical section is required.
     TaktOSDisableInterrupts();
-    s_RunQueue.pHead[cur->Priority] = cur;
+    g_TaktRunQueue.pHead[cur->Priority] = cur;
     // Guard: don't overwrite pNextThread if a higher-priority thread is already
     // pending (TaktReadyTask raised TopPri between the singleton check and here).
-    if (cur->Priority >= s_RunQueue.TopPri)
+    if (cur->Priority >= g_TaktRunQueue.TopPri)
     {
         g_TaktosCtx.pNextThread = cur->pNext;
     }
@@ -431,11 +316,11 @@ void TaktOSThreadYield(void)
 TaktOSErr_t TaktOSInit(uint32_t KernClockHz, uint32_t TickHz,
                       TaktOSTickClockSrc_t TickClockSrc, uintptr_t HandlerBaseAddr)
 {
-    memset(&s_RunQueue, 0, sizeof(s_RunQueue));
+    memset(&g_TaktRunQueue, 0, sizeof(g_TaktRunQueue));
     memset(&g_TaktosCtx, 0, sizeof(g_TaktosCtx));
 
     s_DeferredYieldFor = nullptr;   // clear any stale deferred yield from prior run
-    s_RunQueue.TopPri = 0u;
+    g_TaktRunQueue.TopPri = 0u;
     g_TickCount = 0;
     s_KernClockHz = KernClockHz;
     s_TickFreq = TickHz;
@@ -511,7 +396,7 @@ extern "C" void TaktTestSetDeferredYieldFor(TaktOSThread_t *t)
  */
 void TaktOSStart(void)
 {
-    UpdateNextThread();
+    TaktUpdateNextThread();
     TaktOSTickInit(s_KernClockHz, s_TickFreq, s_TickClockSrc);
     TaktOSStartFirst();
 
@@ -567,9 +452,9 @@ extern "C" void TaktKernelTickHandler(void)
             // Rotate: cur becomes new tail, pNextThread advances to cur->pNext.
             // Guard: same as TaktOSThreadYield  don't overwrite pNextThread
             // if a higher-priority thread was made ready since the last switch.
-            s_RunQueue.pHead[cur->Priority] = cur;
+            g_TaktRunQueue.pHead[cur->Priority] = cur;
 
-            if (cur->Priority >= s_RunQueue.TopPri)
+            if (cur->Priority >= g_TaktRunQueue.TopPri)
             {
                 g_TaktosCtx.pNextThread = cur->pNext;
                 needSwitch = true;

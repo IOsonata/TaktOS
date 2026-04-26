@@ -266,7 +266,7 @@ TaktOSErr_t TaktOSThreadSuspend(hTaktOSThread_t hThread)
     //   thread is in the run queue; on a circular singly-linked list this walks
     //   forever (infinite loop) or corrupts the list.
     uint32_t primask = TaktOSEnterCritical();
-    TaktOSState_t state = hThread->State;
+    TaktOSState_t state = (TaktOSState_t)hThread->State;
 
     if (state == TAKTOS_DEAD)
     {
@@ -664,7 +664,7 @@ TaktOSErr_t TaktOSThreadResume(hTaktOSThread_t hThread)
     // Optimistic unlocked pre-check.  READY/RUNNING and DEAD are common
     // early-exit cases that avoid the EnterCritical overhead entirely.
     // This read is racy  we re-verify every branch under the lock below.
-    TaktOSState_t stateFast = hThread->State;
+    TaktOSState_t stateFast = (TaktOSState_t)hThread->State;
     if (stateFast == TAKTOS_READY || stateFast == TAKTOS_RUNNING)
     {
         return TAKTOS_OK;
@@ -681,7 +681,7 @@ TaktOSErr_t TaktOSThreadResume(hTaktOSThread_t hThread)
     // read above and TaktOSEnterCritical().  Without this second check we
     // would call TaktReadyTask() on a thread already in the run queue,
     // corrupting the circular ready list.
-    TaktOSState_t state = hThread->State;
+    TaktOSState_t state = (TaktOSState_t)hThread->State;
 
     if (state == TAKTOS_READY || state == TAKTOS_RUNNING)
     {

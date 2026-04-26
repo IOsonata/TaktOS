@@ -21,7 +21,7 @@
  * ORIGIN to 0x00004000 and reduce FLASH LENGTH to 240K.
  */
 
-ENTRY(Reset_Handler)
+ENTRY(ResetEntry)
 
 _Min_Heap_Size  = 0x0;     /* No heap: TaktOS is static-allocation-only.
                               Setting to 0 avoids wasting RAM that would
@@ -31,7 +31,11 @@ _Min_Stack_Size = 0x400;   /* 1 KB MSP reserve — ISRs + pre-scheduler init.
 
 MEMORY
 {
-    FLASH (rx)  : ORIGIN = 0x00000000, LENGTH = 256K
+    /* Arduino Nano R4 ships with a DFU bootloader at 0x00000000-0x00003FFF.
+     * dfu-util writes user code starting at 0x00004000, so our link base
+     * must match. If you remove the bootloader and flash via SWD, change
+     * ORIGIN back to 0x00000000 and LENGTH to 256K. */
+    FLASH (rx)  : ORIGIN = 0x00004000, LENGTH = 240K
     RAM   (rw)  : ORIGIN = 0x20000000, LENGTH = 32K
 }
 

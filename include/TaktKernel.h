@@ -44,6 +44,8 @@ SOFTWARE.
 #ifndef __TAKTKERNEL_H__
 #define __TAKTKERNEL_H__
 
+#include <stddef.h>
+
 #include "TaktOS.h"
 #include "TaktOSCriticalSection.h"
 #include "TaktKernelCore.h"
@@ -93,22 +95,22 @@ typedef struct __TaktKernelWaitList_s {
 
 
 struct __TaktOSThread_s {
-	void          *pSp;						//!< offset  0  loaded by context switch handler
-	uint8_t        Priority;				//!< offset  4  031
-	TaktOSState_t  State;					//!< offset  5  uint8_t enum; no padding before WakeTick
-	uint8_t        WakeReason;				//!< offset  6 - TAKT_WOKEN_BY_EVENT / _TIMEOUT
-	uint8_t        _pad1;					//!< offset  7 - reserved  alignment pad
-	uint32_t       WakeTick;				//!< offset  8
-	struct __TaktOSThread_s *pNext;			//!< offset 12  run queue and sleep list
-	void          *pStackBottom;			//!< offset 16  aligned stack floor / guard base
-	                                        //!<   MPU guard base when the arch binds the MPU-aware handler path
-	                                        //!<   PSPLIM value  (TAKTOS_STACK_LIMIT=1, M33+)
-	struct __TaktOSThread_s *pWaitNext;		//!< offset 20  semaphore / mutex wait list only
-	TaktKernelWaitList_t    *pWaitList;		//!< offset 24  wait list this thread is blocked on (null if none)
-	                                		//!<   tick ISR uses this to remove on timeout
-	void                    *pMsg;			//!< offset 28  queue direct-handoff: src ptr (sender) / dst ptr (receiver)
-	                                		//!<   set before blocking on queue send/recv; cleared by wake path
-};                 // 32 bytes
+	void *pSp;							//!< offset  0  loaded by context switch handler
+	uint8_t Priority;					//!< offset  4  031
+	uint8_t	State;						//!< offset  5  uint8_t enum; no padding before WakeTick
+	uint8_t WakeReason;					//!< offset  6 - TAKT_WOKEN_BY_EVENT / _TIMEOUT
+	uint8_t _pad1;						//!< offset  7 - reserved  alignment pad
+	uint32_t WakeTick;					//!< offset  8
+	struct __TaktOSThread_s *pNext;		//!< offset 12  run queue and sleep list
+	void *pStackBottom;					//!< offset 16  aligned stack floor / guard base
+	                                    //!<   MPU guard base when the arch binds the MPU-aware handler path
+	                                    //!<   PSPLIM value  (TAKTOS_STACK_LIMIT=1, M33+)
+	struct __TaktOSThread_s *pWaitNext;	//!< offset 20  semaphore / mutex wait list only
+	TaktKernelWaitList_t *pWaitList;	//!< offset 24  wait list this thread is blocked on (null if none)
+	                                	//!<   tick ISR uses this to remove on timeout
+	void *pMsg;							//!< offset 28  queue direct-handoff: src ptr (sender) / dst ptr (receiver)
+	                                	//!<   set before blocking on queue send/recv; cleared by wake path
+}; // 32 bytes
 
 
 typedef struct {
@@ -138,38 +140,148 @@ TAKT_ALWAYS_INLINE uint32_t TaktOSTickCount(void) {
 }
 
 //--- Scheduler --------------------------------------------------
+//
+// Run queue semantics:
+//   pHead[pri] = TAIL of the circular singly-linked list at priority pri.
+//   pHead[pri]->pNext = FRONT = next-to-run candidate at that priority.
+//   Insert: O(1)  new node becomes new tail, no list walk.
+//   Block:  O(n)  must find predecessor (unavoidable with singly-linked).
+//
+// TopPri caches the highest non-empty priority so the hot-path dispatch does
+// not need CLZ on every context switch  only when the last ready thread at
+// the current top leaves the queue.
+//
+// These primitives are defined inline in this header so every TU that calls
+// them (taktos_thread, taktos_sem, taktos_mutex, taktos_queue, posix/pthread)
+// sees the full body. Out-of-line BL calls across TUs cost ~12-16 cycles each
+// on Cortex-M4 (push/pop of callee-saved regs + BL + pipeline refill), and
+// TM3/TM2 pay that cost 8-9 times per preemptive iteration. Inlining also
+// enables the compiler to fold the bitmap/state loads with the caller's
+// existing register state.
+
+typedef struct {
+    uint32_t        Bitmap;                  // 32-bit priority bitmap (one bit per priority)
+    uint8_t         TopPri;                  // cached highest ready priority
+    TaktOSThread_t *pHead[TAKTOS_MAX_PRI];   // pHead[pri] = TAIL of circular run queue
+} TaktRunQueue_t;
+
+extern TaktRunQueue_t g_TaktRunQueue;
+extern TaktKernelCtx_t g_TaktosCtx;
+
+//--- Bitmap helpers ---------------------------------------------
+// Must be called inside a critical section.
+
+static TAKT_ALWAYS_INLINE void TaktPrioBitmapSet(uint8_t Prio)
+{
+    g_TaktRunQueue.Bitmap |= (1u << Prio);
+}
+
+static TAKT_ALWAYS_INLINE void TaktPrioBitmapClear(uint8_t Prio)
+{
+    g_TaktRunQueue.Bitmap &= ~(1u << Prio);
+}
+
+// Returns the highest priority level that has at least one ready thread.
+// The idle thread at priority 0 is always ready in normal operation so the
+// bitmap is never zero; a zero bitmap returns 0 as a safe fallback because
+// CLZ(0) == 32 on ARM and would wrap to 0xFF -> pHead[255] OOB.
+static TAKT_ALWAYS_INLINE uint8_t TaktPrioBitmapTop(void)
+{
+    uint32_t bm = g_TaktRunQueue.Bitmap;
+    if (bm == 0u)
+    {
+        return 0u;
+    }
+    return (uint8_t)(31u - (uint32_t)TAKT_CLZ(bm));
+}
+
+//--- UpdateNextThread  cached-top fast path ---------------------
+// Re-point g_TaktosCtx.pNextThread at the front of the current top-priority
+// queue. One pHead[] lookup, no CLZ in the hot path.
+static TAKT_ALWAYS_INLINE void TaktUpdateNextThread(void)
+{
+    g_TaktosCtx.pNextThread = g_TaktRunQueue.pHead[g_TaktRunQueue.TopPri]->pNext;
+}
 
 /**
- * @brief	Move a thread to the READY run queue.
+ * @brief	Move a thread to the READY run queue  O(1) insert at tail.
  *
  * Internal scheduler primitive  not for direct application use.
  * Must be called inside a critical section.
  *
- * @param	hThread : Thread to make ready.
+ * Incremental pNextThread maintenance:
+ *   - higher priority inserted   -> becomes new top, update pNextThread
+ *   - same/lower priority insert -> front of current top queue unchanged in
+ *                                   the common case, so no global update
+ *   - initialization path        -> pNextThread may still be null; update
+ *
+ * @param	pThread : Thread to make ready.
  */
-void TaktReadyTask(hTaktOSThread_t hThread);
+static TAKT_ALWAYS_INLINE void TaktReadyTask(TaktOSThread_t *pThread)
+{
+    uint8_t pri = pThread->Priority;
+
+    if (g_TaktRunQueue.pHead[pri] == NULL)
+    {
+        pThread->pNext = pThread;                            // singleton: tail->next = front = itself
+        g_TaktRunQueue.pHead[pri] = pThread;
+    }
+    else
+    {
+        pThread->pNext = g_TaktRunQueue.pHead[pri]->pNext;   // new->next = old front
+        g_TaktRunQueue.pHead[pri]->pNext = pThread;           // old tail->next = new
+        g_TaktRunQueue.pHead[pri] = pThread;                  // new tail = new node
+    }
+
+    TaktPrioBitmapSet(pri);
+
+    if (g_TaktosCtx.pNextThread == NULL || pri > g_TaktRunQueue.TopPri)
+    {
+        g_TaktRunQueue.TopPri = pri;
+        g_TaktosCtx.pNextThread = g_TaktRunQueue.pHead[pri]->pNext;
+    }
+}
 
 /**
- * @brief	Remove a thread from the READY run queue and mark it BLOCKED.
+ * @brief	Remove a thread from the READY run queue and mark it BLOCKED
+ *          O(n) splice (unavoidable with singly-linked list).
+ *
+ * Kept out-of-line (defined in taktos.cpp) because the body is ~120 bytes and
+ * contains the predecessor-walk loop for non-singleton priorities. Inlining at
+ * every call site would cost ~600 bytes of code across the kernel for a body
+ * whose loop is never taken in TM3/TM2 (every priority is singleton there).
+ * The fast path is short enough that BL+prologue/epilogue is acceptable.
  *
  * Internal scheduler primitive  not for direct application use.
  * Must be called inside a critical section.
  *
- * @param	hThread : Thread to block.
+ * Incremental pNextThread maintenance:
+ *   - removing non-top priority thread       : no change
+ *   - removing current front of top queue    : next front becomes pNextThread
+ *   - removing the last thread at top prio   : recompute TopPri once
+ *
+ * @param	pThread : Thread to block.
  */
-void TaktBlockTask(hTaktOSThread_t hThread);
+void TaktBlockTask(TaktOSThread_t *pThread);
 
 /**
  * @brief	Force a specific thread to run next (HandOff helper).
  *
  * Sets pNextThread so that the named thread is selected on the next context
- * switch, provided no thread of strictly higher priority is already waiting.
+ * switch, provided no thread of strictly higher priority is already waiting
+ * (that case is correct priority scheduling, not a violation  leave it).
  * Called exclusively by @ref TaktOSThreadHandOff.
  * Must be called inside a critical section.
  *
- * @param	hThread : Thread to designate as next-to-run.
+ * @param	pThread : Thread to designate as next-to-run.
  */
-void TaktForceNextThread(hTaktOSThread_t hThread);
+static TAKT_ALWAYS_INLINE void TaktForceNextThread(TaktOSThread_t *pThread)
+{
+    if (pThread->Priority >= g_TaktRunQueue.TopPri)
+    {
+        g_TaktosCtx.pNextThread = pThread;
+    }
+}
 
 //--- Sleep list -------------------------------------------------
 

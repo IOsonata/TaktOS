@@ -42,6 +42,12 @@ SOFTWARE.
 #ifndef __TAKTCOMPILER_H__
 #define __TAKTCOMPILER_H__
 
+#ifdef __cplusplus
+  #define TAKT_STATIC_ASSERT(cond, msg) static_assert(cond, msg)
+#else
+  #define TAKT_STATIC_ASSERT(cond, msg) _Static_assert(cond, msg)
+#endif
+
 //  Force-inline 
 // Marks a function for mandatory inlining.  All three toolchains support
 // __attribute__((always_inline)); IAR also accepts it as a compatibility

@@ -1,25 +1,24 @@
 /**
- * @file    system_ra4m1.c
- * @brief   Early system init for Renesas RA4M1: select HOCO (48 MHz) as ICLK
- *          and all peripheral clocks, leave MOCO/SOSC/MOSC in reset state.
+ * @file    system_ra4m1.c  (DEBUG-INSTRUMENTED VERSION)
+ * @brief   Early system init for Renesas RA4M1 — Arduino Nano R4.
  *
- * RA4M1 cold reset defaults:
- *   - CKSEL (SCKSCR.CKSEL) = 0b001 (MOCO @ 8 MHz) → ICLK = 8 MHz / 1 = 8 MHz
- *   - SCKDIVCR = 0 (all peripheral dividers /1)
- *   - HOCO is CONTROLLED BY OFS1 (option function select register in flash).
- *     The Arduino factory OFS1 on Nano R4 / UNO R4 Minima sets HOCOEN=1 so
- *     HOCO is already running at reset. If flashed via SWD without preserving
- *     the factory OFS1 region, HOCO may be disabled — we therefore force it
- *     on here regardless.
+ * This version adds visual debugging via the on-board orange LED
+ * (LED_BUILTIN = D22 = RA4M1 P204). Each milestone emits ONE slow pulse
+ * (~600 ms on, ~2 s off). Count the number of pulses before the LED
+ * freezes (either solid-on = fault, or dark = hang).
  *
- * HOCO output frequency is also OFS1-configured (HOCOFRQ1[2:0]). Arduino
- * factory Nano R4 is 48 MHz (HOCOFRQ1 = 000b). If a user has reprogrammed
- * OFS1 to a different HOCO frequency the value reported in SystemCoreClock
- * will be wrong; override TM_TAKTOS_CORE_CLOCK_HZ in the port if needed.
+ *   Pulses seen before freeze / heartbeat:
+ *     0 = hung before Reset_Handler reached SystemInit (startup issue)
+ *     1 = hung in PRCR unlock / OPCCR write
+ *     2 = hung in OPCMTSF spin
+ *     3 = hung in HOCO stability wait
+ *     4 = hung in SCKSCR switch (unlikely)
+ *     5 = SystemInit finished — then milestones 6..9 from startup/main
  *
- * Register access: HOCOCR, SCKDIVCR, SCKSCR, OPCCR are all protected by
- * PRCR.PRC0. We unlock, write, relock. All writes are via explicit
- * addresses — no SoC vendor SDK dependency.
+ * You just count long pulses. No rapid sequences, no "is that 4 or 5?" —
+ * each pulse is clearly separated by 2 seconds of darkness.
+ *
+ * Remove this instrumentation for benchmark runs; it alters timing.
  */
 
 #include <stdint.h>
@@ -29,58 +28,76 @@
 /* ========================================================================= */
 #define SYSTEM_BASE         0x4001E000UL
 
-/* Clock source select register (8-bit). CKSEL[2:0] at bits [2:0].
- *   000: HOCO
- *   001: MOCO (reset default)
- *   010: LOCO
- *   011: MOSC
- *   100: SOSC
- */
 #define SCKSCR_ADDR         (SYSTEM_BASE + 0x026UL)
 #define SCKSCR              (*(volatile uint8_t*)SCKSCR_ADDR)
 
-/* System clock divider control register (32-bit). Four-bit fields per
- * divider. All zero = /1 for every clock. */
 #define SCKDIVCR_ADDR       (SYSTEM_BASE + 0x020UL)
 #define SCKDIVCR            (*(volatile uint32_t*)SCKDIVCR_ADDR)
 
-/* HOCO control register (8-bit). Bit 0 (HCSTP): 0 = HOCO operating,
- * 1 = HOCO stopped. */
 #define HOCOCR_ADDR         (SYSTEM_BASE + 0x036UL)
 #define HOCOCR              (*(volatile uint8_t*)HOCOCR_ADDR)
 
-/* Oscillator stabilization flag register (8-bit). Bit 0 (HOCOSF): 1 = HOCO
- * is stable and safe to switch to. */
 #define OSCSF_ADDR          (SYSTEM_BASE + 0x03CUL)
 #define OSCSF               (*(volatile uint8_t*)OSCSF_ADDR)
 
-/* Operating power control register (8-bit). OPCM[1:0] at bits [1:0]:
- *   00: High-speed mode (required for ICLK > 24 MHz).
- *   01: Middle-speed mode.
- *   11: Low-speed mode.
- *
- * After a cold reset OPCM = 0b10 on RA4M1 which is invalid — setting to
- * 0b00 (high-speed) is mandatory before selecting HOCO @ 48 MHz.
- */
 #define OPCCR_ADDR          (SYSTEM_BASE + 0x0A0UL)
 #define OPCCR               (*(volatile uint8_t*)OPCCR_ADDR)
 
-/* Memory wait cycle control register (8-bit). MEMWAIT[0]: 0 = no wait state,
- * 1 = 1 wait state. RA4M1 requires MEMWAIT = 1 when ICLK > 32 MHz. */
 #define MEMWAIT_ADDR        (SYSTEM_BASE + 0x031UL)
 #define MEMWAIT             (*(volatile uint8_t*)MEMWAIT_ADDR)
 
-/* Register write protection (16-bit).
- *   [15:8] = key — must be 0xA5 to accept the write.
- *   [0]    = PRC0 — protect clocks (SCKDIVCR, SCKSCR, HOCOCR, OPCCR, ...).
- *   [1]    = PRC1 — protect low-power modes.
- *   [3]    = PRC3 — protect LVD.
- */
 #define PRCR_ADDR           (SYSTEM_BASE + 0x3FEUL)
 #define PRCR                (*(volatile uint16_t*)PRCR_ADDR)
 
 #define PRCR_KEY            (0xA500U)
-#define PRCR_PRC0           (1U << 0)
+#define PRCR_PRC0           (1U << 0)   /* clock-gen regs (SCKDIVCR/SCKSCR/HOCOCR/...) */
+#define PRCR_PRC1           (1U << 1)   /* low-power regs (MSTPCRA/B/C + OPCCR) */
+
+/* ========================================================================= */
+/*  LED debug — P204 (D22, LED_BUILTIN)                                       */
+/*                                                                            */
+/*  PORT0..9 registers are memory-mapped starting at 0x40040000 with a       */
+/*  0x20-byte stride. PORT2 base = 0x40040040.                               */
+/*                                                                            */
+/*    PDR  (offset 0x00, 16-bit): 0 = input, 1 = output                      */
+/*    PODR (offset 0x02, 16-bit): output data                                */
+/*    PIDR (offset 0x04, 16-bit): input data                                 */
+/*                                                                            */
+/*  P204 = PORT2 bit 4 -> mask = (1 << 4) = 0x0010.                          */
+/* ========================================================================= */
+#define PORT2_BASE          0x40040040UL
+#define PORT2_PDR           (*(volatile uint16_t*)(PORT2_BASE + 0x00U))
+#define PORT2_PODR          (*(volatile uint16_t*)(PORT2_BASE + 0x02U))
+#define LED_PIN_MASK        (1U << 4)
+
+/* PFS register for P204:
+ *   0x40040800 + port_num*0x40 + pin_num*0x04
+ *   = 0x40040800 + 2*0x40 + 4*0x04 = 0x40040890 */
+#define P204PFS_ADDR        (0x40040800UL + 0x40U*2U + 0x04U*4U)
+#define P204PFS             (*(volatile uint32_t*)P204PFS_ADDR)
+
+/* PFS write-protect register. */
+#define PWPR_ADDR           0x40040D03UL
+#define PWPR                (*(volatile uint8_t*)PWPR_ADDR)
+#define PWPR_B0WI           (1U << 7)
+#define PWPR_PFSWE          (1U << 6)
+
+static inline void debug_busywait(uint32_t cycles)
+{
+    for (volatile uint32_t i = 0; i < cycles; ++i) { __asm__ volatile ("nop"); }
+}
+
+static void debug_led_init(void)
+{
+    /* Unlock PFS, reset P204 to GPIO output mode. */
+    PWPR = 0x00U;
+    PWPR = PWPR_PFSWE;
+    P204PFS = 0x00000000U;           /* PMR=0 (GPIO), all other fields 0 */
+    PWPR = PWPR_B0WI;
+
+    PORT2_PDR  |= LED_PIN_MASK;      /* P204 as output */
+    PORT2_PODR &= ~LED_PIN_MASK;     /* start LOW (LED off) */
+}
 
 /* ========================================================================= */
 /*  Exported globals                                                          */
@@ -92,30 +109,27 @@ uint32_t SystemCoreClock = 48000000UL;
 /* ========================================================================= */
 void SystemInit(void)
 {
-    /* Unlock clock + OPCCR registers. */
-    PRCR = PRCR_KEY | PRCR_PRC0;
+    /* LED init runs first so we can see anything at all. */
+    debug_led_init();
 
-    /* Step 1: high-speed operating power mode.
-     * OPCCR write is only accepted while the other OPCCR bits indicate no
-     * mode transition is in progress; writing 0x00 is unconditional. */
+    /* Unlock clock (PRC0) AND low-power (PRC1) registers. */
+    PRCR = PRCR_KEY | PRCR_PRC0 | PRCR_PRC1;
+
+    /* Step 1: high-speed operating power mode. */
     OPCCR = 0x00u;
-    /* Wait for mode transition bit to clear (OPCMTSF at bit 4). */
-    while ((OPCCR & (1u << 4)) != 0u) { /* spin until steady */ }
+    while ((OPCCR & (1u << 4)) != 0u) { /* spin until OPCMTSF = 0 */ }
 
     /* Step 2: one flash wait state (required above 32 MHz). */
     MEMWAIT = 0x01u;
 
-    /* Step 3: turn on HOCO if not already running, then wait for stability.
-     * HOCOCR.HCSTP = 0 means HOCO runs. Factory Arduino firmware has HOCO
-     * already enabled via OFS1; writing 0 here is idempotent in that case. */
+    /* Step 3: turn on HOCO if not already running, wait for stability. */
     HOCOCR = 0x00u;
     while ((OSCSF & 0x01u) == 0u) { /* wait for HOCOSF = 1 */ }
 
-    /* Step 4: all peripheral dividers /1 → ICLK = PCLKA = PCLKB = PCLKC =
-     * PCLKD = FCLK = HOCO (48 MHz). */
+    /* Step 4: all peripheral dividers /1 → 48 MHz everywhere. */
     SCKDIVCR = 0x00000000UL;
 
-    /* Step 5: switch clock source to HOCO. CKSEL = 0b000. */
+    /* Step 5: switch clock source to HOCO. */
     SCKSCR = 0x00u;
 
     /* Relock clock registers. */

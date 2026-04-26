@@ -1,10 +1,11 @@
 
-Compiler : arm-none-eabi-gcc-15.2.1
+Compiler : arm-none-eabi-gcc-12.2
 Optimization -Os
 Tick rate 1000Hz
 MCU : nRF54L15
 
 
+FreeRTOS vV.11.1
 
 Invoking: Cross ARM GNU Create Flash Image
 arm-none-eabi-objcopy -O ihex "ThreadMetricBenchmarkFreeRTOS_BasicProcessing_nRF54L15.elf"  "ThreadMetricBenchmarkFreeRTOS_BasicProcessing_nRF54L15.hex"
@@ -12,40 +13,43 @@ Finished building: ThreadMetricBenchmarkFreeRTOS_BasicProcessing_nRF54L15.hex
  
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_BasicProcessing_nRF54L15.elf"
-   text	   data	    bss	    dec	    hex	filename
-   6856	     24	  17360	  24240	   5eb0	ThreadMetricBenchmarkFreeRTOS_BasicProcessing_nRF54L15.elf
+   text    data     bss     dec     hex filename
+   6557      24   22728   29309    727d ThreadMetricBenchmarkFreeRTOS_BasicProcessing_nRF54L15.elf
 Finished building: ThreadMetricBenchmarkFreeRTOS_BasicProcessing_nRF54L15.siz
 
 
+
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 30
-Time Period Total:  374304
+Time Period Total:  374344
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 60
-Time Period Total:  374304
+Time Period Total:  374344
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 90
-Time Period Total:  374304
+Time Period Total:  374345
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 120
-Time Period Total:  374304
+Time Period Total:  374344
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 150
-Time Period Total:  374303
+Time Period Total:  374343
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 180
-Time Period Total:  374303
+Time Period Total:  374344
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 210
-Time Period Total:  374303
+Time Period Total:  374343
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 240
-Time Period Total:  374304
+Time Period Total:  374343
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 270
-Time Period Total:  374303
+Time Period Total:  374344
 
 **** Thread-Metric Basic Single Thread Processing Test **** Relative Time: 300
-Time Period Total:  374303
+Time Period Total:  374343
+
+
 
 
 
@@ -55,8 +59,8 @@ Finished building: ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_nRF54L15.
  
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_nRF54L15.elf"
-   text	   data	    bss	    dec	    hex	filename
-   8636	     24	  13296	  21956	   55c4	ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_nRF54L15.elf
+   text    data     bss     dec     hex filename
+   8253      24   18664   26941    693d ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_nRF54L15.elf
 Finished building: ThreadMetricBenchmarkFreeRTOS_CooperativeScheduling_nRF54L15.siz
 
 
@@ -98,8 +102,8 @@ Finished building: ThreadMetricBenchmarkFreeRTOS_MessageProcessing_nRF54L15.hex
  
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadMetricBenchmarkFreeRTOS_MessageProcessing_nRF54L15.elf"
-   text	   data	    bss	    dec	    hex	filename
-   8540	     24	  13528	  22092	   564c	ThreadMetricBenchmarkFreeRTOS_MessageProcessing_nRF54L15.elf
+   text    data     bss     dec     hex filename
+   8287      24   18896   27207    6a47 ThreadMetricBenchmarkFreeRTOS_MessageProcessing_nRF54L15.elf
 Finished building: ThreadMetricBenchmarkFreeRTOS_MessageProcessing_nRF54L15.siz
 
 
