@@ -1,19 +1,25 @@
 /**---------------------------------------------------------------------------
-@file   mutex_pi_c.c
+@file   mutex_pcp_c.c
 
-@brief  Priority inheritance example  C API
+@brief  Immediate Priority Ceiling Protocol example  C API
 
-Three-thread scenario that exercises priority inheritance:
-  Low     takes the mutex first, holds it for ~20 ms
-  High    blocks on the same mutex shortly after Low; should inherit
-           Low's boosted priority, preventing Medium from running ahead
-  Medium  runs free once started; should be suppressed while High waits
+Three-thread bounded-priority-inversion scenario using the IPCP mutex
+(equivalent to POSIX PTHREAD_PRIO_PROTECT). Low takes the mutex and holds
+it for ~20 ms. High blocks on it. Medium runs at NORMAL priority and would
+classically preempt Low — except that Low's effective priority is boosted
+to the mutex Ceiling on Lock(), so Medium does not run until Low Unlocks
+and the boost is removed.
 
-With priority inheritance active, gMediumIterationsBeforeUnlock should
-stay small (Low task runs at High priority, so Medium stays blocked).
-Without PI, Medium would accumulate many iterations before Low unlocks.
+Expected behaviour:
+  - gMediumIterationsBeforeUnlock is small (Medium did not run during the
+    critical section) — IPCP successfully bounded the inversion.
+  - gHighAcquireTick is gLowUnlockTick + ~1 (High acquires immediately on
+    Unlock).
+  - High never observes Medium completing iterations while it waits.
 
-Inspect the volatile counters in a debugger.
+Compare with the plain-mutex scenario: with TaktOSMutexInit() (no ceiling)
+Medium would preempt Low for the full 20 ms hold, and gMediumIterations-
+BeforeUnlock would grow to ~20.
 
 @author Nguyen Hoan Hoang
 @date   Apr. 2026
@@ -77,6 +83,7 @@ static void LowThread(void *arg)
 
     for (;;)
     {
+        // Lock() boosts effective priority to max(LOW, HIGH) = HIGH.
         TaktOSMutexLock(&gMutex, true, TAKTOS_WAIT_FOREVER);
         ++gLowEnteredCritical;
 
@@ -85,12 +92,17 @@ static void LowThread(void *arg)
 
         for (uint32_t i = 0u; i < 20u; ++i)
         {
+            // 1 ms of work each iteration. Medium would normally preempt
+            // here, but IPCP keeps this thread at HIGH priority for the
+            // duration of the critical section.
             TaktOSThreadSleep(TaktOSCurrentThread(), 1u);
         }
 
         gMediumIterationsBeforeUnlock = gMediumIterations;
         gLowUnlockTick = TaktOSTickCount();
         ++gLowUnlocked;
+        // Unlock() restores effective priority to BasePriority (LOW).
+        // High is unblocked and runs immediately.
         TaktOSMutexUnlock(&gMutex);
 
         TaktOSThreadSleep(TaktOSCurrentThread(), 50u);
@@ -132,7 +144,11 @@ static void HighThread(void *arg)
 int main(void)
 {
     TaktOSInit(APP_CORE_CLOCK_HZ, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR, 0u);
-    TaktOSMutexInit(&gMutex);
+
+    // Ceiling = highest priority of any thread that will Lock this mutex.
+    // Here HIGH is the maximum across Low, High (Medium does not Lock).
+    TaktOSMutexInitProtect(&gMutex, TAKTOS_PRIORITY_HIGH);
+
     TaktOSSemInit(&gStartHighSem, 0u, 1u);
     TaktOSSemInit(&gStartMediumSem, 0u, 1u);
 
@@ -144,4 +160,5 @@ int main(void)
                        HighThread, NULL, TAKTOS_PRIORITY_HIGH);
 
     TaktOSStart();
+    return 0;
 }

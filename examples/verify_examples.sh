@@ -12,7 +12,7 @@ CXXFLAGS=("${CXXFLAGS:-}" -std=gnu++17 -fsyntax-only)
 C_EXAMPLES=(
   "${ROOT_DIR}/examples/basic/basic_c.c"
   "${ROOT_DIR}/examples/queue/producer_consumer_c.c"
-  "${ROOT_DIR}/examples/mutex/mutex_pi_c.c"
+  "${ROOT_DIR}/examples/mutex/mutex_pcp_c.c"
   "${ROOT_DIR}/examples/posix/posix_pse51.c"
   "${ROOT_DIR}/examples/mpu_guard.c"
 )
@@ -20,7 +20,7 @@ C_EXAMPLES=(
 CPP_EXAMPLES=(
   "${ROOT_DIR}/examples/basic/basic_cpp.cpp"
   "${ROOT_DIR}/examples/queue/producer_consumer.cpp"
-  "${ROOT_DIR}/examples/mutex/mutex_pi.cpp"
+  "${ROOT_DIR}/examples/mutex/mutex_pcp.cpp"
   "${ROOT_DIR}/examples/posix/posix_pse51_cpp.cpp"
 )
 

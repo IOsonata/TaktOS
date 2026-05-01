@@ -151,7 +151,10 @@ TAKT_COLD TAKT_NOINLINE TaktOSErr_t TaktOSSemTakeSlowPath(TaktOSSem_t *pSem, uin
 
     if (timeoutTicks != TAKTOS_WAIT_FOREVER)
     {
-        current->WakeTick = TaktOSTickCount() + timeoutTicks;
+        // +1u so the wait covers AT LEAST timeoutTicks full tick-periods
+        // regardless of phase within the current tick.  See comment in
+        // TaktOSThreadSleep for the underlying rationale.
+        current->WakeTick = TaktOSTickCount() + timeoutTicks + 1u;
         TaktSleepListAdd(current);
     }
     // WAIT_FOREVER: WakeTick is always 0 on entry  cleared by all three

@@ -29,7 +29,7 @@ If your change touches a cert-boundary file, your PR description must include:
 1. Which branches / decisions changed
 2. Whether the change adds, removes, or modifies a branch
 3. Confirmation that the existing MC/DC test vectors still cover all paths,
-   or a list of new vectors needed in `test/test_kernel.cpp`
+   or a list of new test cases needed in the KVB harness (`KVB/src/tests/`)
 
 ---
 
@@ -190,23 +190,21 @@ ports add their own prefix (e.g., `riscv`, `xtensa`).
 
 ### Host-native unit tests
 
-A single compile command from the `test/` directory, no CMake:
+The host-native MC/DC harness is the **KVB** (Kernel Validation Benchmark)
+suite. Per-target ports live under `KVB/Targets/`; a host-only port is
+planned for the gcov-instrumented MC/DC build (see *TaktOS Engineering
+Spec* §11 #3). Until that port lands, on-target validation goes through
+the KVB Eclipse projects and the `TaktOSMpuVectorRelocTest_*` tests under
+`test/`.
 
-```bash
-cd test
-g++ -std=gnu++23 -O0 -g -DTAKT_ARCH_STUB=1 -DTAKT_TEST_ACCESS=1 \
-    -I../include -I../ARM/include -I. \
-    test_kernel.cpp takt_arch_stub.cpp \
-    ../src/taktos.cpp ../src/taktos_thread.cpp \
-    ../src/taktos_sem.cpp ../src/taktos_mutex.cpp \
-    ../src/taktos_queue.cpp \
-    -o test_kernel && ./test_kernel
-```
+The legacy `test/test_kernel.cpp` and `test/unit/` harnesses have been
+retired. Do not add new test code under `test/unit/` — extend the KVB
+harness in `KVB/src/tests/` instead.
 
-Pass criterion: exit code 0, "ALL TESTS PASSED" on stdout. Run the same
-build with and without `-DTAKT_INLINE_OPTIMIZATION=1` when your change
-touches the semaphore, mutex, or queue fast paths. Run under ASAN/UBSAN
-(`-fsanitize=address,undefined`) for any kernel object change.
+Pass criterion (target builds): every KVB test in the chosen group
+reports `OK` and the run completes with no determinism errors. Run the
+fast-path-affecting changes both with and without
+`-DTAKT_INLINE_OPTIMIZATION=1`.
 
 ### Target builds (Eclipse)
 

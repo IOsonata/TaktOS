@@ -1,30 +1,54 @@
 /**---------------------------------------------------------------------------
 @file   TaktOSMutex.h
 
-@brief  TaktOS binary mutex with priority inheritance  C and C++
+@brief  TaktOS binary mutex  C and C++
 
-Priority inheritance (PI) is deferred to v1.1. In v1.0, priority inversion is bounded only
-by the scheduler's FIFO ordering within a priority level. If your application requires PI,
-define TAKT_MUTEX_PI=1 at compile time  the build will fail with an explicit error message
-until the implementation is ready, preventing silent reliance on a missing feature.
+Two flavors of mutex are provided:
 
-Recursive locking is NOT supported  a task that calls Lock() while already
-holding the mutex will deadlock.
+  1. PLAIN MUTEX  TaktOSMutexInit / TaktOSMutex::Init
+     Non-recursive binary mutex.  No priority adjustment.  Cheapest fast path.
+     Use when contention is rare and bounded priority inversion is acceptable
+     (e.g. single-priority lockers, or ISR-protected data with no scheduler
+     interaction).
 
-  C:
+  2. PRIORITY-CEILING MUTEX  TaktOSMutexInitProtect / TaktOSMutex::InitProtect
+     Non-recursive binary mutex implementing the Immediate Priority Ceiling
+     Protocol (IPCP, equivalent to POSIX PTHREAD_PRIO_PROTECT).
+
+     On Lock(): the holder's effective priority is raised to
+                  max(holder->Priority, mutex->Ceiling).
+                The original priority is recorded in TCB.BasePriority on the
+                first PCP acquire, and the ceiling is pushed onto the
+                per-thread HeldCeilings stack (size TAKTOS_MAX_HELD_PCP_MUTEXES).
+
+     On Unlock(): the ceiling is popped, and the holder's priority is
+                  restored to max(BasePriority, max of remaining held ceilings).
+
+     Properties:
+        - Bounded priority inversion: at most one critical section.
+        - Deadlock-free without lock-ordering rules, provided every locker's
+          priority is <= the ceiling (strict precondition).
+        - Lock fails with TAKTOS_ERR_INVALID if caller priority > ceiling.
+
+  Recursive locking is NOT supported by either flavor  a thread that calls
+  Lock() while already holding the mutex will block on itself.
+
+  C usage:
     static TaktOSMutex_t gMtx;
-    TaktOSMutexInit(&gMtx);
-    TaktOSMutexLock(&gMtx, true, TAKTOS_WAIT_FOREVER);
-    TaktOSMutexUnlock(&gMtx);
+    TaktOSMutexInit(&gMtx);                              // plain
+    TaktOSMutexInitProtect(&gPcp, TAKTOS_PRIORITY_HIGH); // IPCP
 
-  C++:
-    static TaktOSMutex gMtx;
-    gMtx.Init();
-    gMtx.Lock(true, TAKTOS_WAIT_FOREVER);
-    gMtx.Unlock();
+  C++ usage:
+    TaktOSMutex gMtx; gMtx.Init();
+    TaktOSMutex gPcp; gPcp.InitProtect(TAKTOS_PRIORITY_HIGH);
 
-Acquire hot path is inlined; slow paths (contention, PI, timeout) are in
-taktos_mutex.cpp.
+Inlining gate (TAKT_INLINE_OPTIMIZATION):
+  When defined, TaktOSMutexLock and TaktOSMutexUnlock are static inline in this
+  header so the plain-mutex fast path folds directly into the call site,
+  eliminating function-call overhead.  The PCP path and the contended/blocking
+  path remain out-of-line in taktos_mutex.cpp behind TaktOSMutexLockSlow /
+  TaktOSMutexUnlockSlow.  When undefined, the public functions are out-of-line
+  in taktos_mutex.cpp (default, smaller code size).
 
 Safety boundary: IN  MC/DC coverage required.
 
@@ -62,21 +86,15 @@ SOFTWARE.
 
 #include "TaktOS.h"
 #include "TaktKernel.h"
+#include "TaktOSThread.h"   // for TaktOSCurrentThread() used by inline fast paths
 
 #pragma pack(push, 4)
-
-// PI guard: TAKT_MUTEX_PI=1 signals that the caller expects priority-inheritance
-// boosting on contended Lock().  That feature is NOT YET IMPLEMENTED (v1.0).
-// Fail the build explicitly so no integration silently runs without PI.
-#if defined(TAKT_MUTEX_PI) && (TAKT_MUTEX_PI != 0)
-#  error "TAKT_MUTEX_PI=1: priority inheritance is deferred to v1.1  not yet implemented."
-#endif
 
 typedef struct __TaktOSMutex_s {
     TaktOSThread_t *pOwner;         // nullptr = free, else = owning thread
     TaktKernelWaitList_t WaitList;
-    uint8_t OwnerBasePri;  			// reserved for v1.1 priority inheritance
-    uint8_t _pad[3];       			// alignment padding
+    uint8_t Ceiling;                // 0 = plain mutex, 1..31 = IPCP ceiling priority
+    uint8_t _pad[3];                // alignment padding
 } TaktOSMutex_t;
 
 #pragma pack(pop)
@@ -86,7 +104,9 @@ extern "C" {
 #endif
 
 /**
- * @brief	Initialize a mutex object.
+ * @brief	Initialize a plain (non-PCP) mutex.
+ *
+ * The resulting mutex performs no priority adjustment on Lock / Unlock.
  *
  * @param	pMtx : Pointer to caller-allocated mutex object.
  * @return	TAKTOS_OK on success, TAKTOS_ERR_INVALID if @p pMtx is null.
@@ -94,10 +114,30 @@ extern "C" {
 TaktOSErr_t TaktOSMutexInit(TaktOSMutex_t *pMtx);
 
 /**
+ * @brief	Initialize a priority-ceiling (IPCP) mutex.
+ *
+ * The resulting mutex applies the Immediate Priority Ceiling Protocol:
+ *   - On Lock(), the holder is boosted to max(holder->Priority, Ceiling).
+ *   - On Unlock(), the holder's priority is restored.
+ *   - Lock() returns TAKTOS_ERR_INVALID if caller priority > Ceiling.
+ *
+ * The caller must declare Ceiling >= the priority of every thread that
+ * will ever lock this mutex.  Locking outside that set is a configuration
+ * error and is detected by the strict ceiling check at Lock-time.
+ *
+ * @param	pMtx    : Pointer to caller-allocated mutex object.
+ * @param	Ceiling : Priority ceiling (1..TAKTOS_MAX_PRI-1).
+ *                    Ceiling 0 (idle) is rejected as TAKTOS_ERR_INVALID.
+ * @return	TAKTOS_OK on success, TAKTOS_ERR_INVALID if @p pMtx is null
+ *          or @p Ceiling is out of range.
+ */
+TaktOSErr_t TaktOSMutexInitProtect(TaktOSMutex_t *pMtx, uint8_t Ceiling);
+
+/**
  * @brief	Slow path for mutex lock called when the mutex is already owned.
  *
- * Called by @ref TaktOSMutexLock after entering a critical section when the
- * mutex is found to be held by another thread.  Must not be called directly.
+ * Internal entry point.  Must not be called directly.  Called by
+ * @ref TaktOSMutexLockSlow after it has decided that the caller must block.
  *
  * @param	pMtx           : Pointer to mutex.
  * @param	savedPrimask   : Saved interrupt state from critical-section entry.
@@ -113,9 +153,10 @@ TaktOSErr_t TaktOSMutexLockSlowPath(TaktOSMutex_t *pMtx, uint32_t savedPrimask,
 /**
  * @brief	Slow path for mutex unlock called when waiters are present.
  *
- * Called by @ref TaktOSMutexUnlock after entering a critical section when the
- * wait list is non-empty.  Hands ownership to the highest-priority waiter and
- * may trigger a context switch.  Must not be called directly.
+ * Internal entry point.  Hands ownership to the highest-priority waiter,
+ * applies the IPCP ceiling boost to the new owner if Ceiling != 0, and may
+ * trigger a context switch.  Must not be called directly.  Called by
+ * @ref TaktOSMutexUnlockSlow after the PCP unboost has been applied.
  *
  * @param	pMtx           : Pointer to mutex.
  * @param	savedPrimask   : Saved interrupt state from critical-section entry.
@@ -125,14 +166,120 @@ TaktOSErr_t TaktOSMutexLockSlowPath(TaktOSMutex_t *pMtx, uint32_t savedPrimask,
 TaktOSErr_t TaktOSMutexUnlockSlowPath(TaktOSMutex_t *pMtx, uint32_t savedPrimask,
                                       TaktOSThread_t *current);
 
+/**
+ * @brief  Wider slow entry for mutex Lock  handles PCP acquire and contended
+ *         blocking, and is invoked from the inline plain-mutex fast path on
+ *         miss.  Internal entry point  must not be called directly.
+ *
+ * Reaching this function means the inline plain-mutex fast path did NOT take
+ * (either Ceiling != 0, or pOwner != NULL, or both).  The function decides
+ * which sub-case applies and either:
+ *   - performs the PCP acquire (push held ceiling, migrate priority), or
+ *   - returns TAKTOS_ERR_BUSY for a non-blocking caller, or
+ *   - delegates to @ref TaktOSMutexLockSlowPath to block.
+ *
+ * @param	pMtx          : Pointer to mutex.
+ * @param	savedPrimask  : Saved interrupt state from critical-section entry.
+ * @param	bBlocking     : true if the caller permits blocking.
+ * @param	timeoutTicks  : Timeout in ticks (TAKTOS_WAIT_FOREVER permitted).
+ * @return	Status code per TaktOSMutexLock spec.
+ */
+TaktOSErr_t TaktOSMutexLockSlow(TaktOSMutex_t *pMtx, uint32_t savedPrimask,
+                                bool bBlocking, uint32_t timeoutTicks);
 
 /**
- * @brief	Acquire a mutex.
+ * @brief  Wider slow entry for mutex Unlock  handles PCP unboost and waiter
+ *         handoff, invoked from the inline plain-mutex fast path on miss.
+ *         Internal entry point  must not be called directly.
  *
- * Fast path acquires immediately when the mutex is free.  If already owned:
- *   - non-blocking (@p bBlocking == false or @p timeoutTicks == TAKTOS_NO_WAIT)
- *     returns TAKTOS_ERR_BUSY immediately.
- *   - blocking delegates to the slow path and blocks up to @p timeoutTicks.
+ * Reaching this function means the inline plain-mutex fast path did NOT take
+ * (either Ceiling != 0, or a waiter is present, or both).  The function:
+ *   - applies the PCP unboost if Ceiling != 0, then
+ *   - takes the no-waiter path (clearing pOwner) when WaitList is empty, or
+ *   - delegates to @ref TaktOSMutexUnlockSlowPath to hand ownership to the
+ *     highest-priority waiter.
+ *
+ * @param	pMtx          : Pointer to mutex.
+ * @param	savedPrimask  : Saved interrupt state from critical-section entry.
+ * @param	current       : Pointer to the calling thread's TCB.
+ * @return	Status code per TaktOSMutexUnlock spec.
+ */
+TaktOSErr_t TaktOSMutexUnlockSlow(TaktOSMutex_t *pMtx, uint32_t savedPrimask,
+                                  TaktOSThread_t *current);
+
+
+#ifdef TAKT_INLINE_OPTIMIZATION
+
+/**
+ * @brief	Acquire a mutex  inline plain-mutex fast path.  See file header
+ *          for the full spec.  Out-of-line cases delegate to
+ *          @ref TaktOSMutexLockSlow.
+ */
+static TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSMutexLock(TaktOSMutex_t *pMtx,
+                                                     bool bBlocking,
+                                                     uint32_t timeoutTicks)
+{
+    if (pMtx == NULL)
+    {
+        return TAKTOS_ERR_INVALID;
+    }
+
+    uint32_t state = TaktOSEnterCritical();
+
+    // Plain-mutex fast path: pOwner == NULL  AND  Ceiling == 0.
+    // Order is intentional  pOwner is the more variable field at run time;
+    // testing it first lets the compiler short-circuit when contended without
+    // also loading the (mostly-static) Ceiling byte.
+    if (TAKT_LIKELY(pMtx->pOwner == NULL) && TAKT_LIKELY(pMtx->Ceiling == 0u))
+    {
+        pMtx->pOwner = TaktOSCurrentThread();
+        TaktOSExitCritical(state);
+        return TAKTOS_OK;
+    }
+
+    return TaktOSMutexLockSlow(pMtx, state, bBlocking, timeoutTicks);
+}
+
+/**
+ * @brief	Release a mutex  inline plain-mutex fast path.  See file header
+ *          for the full spec.  Out-of-line cases delegate to
+ *          @ref TaktOSMutexUnlockSlow.
+ */
+static TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSMutexUnlock(TaktOSMutex_t *pMtx)
+{
+    if (pMtx == NULL)
+    {
+        return TAKTOS_ERR_INVALID;
+    }
+
+    uint32_t state = TaktOSEnterCritical();
+    TaktOSThread_t *current = TaktOSCurrentThread();
+
+    if (TAKT_UNLIKELY(pMtx->pOwner != current))
+    {
+        TaktOSExitCritical(state);
+        return TAKTOS_ERR_INVALID;
+    }
+
+    // Plain-mutex fast path: Ceiling == 0  AND  no waiter.
+    if (TAKT_LIKELY(pMtx->Ceiling == 0u) &&
+        TAKT_LIKELY(pMtx->WaitList.pHead == NULL))
+    {
+        pMtx->pOwner = NULL;
+        TaktOSExitCritical(state);
+        return TAKTOS_OK;
+    }
+
+    return TaktOSMutexUnlockSlow(pMtx, state, current);
+}
+
+#else // TAKT_INLINE_OPTIMIZATION
+
+/**
+ * @brief	Acquire a mutex  out-of-line variant.
+ *
+ * Active when TAKT_INLINE_OPTIMIZATION is not defined.  See file header
+ * for the full spec.  Identical semantics to the inline form.
  *
  * @param	pMtx          : Pointer to mutex.
  * @param	bBlocking     : true to block when owned by another thread.
@@ -143,16 +290,18 @@ TaktOSErr_t TaktOSMutexUnlockSlowPath(TaktOSMutex_t *pMtx, uint32_t savedPrimask
 TaktOSErr_t TaktOSMutexLock(TaktOSMutex_t *pMtx, bool bBlocking, uint32_t timeoutTicks);
 
 /**
- * @brief	Release a mutex.
+ * @brief	Release a mutex  out-of-line variant.
  *
- * Must be called by the owning thread only.  If waiters exist in the wait list,
- * ownership is handed to the highest-priority waiter inside the slow path.
+ * Active when TAKT_INLINE_OPTIMIZATION is not defined.  See file header
+ * for the full spec.  Identical semantics to the inline form.
  *
  * @param	pMtx : Pointer to mutex.
  * @return	TAKTOS_OK on success, TAKTOS_ERR_INVALID if @p pMtx is null or
  *          the caller is not the owner.
  */
 TaktOSErr_t TaktOSMutexUnlock(TaktOSMutex_t *pMtx);
+
+#endif // TAKT_INLINE_OPTIMIZATION
 
 
 #ifdef __cplusplus
@@ -161,6 +310,7 @@ TaktOSErr_t TaktOSMutexUnlock(TaktOSMutex_t *pMtx);
 class TaktOSMutex {
 public:
     TaktOSErr_t Init() { return TaktOSMutexInit(&vMtx); }
+    TaktOSErr_t InitProtect(uint8_t Ceiling) { return TaktOSMutexInitProtect(&vMtx, Ceiling); }
     TaktOSErr_t Lock(bool bBlocking = true,
                      uint32_t TimeoutTicks = TAKTOS_WAIT_FOREVER) {
         return TaktOSMutexLock(&vMtx, bBlocking, TimeoutTicks);
@@ -174,4 +324,3 @@ private:
 #endif // __cplusplus
 
 #endif // __TAKTOSMUTEX_H__
-

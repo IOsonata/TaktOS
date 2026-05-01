@@ -207,13 +207,14 @@ hTaktOSThread_t TaktOSThreadCreate(void *pMem, uint32_t MemSize,
     t->Priority     = Priority;
     t->State        = TAKTOS_READY;
     t->WakeReason   = TAKT_WOKEN_BY_EVENT;
-    t->_pad1        = 0u;
+    t->BasePriority = Priority;       // IPCP unboost target; matches Priority on Create
     t->WakeTick     = 0u;
     t->pNext        = nullptr;
     t->pStackBottom = nullptr;
     t->pWaitNext    = nullptr;
     t->pWaitList    = nullptr;
     t->pMsg         = nullptr;
+    t->HeldCeilingTop = 0u;            // no PCP mutexes held at create
     t->pSp          = TaktKernelStackInit((uint8_t*)pMem + MemSize, pEntry, pArg);
 
     {
@@ -375,9 +376,9 @@ TaktOSErr_t TaktOSThreadResumeSlowPath(TaktOSThread_t *t, uint32_t primask)
 // to lose the CPU even when sleeping a different (foreign) thread.
 
 /**
- * @brief	Sleep a thread  implementation.  @see TaktOSThread.h.
+ * @brief	Sleep a thread for N ticks  implementation.  @see TaktOSThread.h.
  */
-TaktOSErr_t TaktOSThreadSleep(hTaktOSThread_t hThread, uint32_t ticks)
+TaktOSErr_t TaktOSThreadSleepTicks(hTaktOSThread_t hThread, uint32_t ticks)
 {
     if (hThread == nullptr)
     {
@@ -398,7 +399,14 @@ TaktOSErr_t TaktOSThreadSleep(hTaktOSThread_t hThread, uint32_t ticks)
         TaktOSExitCritical(primask);
         return TAKTOS_ERR_INVALID;
     }
-    hThread->WakeTick   = TaktOSTickCount() + ticks;
+    // WakeTick uses (now + ticks + 1) so the wake fires on the (N+1)th
+    // SysTick after entry, guaranteeing AT LEAST `ticks` full tick-periods
+    // have elapsed regardless of where in the current tick window this
+    // call landed.  Without the +1, a sleep entered partway through a
+    // tick wakes after only (ticks - phase) of real time — strictly less
+    // than the user requested.  Same correction applies to all timed
+    // waits in sem/mutex/queue.
+    hThread->WakeTick   = TaktOSTickCount() + ticks + 1u;
     hThread->State      = TAKTOS_SLEEPING;
     hThread->pWaitList = nullptr;   // plain sleep  not a timed kernel-object wait
     TaktBlockTask(hThread);
@@ -411,6 +419,43 @@ TaktOSErr_t TaktOSThreadSleep(hTaktOSThread_t hThread, uint32_t ticks)
     }
 
     return TAKTOS_OK;
+}
+
+/**
+ * @brief	Sleep a thread for N milliseconds  implementation.  @see TaktOSThread.h.
+ *
+ * Converts Ms to ticks via the configured TickHz, rounding UP so the
+ * effective sleep covers AT LEAST Ms milliseconds (preserves the "at
+ * least" semantic when Ms is shorter than one tick period).  Uses a
+ * 64-bit intermediate to avoid overflow at large Ms values.
+ */
+TaktOSErr_t TaktOSThreadSleep(hTaktOSThread_t hThread, uint32_t Ms)
+{
+    if (Ms == 0u)
+    {
+        return TAKTOS_OK;
+    }
+
+    uint32_t tickHz = TaktOSGetTickHz();
+    if (tickHz == 0u)
+    {
+        // Kernel not initialised — same shape as a bad handle.
+        return TAKTOS_ERR_INVALID;
+    }
+
+    // ticks = ceil(Ms * tickHz / 1000), 64-bit intermediate.
+    uint64_t product = (uint64_t)Ms * (uint64_t)tickHz;
+    uint32_t ticks   = (uint32_t)((product + 999ull) / 1000ull);
+
+    // ceil() of a positive product is always >= 1, but be defensive:
+    // the SleepTicks fast-out path treats ticks == 0 as immediate-return,
+    // and for Ms > 0 we always want a real wait.
+    if (ticks == 0u)
+    {
+        ticks = 1u;
+    }
+
+    return TaktOSThreadSleepTicks(hThread, ticks);
 }
 
 //--- Destroy ------------------------------------------------------------

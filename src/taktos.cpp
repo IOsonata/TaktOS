@@ -141,8 +141,17 @@ extern "C" TAKT_WEAK bool TaktKernelHandlerAssign(uintptr_t HandlerBaseAddr)
 void TaktBlockTask(TaktOSThread_t *pThread)
 {
     uint8_t pri = pThread->Priority;
+    TaktOSThread_t *tail = g_TaktRunQueue.pHead[pri];
 
-    if (pThread->pNext == pThread)
+    if (tail == nullptr)
+    {
+#ifdef TAKT_DEBUG_CHECKS
+        TAKT_TRAP();
+#endif
+        return;
+    }
+
+    if (tail == pThread && pThread->pNext == pThread)
     {
         // only thread at this priority  fast path
         g_TaktRunQueue.pHead[pri] = nullptr;
@@ -156,23 +165,43 @@ void TaktBlockTask(TaktOSThread_t *pThread)
     }
     else
     {
-        // find predecessor  start from tail (wraps to front on first step)
-        TaktOSThread_t *prev = g_TaktRunQueue.pHead[pri];
+        // Find predecessor.  Start from tail (wraps to front on first step),
+        // but never walk forever: pNext corruption or a caller passing a thread
+        // that is not in the READY ring must fail closed instead of hanging the
+        // kernel inside this loop.
+        TaktOSThread_t *prev = tail;
 
-        while (prev->pNext != pThread)
+        while (prev != nullptr && prev->pNext != pThread)
         {
             prev = prev->pNext;
-        }
-        prev->pNext = pThread->pNext;
 
-        if (g_TaktRunQueue.pHead[pri] == pThread)
+            if (prev == tail)
+            {
+                // Completed one full ring without seeing pThread.
+                prev = nullptr;
+                break;
+            }
+        }
+
+        if (prev == nullptr)
         {
-            g_TaktRunQueue.pHead[pri] = prev;   // t was tail  prev becomes new tail
+#ifdef TAKT_DEBUG_CHECKS
+            TAKT_TRAP();
+#endif
+            return;
+        }
+
+        TaktOSThread_t *next = pThread->pNext;
+        prev->pNext = next;
+
+        if (tail == pThread)
+        {
+            g_TaktRunQueue.pHead[pri] = prev;   // pThread was tail; prev becomes new tail
         }
 
         if (pri == g_TaktRunQueue.TopPri && g_TaktosCtx.pNextThread == pThread)
         {
-            g_TaktosCtx.pNextThread = pThread->pNext;  // next front already known
+            g_TaktosCtx.pNextThread = next;     // next front already known
         }
     }
 
@@ -336,7 +365,7 @@ TaktOSErr_t TaktOSInit(uint32_t KernClockHz, uint32_t TickHz,
     idle->Priority   = 0u;
     idle->State      = TAKTOS_READY;
     idle->WakeReason = TAKT_WOKEN_BY_EVENT;
-    idle->_pad1      = 0u;
+    idle->BasePriority = 0u;
     idle->WakeTick   = 0u;
     idle->pNext        = nullptr;
     // pStackBottom: set to the aligned stack floor (above the guard word).
@@ -350,6 +379,7 @@ TaktOSErr_t TaktOSInit(uint32_t KernClockHz, uint32_t TickHz,
     idle->pWaitNext    = nullptr;
     idle->pWaitList    = nullptr;
     idle->pMsg         = nullptr;
+    idle->HeldCeilingTop = 0u;
     idle->pSp = TaktKernelStackInit(stackTop, IdleThread, nullptr);
 
     TaktReadyTask(idle);
@@ -403,6 +433,17 @@ void TaktOSStart(void)
     for (;;)
     {
     }
+}
+
+/**
+ * @brief	Return the configured kernel tick rate  @see TaktOSGetTickHz in TaktOS.h.
+ *
+ * Reads s_TickFreq, written once by TaktOSInit() and never modified
+ * afterwards.  No critical section needed — single-write/multi-read.
+ */
+uint32_t TaktOSGetTickHz(void)
+{
+    return s_TickFreq;
 }
 
 //--- Tick --------------------------------------------------------

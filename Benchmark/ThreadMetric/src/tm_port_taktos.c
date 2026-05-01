@@ -58,6 +58,11 @@ static uint8_t        g_tm_queue_storage[TM_PORT_MAX_QUEUES]
 static TaktOSSem_t    g_tm_sem  [TM_PORT_MAX_SEMAPHORES];
 static TaktOSMutex_t  g_tm_mutex[TM_PORT_MAX_MUTEXES];
 
+static inline bool tm_valid_thread_id(int thread_id)
+{
+    return (thread_id >= 0) && (thread_id < TM_PORT_MAX_THREADS);
+}
+
 static uint8_t        g_tm_pool_area[TM_PORT_MAX_POOLS][TM_PORT_POOL_BYTES]
                                     __attribute__((aligned(sizeof(void*))));
 static void          *g_tm_pool_free[TM_PORT_MAX_POOLS];
@@ -79,6 +84,8 @@ static void tm_thread_trampoline(void *param)
 
 static int tm_materialize_thread(int thread_id)
 {
+    if (!tm_valid_thread_id(thread_id)) return TM_ERROR;
+
     TmThreadDesc_t *t = &g_tm_thread[thread_id];
     if (t->handle != NULL) return TM_SUCCESS;
     t->handle = TaktOSThreadCreate(t->mem,
@@ -132,6 +139,8 @@ void tm_initialize(void (*test_initialization_function)(void))
 /* ----- Thread ---------------------------------------------------------- */
 int tm_thread_create(int thread_id, int priority, void (*entry_function)(void))
 {
+    if (!tm_valid_thread_id(thread_id)) return TM_ERROR;
+
     TmThreadDesc_t *t = &g_tm_thread[thread_id];
     t->allocated      = true;
     t->tm_priority    = (uint8_t)priority;
@@ -164,13 +173,13 @@ void tm_thread_relinquish(void) { TaktOSThreadYield(); }
 
 void tm_thread_sleep(int seconds)
 {
-    (void)TaktOSThreadSleep(TaktOSCurrentThread(),
+    (void)TaktOSThreadSleepTicks(TaktOSCurrentThread(),
                             (uint32_t)seconds * TM_PORT_TICK_HZ);
 }
 
 void tm_thread_sleep_ticks(int ticks)
 {
-    (void)TaktOSThreadSleep(TaktOSCurrentThread(), (uint32_t)ticks);
+    (void)TaktOSThreadSleepTicks(TaktOSCurrentThread(), (uint32_t)ticks);
 }
 
 /* ----- Queue ----------------------------------------------------------- */

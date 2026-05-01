@@ -1,6 +1,6 @@
 # TaktOS
 
-**Deterministic kernel for ARM Cortex-M**  *(RISC-V RV32 port planned)*
+**Deterministic kernel for ARM Cortex-M**
 
 [![IEC 61508 SIL 2 target](https://img.shields.io/badge/IEC%2061508-SIL%202%20target-blue)](docs/)
 [![ISO 26262 ASIL D path](https://img.shields.io/badge/ISO%2026262-ASIL%20D%20path-blue)](docs/)
@@ -42,12 +42,14 @@ So the operational rule is: **immediate yield in normal Thread mode; deferred yi
 
 ¹ Design target from llvm-mca cycle budget. Measured performance via Thread-Metric on real hardware (nRF52832 M4, nRF54L15 M33).
 
-**RISC-V RV32 port:** planned. The `RISCV/` directory in this repository contains early experimental work only; nothing there is functional or ready for use. No RISC-V Thread-Metric results are published. Do not treat anything under `RISCV/` as a working port.
-
-When the RV32 port is implemented, candidate first validation targets are:
-
-- **CV32E40P on FPGA** (Digilent Arty A7). Open-core IP from OpenHW Group, upstream OpenOCD, `riscv-none-elf-` toolchain — fully open workflow.
-- **Renesas R9A02G021** (Andes N22, RV32IMAC). Requires a specific workflow: **both TaktOS and IOsonata must be built inside Renesas e² studio** for source-level debug to work. The E2 Lite probe protocol and the Andes debug-module variant on this part are not supported by mainline OpenOCD, so debug is only available through the Renesas GDB server bundled with e² studio. Integrators who do not need debug can build the application with any `riscv-none-elf-` toolchain of their choice and flash the resulting image using Renesas Flash Programmer — build-and-flash without debug.
+**RISC-V RV32 port:** placeholder, not in v1.x scope. The `RISCV/`
+directory and the `Benchmark/ThreadMetric/ESP32C*/` projects in this
+repository contain placeholder code only. No functional RISC-V port is
+intended for any v1.x release. No RISC-V Thread-Metric results exist.
+Do not treat anything under `RISCV/` as a working port. RISC-V will be
+revisited as a separate scoped effort when product demand justifies the
+silicon validation campaign and the IOsonata build path. See
+*TaktOS Engineering Specification* §11 #6 for the canonical statement.
 
 ---
 
@@ -146,8 +148,8 @@ TaktOS/
 │   ├── cm7/PendSV_M7.S       # SAFETY BOUNDARY — M7
 │   ├── cm33/PendSV_M33.S     # SAFETY BOUNDARY — M33
 │   └── cm55/PendSV_M55.S     # SAFETY BOUNDARY — M55
-├── RISCV/                    # EXPERIMENTAL — placeholder RV32 work, not functional
-│   └── rv32/                 # skeleton files only; do not use
+├── RISCV/                    # PLACEHOLDER — not in v1.x scope, not functional
+│   └── rv32/                 # design sketch only; do not use
 ├── src/
 │   ├── taktos.cpp            # scheduler, init
 │   ├── taktos_sem.cpp        # semaphore slow paths
@@ -156,8 +158,9 @@ TaktOS/
 │   ├── taktos_thread.cpp     # thread lifecycle
 │   └── posix/                # PSE51 implementation
 ├── Benchmark/Thread-Metric/  # Thread-Metric Eclipse projects (nRF52832, nRF54L15)
+├── KVB/                      # Kernel Validation Benchmark — primary on-target test harness
 ├── examples/                 # basic, mutex, posix, queue
-└── test/unit/                # host-native Google Test, no arch dependency
+└── test/                     # MPU vector reloc tests (on-target)
 ```
 
 ### Arch port
@@ -177,7 +180,7 @@ void *TaktOSStackInit (void *stackTop, void (*entry)(void*), void *arg);
 |---|---|---|---|
 | Land | `TaktOSCriticalSection.h`, `systick.h` | ~80 per arch | Arch files only |
 | Roots | scheduler, semaphore, mutex, queue, task | ~760 portable C++23 | None |
-| Arch port | `ARM/cm*/PendSV_*.S`, `TaktKernelCM.cpp` | ~200–300 | ARM only (RISC-V planned) |
+| Arch port | `ARM/cm*/PendSV_*.S`, `TaktKernelCM.cpp` | ~200–300 | ARM only |
 | Fruit | POSIX PSE51 (pthread, sem_t, mqueue, timer) | ~1,800 | None |
 
 **Safety boundary total: ~1,454 LOC** (ARM + portable C++23).
@@ -316,8 +319,9 @@ IOsonata architecture (the Land/Roots/Trees/Fruit orchard metaphor and `DevIntrf
 - [x] ARM Cortex-M55 port — functional, no Thread-Metric run yet
 - [x] POSIX PSE51 layer (pthread, sem, mqueue, timer)
 - [x] Thread-Metric TM1/TM2/TM3/TM6/TM7/TM8 — TaktOS, FreeRTOS, ThreadX on nRF52832 and nRF54L15
-- [ ] RISC-V RV32IMAC port — **planned, not implemented.** `RISCV/` directory contains experimental placeholder only.
-- [ ] MC/DC coverage run (`test/unit/`)
+- [ ] RISC-V RV32IMAC port — **placeholder, not in v1.x scope.** `RISCV/` and `Benchmark/ThreadMetric/ESP32C*/` contain placeholder code only; not on the v1.x roadmap.
+- [ ] MC/DC coverage run — pending KVB host platform port (gcov-instrumented x86 build of cert-boundary modules running KVB test bodies)
+- [ ] POSIX PSE51 functional test suite — pending KVB POSIX test group
 - [ ] IEC 61508 SIL 2 certification campaign
 
 TM4 and TM5 are not planned: TM4 requires kernel-owned IRQs (TaktOS does not have them by design), TM5 requires dynamic allocation (TaktOS does not have it by design).

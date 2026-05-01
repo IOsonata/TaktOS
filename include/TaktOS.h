@@ -118,6 +118,17 @@ typedef enum {
 #define TAKTOS_PRIORITY_HIGHEST     28u
 #define TAKTOS_PRIORITY_CRITICAL    31u
 
+//--- Priority Ceiling Protocol -----------------------------------
+// IPCP (Immediate Priority Ceiling Protocol) per-thread state limit.
+// A thread may hold at most TAKTOS_MAX_HELD_PCP_MUTEXES priority-protect
+// mutexes simultaneously.  Sized small on purpose: realistic safety-critical
+// designs hold one or two PCP mutexes at a time; deeper nesting is a design
+// smell.  Overflow on Lock() returns TAKTOS_ERR_INVALID rather than corrupt
+// the held-ceiling stack.
+#ifndef TAKTOS_MAX_HELD_PCP_MUTEXES
+#define TAKTOS_MAX_HELD_PCP_MUTEXES 4u
+#endif
+
 //--- Handles ---------------------------------------------
 
 typedef struct __TaktOSThread_s *   hTaktOSThread_t;
@@ -176,6 +187,17 @@ TaktOSErr_t TaktOSInit(uint32_t KernClockHz, uint32_t TickHz,
  * @return	None
  */
 void TaktOSStart(void);          // never returns
+
+/**
+ * @brief	Return the configured kernel tick rate in Hz.
+ *
+ * Returns the TickHz value passed to TaktOSInit().  Useful for converting
+ * between time units and ticks at user level — e.g. timeout APIs that
+ * accept ticks but the caller has milliseconds.
+ *
+ * @return	Tick rate in Hz, or 0 if TaktOSInit() has not yet been called.
+ */
+uint32_t TaktOSGetTickHz(void);
 
 #ifdef __cplusplus
 }

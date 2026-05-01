@@ -53,15 +53,15 @@ ThreadX produced zero determinism errors across all tests.
 No context switches occur during the TM1 measurement window; the result
 reflects compiler output, not RTOS scheduling performance.
 
-### TM2 alignment note
-
-TM2 throughput reflects a known code-alignment artifact. A recent fast-path
-optimization commit set added 4 bytes to the TM2 binary, which shifts
-`PendSV_Handler` relative to the nRF52832's 128-byte I-code prefetch window.
-The handler is 36 bytes (confirmed from `.map`); a boundary crossing adds one
-stall cycle per fetch, compounding at 16M+ context switches per 30 s.
-
-Fix in progress: `.balign 64` before `PendSV_Handler` in `PendSV_M4.S`.
+**TM2 note:** TM2 throughput on this PCA10040 run differs from the
+canonical nRF52832 figure published in the *TaktOS Performance Benchmark
+Report* Rev 3.0, which uses the I-SYST BLYST Nano board. Same SoC, same
+clock (nRF52832 @ 64 MHz), but a different physical board and run
+instance. For cross-RTOS comparisons and the supported reference
+numbers, treat the Bench Report Rev 3.0 as the canonical source. The
+.balign 64 alignment workaround that earlier appeared here was tested
+in `PendSV_M4.S` and rejected — see the comment block at the top of
+`ARM/cm4/PendSV_M4.S` for why.
 
 ## Hardware and port details
 

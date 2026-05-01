@@ -399,12 +399,12 @@ extern "C" void tm_thread_relinquish(void)
 extern "C" void tm_thread_sleep(int seconds)
 {
     uint32_t ticks = (seconds <= 0) ? 0u : (uint32_t)seconds * TM_TAKTOS_TICK_HZ;
-    (void)TaktOSThreadSleep(TaktOSCurrentThread(), ticks);
+    (void)TaktOSThreadSleepTicks(TaktOSCurrentThread(), ticks);
 }
 void tm_thread_sleep_ticks(int ticks)
 {
     uint32_t t = (uint32_t)(ticks <= 0 ? 1 : ticks);
-    (void)TaktOSThreadSleep(TaktOSCurrentThread(), t);
+    (void)TaktOSThreadSleepTicks(TaktOSCurrentThread(), t);
 }
 
 extern "C" int tm_queue_create(int queue_id)

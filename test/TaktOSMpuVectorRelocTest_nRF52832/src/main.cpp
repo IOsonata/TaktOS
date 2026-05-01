@@ -72,33 +72,33 @@ SOFTWARE.
 #define ARM_VECTOR_PENDSV_INDEX         14u
 #define ARM_VECTOR_SYSTICK_INDEX        15u
 
-static uint32_t gRamVectorTable[APP_VECTOR_WORD_COUNT]
+static uint32_t g_RamVectorTable[APP_VECTOR_WORD_COUNT]
     __attribute__((aligned(APP_VECTOR_ALIGN_BYTES)));
 
-static uint8_t gProducerThreadMem[TAKTOS_THREAD_MEM_SIZE(512u)]
+static uint8_t g_ProducerThreadMem[TAKTOS_THREAD_MEM_SIZE(512u)]
     __attribute__((aligned(TAKTOS_STACK_GUARD_ALIGN)));
-static uint8_t gConsumerThreadMem[TAKTOS_THREAD_MEM_SIZE(512u)]
+static uint8_t g_ConsumerThreadMem[TAKTOS_THREAD_MEM_SIZE(512u)]
     __attribute__((aligned(TAKTOS_STACK_GUARD_ALIGN)));
-static uint8_t gFaultThreadMem[TAKTOS_THREAD_MEM_SIZE(512u)]
+static uint8_t g_FaultThreadMem[TAKTOS_THREAD_MEM_SIZE(512u)]
     __attribute__((aligned(TAKTOS_STACK_GUARD_ALIGN)));
 
-static TaktOSSem_t gSem;
-static hTaktOSThread_t gFaultThread = nullptr;
+static TaktOSSem_t g_Sem;
+static hTaktOSThread_t g_FaultThread = nullptr;
 
-volatile uint32_t gFlashVectorBase = 0u;
-volatile uint32_t gRamVectorBase = 0u;
-volatile uint32_t gVectorRelocated = 0u;
-volatile uint32_t gVectorSlotSVC = 0u;
-volatile uint32_t gVectorSlotPendSV = 0u;
-volatile uint32_t gVectorSlotSysTick = 0u;
-volatile uint32_t gMpuHandlersBound = 0u;
-volatile uint32_t gProducedCount = 0u;
-volatile uint32_t gConsumedCount = 0u;
-volatile uint32_t gLastConsumerTick = 0u;
-volatile uint32_t gTriggerMpuFault = 0u;
-volatile uint32_t gMemManageFaultCount = 0u;
-volatile uint32_t gMemManageCfsr = 0u;
-volatile uint32_t gMemManageMmar = 0u;
+volatile uint32_t g_FlashVectorBase = 0u;
+volatile uint32_t g_RamVectorBase = 0u;
+volatile uint32_t g_VectorRelocated = 0u;
+volatile uint32_t g_VectorSlotSVC = 0u;
+volatile uint32_t g_VectorSlotPendSV = 0u;
+volatile uint32_t g_VectorSlotSysTick = 0u;
+volatile uint32_t g_MpuHandlersBound = 0u;
+volatile uint32_t g_ProducedCount = 0u;
+volatile uint32_t g_ConsumedCount = 0u;
+volatile uint32_t g_LastConsumerTick = 0u;
+volatile uint32_t g_TriggerMpuFault = 0u;
+volatile uint32_t g_MemManageFaultCount = 0u;
+volatile uint32_t g_MemManageCfsr = 0u;
+volatile uint32_t g_MemManageMmar = 0u;
 
 extern "C" void PendSV_Handler_MPU(void);
 extern "C" void SVC_Handler_MPU(void);
@@ -129,30 +129,30 @@ static void RelocateVectorTableToRam(void)
         pSrc = (uint32_t*)0u;
     }
 
-    gFlashVectorBase = (uint32_t)(uintptr_t)pSrc;
+    g_FlashVectorBase = (uint32_t)(uintptr_t)pSrc;
 
     for (uint32_t i = 0u; i < APP_VECTOR_WORD_COUNT; ++i)
     {
-        gRamVectorTable[i] = pSrc[i];
+        g_RamVectorTable[i] = pSrc[i];
     }
 
-    gRamVectorBase = (uint32_t)(uintptr_t)gRamVectorTable;
-    MmioWrite32(ARM_VTOR_ADDR, gRamVectorBase);
+    g_RamVectorBase = (uint32_t)(uintptr_t)g_RamVectorTable;
+    MmioWrite32(ARM_VTOR_ADDR, g_RamVectorBase);
     ArmSyncBarrier();
 
-    gVectorRelocated = MmioRead32(ARM_VTOR_ADDR) == gRamVectorBase ? 1u : 0u;
+    g_VectorRelocated = MmioRead32(ARM_VTOR_ADDR) == g_RamVectorBase ? 1u : 0u;
 }
 
 static void CaptureKernelVectorSlots(void)
 {
-    gVectorSlotSVC = gRamVectorTable[ARM_VECTOR_SVC_INDEX];
-    gVectorSlotPendSV = gRamVectorTable[ARM_VECTOR_PENDSV_INDEX];
-    gVectorSlotSysTick = gRamVectorTable[ARM_VECTOR_SYSTICK_INDEX];
+    g_VectorSlotSVC = g_RamVectorTable[ARM_VECTOR_SVC_INDEX];
+    g_VectorSlotPendSV = g_RamVectorTable[ARM_VECTOR_PENDSV_INDEX];
+    g_VectorSlotSysTick = g_RamVectorTable[ARM_VECTOR_SYSTICK_INDEX];
 
-    gMpuHandlersBound =
-        gVectorSlotSVC == (uint32_t)(uintptr_t)SVC_Handler_MPU &&
-        gVectorSlotPendSV == (uint32_t)(uintptr_t)PendSV_Handler_MPU &&
-        gVectorSlotSysTick == (uint32_t)(uintptr_t)TaktKernelTickHandler ? 1u : 0u;
+    g_MpuHandlersBound =
+        g_VectorSlotSVC == (uint32_t)(uintptr_t)SVC_Handler_MPU &&
+        g_VectorSlotPendSV == (uint32_t)(uintptr_t)PendSV_Handler_MPU &&
+        g_VectorSlotSysTick == (uint32_t)(uintptr_t)TaktKernelTickHandler ? 1u : 0u;
 }
 
 static void ProducerThread(void *pArg)
@@ -161,8 +161,8 @@ static void ProducerThread(void *pArg)
 
     for (;;)
     {
-        gProducedCount += 1u;
-        TaktOSSemGive(&gSem, false);
+        (void)__sync_add_and_fetch(&g_ProducedCount, 1u);
+        TaktOSSemGive(&g_Sem, false);
         TaktOSThreadSleep(TaktOSCurrentThread(), 100u);
     }
 }
@@ -173,9 +173,9 @@ static void ConsumerThread(void *pArg)
 
     for (;;)
     {
-        TaktOSSemTake(&gSem, true, TAKTOS_WAIT_FOREVER);
-        gConsumedCount += 1u;
-        gLastConsumerTick = TaktOSTickCount();
+        TaktOSSemTake(&g_Sem, true, TAKTOS_WAIT_FOREVER);
+        (void)__sync_add_and_fetch(&g_ConsumedCount, 1u);
+        g_LastConsumerTick = TaktOSTickCount();
     }
 }
 
@@ -192,10 +192,10 @@ static void FaultThread(void *pArg)
 
         if (sDelay >= 10u)
         {
-            gTriggerMpuFault = 1u;
+            g_TriggerMpuFault = 1u;
         }
 
-        if (gTriggerMpuFault != 0u)
+        if (g_TriggerMpuFault != 0u)
         {
             volatile uint32_t *pGuardBase =
                 (volatile uint32_t*)((TaktOSThread_t*)TaktOSCurrentThread())->pStackBottom;
@@ -210,7 +210,7 @@ int main(void)
     RelocateVectorTableToRam();
 
     if (TaktOSInit(APP_CORE_CLOCK_HZ, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR,
-                   (uintptr_t)gRamVectorTable) != TAKTOS_OK)
+                   (uintptr_t)g_RamVectorTable) != TAKTOS_OK)
     {
         for (;;)
         {
@@ -219,16 +219,16 @@ int main(void)
 
     CaptureKernelVectorSlots();
 
-    TaktOSSemInit(&gSem, 0u, 1u);
+    TaktOSSemInit(&g_Sem, 0u, 1u);
 
-    TaktOSThreadCreate(gProducerThreadMem, sizeof(gProducerThreadMem),
+    TaktOSThreadCreate(g_ProducerThreadMem, sizeof(g_ProducerThreadMem),
                        ProducerThread, NULL, TAKTOS_PRIORITY_LOW);
-    TaktOSThreadCreate(gConsumerThreadMem, sizeof(gConsumerThreadMem),
+    TaktOSThreadCreate(g_ConsumerThreadMem, sizeof(g_ConsumerThreadMem),
                        ConsumerThread, NULL, TAKTOS_PRIORITY_NORMAL);
-    gFaultThread = TaktOSThreadCreate(gFaultThreadMem, sizeof(gFaultThreadMem),
-                                      FaultThread, NULL, TAKTOS_PRIORITY_LOWEST);
+    g_FaultThread = TaktOSThreadCreate(g_FaultThreadMem, sizeof(g_FaultThreadMem),
+                                       FaultThread, NULL, TAKTOS_PRIORITY_LOWEST);
 
-    (void)gFaultThread;
+    (void)g_FaultThread;
 
     TaktOSStart();
 
@@ -239,9 +239,9 @@ int main(void)
 
 extern "C" void MemoryManagement_Handler(void)
 {
-    gMemManageFaultCount += 1u;
-    gMemManageCfsr = MmioRead32(ARM_CFSR_ADDR);
-    gMemManageMmar = MmioRead32(ARM_MMFAR_ADDR);
+    (void)__sync_add_and_fetch(&g_MemManageFaultCount, 1u);
+    g_MemManageCfsr = MmioRead32(ARM_CFSR_ADDR);
+    g_MemManageMmar = MmioRead32(ARM_MMFAR_ADDR);
 
     for (;;)
     {

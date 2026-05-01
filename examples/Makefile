@@ -6,14 +6,14 @@ CXX ?= clang++
 C_EXAMPLES := \
 	basic/basic_c.c \
 	queue/producer_consumer_c.c \
-	mutex/mutex_pi_c.c \
+	mutex/mutex_pcp_c.c \
 	posix/posix_pse51.c \
 	mpu_guard.c
 
 CPP_EXAMPLES := \
 	basic/basic_cpp.cpp \
 	queue/producer_consumer.cpp \
-	mutex/mutex_pi.cpp \
+	mutex/mutex_pcp.cpp \
 	posix/posix_pse51_cpp.cpp
 
 .PHONY: check clean

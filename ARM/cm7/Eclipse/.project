@@ -26,22 +26,12 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>ARM</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
 			<name>include</name>
 			<type>2</type>
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>src</name>
-			<type>2</type>
-			<locationURI>virtual:/virtual</locationURI>
-		</link>
-		<link>
-			<name>ARM/cm7</name>
 			<type>2</type>
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
@@ -59,6 +49,11 @@
 			<name>include/compiler.h</name>
 			<type>1</type>
 			<locationURI>PARENT-3-PROJECT_LOC/include/compiler.h</locationURI>
+		</link>
+		<link>
+			<name>include/cxx</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
 			<name>include/mutex.h</name>
@@ -111,6 +106,11 @@
 			<locationURI>virtual:/virtual</locationURI>
 		</link>
 		<link>
+			<name>src/std</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
 			<name>src/systick.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/src/systick.h</locationURI>
@@ -141,14 +141,14 @@
 			<locationURI>PARENT-3-PROJECT_LOC/src/taktos_thread.cpp</locationURI>
 		</link>
 		<link>
-			<name>ARM/cm7/pendsv.s</name>
+			<name>include/cxx/gthr-taktos.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/pendsv.s</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/include/cxx/gthr-taktos.h</locationURI>
 		</link>
 		<link>
-			<name>ARM/cm7/port.h</name>
+			<name>include/cxx/takt_cpp_runtime.h</name>
 			<type>1</type>
-			<locationURI>PARENT-1-PROJECT_LOC/port.h</locationURI>
+			<locationURI>PARENT-3-PROJECT_LOC/include/cxx/takt_cpp_runtime.h</locationURI>
 		</link>
 		<link>
 			<name>include/posix/mqueue.h</name>
@@ -209,6 +209,16 @@
 			<name>src/posix/sem.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-3-PROJECT_LOC/src/posix/sem.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/std/cpp_runtime.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/src/std/cpp_runtime.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/std/threads.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/src/std/threads.cpp</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

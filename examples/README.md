@@ -13,8 +13,8 @@ that you can inspect in a debugger.
 | `basic/basic_cpp.cpp` | C++ | Same as basic C example using `TaktOSThread` and `TaktOSSem` wrappers |
 | `queue/producer_consumer_c.c` | C | Fixed-size queue between producer and consumer threads |
 | `queue/producer_consumer.cpp` | C++ | Same pattern using the `TaktOSQueue` wrapper |
-| `mutex/mutex_pi_c.c` | C | Priority inheritance scenario using `TaktOSMutex_t` |
-| `mutex/mutex_pi.cpp` | C++ | Same scenario using the `TaktOSMutex` wrapper |
+| `mutex/mutex_pcp_c.c` | C | Bounded priority inversion via IPCP (`TaktOSMutexInitProtect`) |
+| `mutex/mutex_pcp.cpp` | C++ | Same scenario using the `TaktOSMutex` wrapper |
 | `posix/posix_pse51.c` | C | POSIX threads, mutex, condvar, semaphore, timer on top of TaktOS |
 | `posix/posix_pse51_cpp.cpp` | C++ | Same POSIX layer from C++ with a small RAII lock helper |
 | `mpu_guard.c` | C | MPU stack-guard example; pass a writable handler table base when the target port needs dynamic handler patching |
@@ -75,10 +75,17 @@ TaktOSQueueReceive(&q, &msg, true, TAKTOS_WAIT_FOREVER);
 ### Mutex API
 
 ```c
+/* Plain mutex — no priority adjustment */
 static TaktOSMutex_t mtx;
 TaktOSMutexInit(&mtx);
 TaktOSMutexLock(&mtx, true, TAKTOS_WAIT_FOREVER);
 TaktOSMutexUnlock(&mtx);
+
+/* IPCP mutex — bounded priority inversion (PTHREAD_PRIO_PROTECT) */
+static TaktOSMutex_t pcp;
+TaktOSMutexInitProtect(&pcp, TAKTOS_PRIORITY_HIGH);
+TaktOSMutexLock(&pcp, true, TAKTOS_WAIT_FOREVER);   /* boosts holder to HIGH */
+TaktOSMutexUnlock(&pcp);                             /* restores BasePriority */
 ```
 
 ### POSIX layer

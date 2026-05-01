@@ -97,13 +97,44 @@ hTaktOSThread_t TaktOSThreadCreate(void *pStackMem, uint32_t StackMemSize,
 TaktOSErr_t TaktOSThreadSuspend(hTaktOSThread_t hThread);
 
 /**
- * @brief	Put a thread to sleep for a number of ticks.
+ * @brief	Put a thread to sleep for at least the given number of ticks.
+ *
+ * The call returns no earlier than @p Ticks full tick-periods after entry.
+ * Because the call may land partway through a tick window, the kernel
+ * waits one extra SysTick fire to guarantee the minimum elapsed time —
+ * typical actual sleep duration is between Ticks and Ticks + 1 ticks.
+ *
+ * Use this form when the caller naturally thinks in ticks (timeout
+ * passthrough, tick-driven state machines, micro-benchmarks).  When the
+ * caller has milliseconds, use TaktOSThreadSleep() instead.
  *
  * @param	hThread : Thread handle.
- * @param	Ticks   : Number of ticks to sleep.  Zero returns immediately.
+ * @param	Ticks   : Minimum ticks to sleep.  Zero returns immediately.
  * @return	TAKTOS_OK on success, TAKTOS_ERR_INVALID on invalid handle/state.
  */
-TaktOSErr_t TaktOSThreadSleep(hTaktOSThread_t hThread, uint32_t Ticks);
+TaktOSErr_t TaktOSThreadSleepTicks(hTaktOSThread_t hThread, uint32_t Ticks);
+
+/**
+ * @brief	Put a thread to sleep for at least the given number of milliseconds.
+ *
+ * Convenience wrapper over TaktOSThreadSleepTicks() that converts @p Ms
+ * to the number of kernel ticks needed to cover at least that duration:
+ *
+ *     ticks = ceil(Ms * TickHz / 1000)
+ *
+ * The conversion rounds UP — so a 1 ms request at TickHz = 100 (10 ms tick
+ * period) produces a 1-tick wait, which then sleeps for at least one full
+ * tick-period (10 ms).  This preserves the "at least Ms" semantic at the
+ * cost of overshoot when the request is shorter than one tick period.
+ *
+ * Ms = 0 returns immediately without entering the kernel.  Conversion uses
+ * a 64-bit intermediate to avoid overflow at large Ms values.
+ *
+ * @param	hThread : Thread handle.
+ * @param	Ms      : Minimum milliseconds to sleep.  Zero returns immediately.
+ * @return	TAKTOS_OK on success, TAKTOS_ERR_INVALID on invalid handle/state.
+ */
+TaktOSErr_t TaktOSThreadSleep(hTaktOSThread_t hThread, uint32_t Ms);
 
 /**
  * @brief	Destroy a thread and remove it from all scheduler/wait structures.
@@ -217,7 +248,8 @@ public:
 
     TaktOSErr_t Suspend() { return TaktOSThreadSuspend(vhThread); }
     TaktOSErr_t Resume() { return TaktOSThreadResume(vhThread); }
-    TaktOSErr_t Sleep(uint32_t Ticks) { return TaktOSThreadSleep(vhThread, Ticks); }
+    TaktOSErr_t Sleep(uint32_t Ms) { return TaktOSThreadSleep(vhThread, Ms); }
+    TaktOSErr_t SleepTicks(uint32_t Ticks) { return TaktOSThreadSleepTicks(vhThread, Ticks); }
     TaktOSErr_t Destroy() { return TaktOSThreadDestroy(vhThread); }
     TaktOSErr_t HandOff(hTaktOSThread_t hNext) { return TaktOSThreadHandOff(hNext); }
 

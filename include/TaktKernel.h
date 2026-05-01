@@ -96,10 +96,10 @@ typedef struct __TaktKernelWaitList_s {
 
 struct __TaktOSThread_s {
 	void *pSp;							//!< offset  0  loaded by context switch handler
-	uint8_t Priority;					//!< offset  4  031
+	uint8_t Priority;					//!< offset  4  current EFFECTIVE priority (may be boosted by IPCP)
 	uint8_t	State;						//!< offset  5  uint8_t enum; no padding before WakeTick
 	uint8_t WakeReason;					//!< offset  6 - TAKT_WOKEN_BY_EVENT / _TIMEOUT
-	uint8_t _pad1;						//!< offset  7 - reserved  alignment pad
+	uint8_t BasePriority;				//!< offset  7  original priority (set in Create); IPCP unboost target
 	uint32_t WakeTick;					//!< offset  8
 	struct __TaktOSThread_s *pNext;		//!< offset 12  run queue and sleep list
 	void *pStackBottom;					//!< offset 16  aligned stack floor / guard base
@@ -110,7 +110,10 @@ struct __TaktOSThread_s {
 	                                	//!<   tick ISR uses this to remove on timeout
 	void *pMsg;							//!< offset 28  queue direct-handoff: src ptr (sender) / dst ptr (receiver)
 	                                	//!<   set before blocking on queue send/recv; cleared by wake path
-}; // 32 bytes
+	uint8_t HeldCeilings[TAKTOS_MAX_HELD_PCP_MUTEXES]; //!< offset 32  IPCP stack of held-mutex ceilings
+	uint8_t HeldCeilingTop;				//!< offset 36  depth of HeldCeilings stack (0 = none)
+	uint8_t _pad2[3];					//!< offset 37  alignment pad to 40 bytes
+}; // 40 bytes
 
 
 typedef struct {
@@ -263,6 +266,33 @@ static TAKT_ALWAYS_INLINE void TaktReadyTask(TaktOSThread_t *pThread)
  * @param	pThread : Thread to block.
  */
 void TaktBlockTask(TaktOSThread_t *pThread);
+
+/**
+ * @brief	Migrate a READY thread between priority queues  IPCP boost / unboost helper.
+ *
+ * Used by the IPCP mutex path to relocate a thread (typically the currently-
+ * running thread) between priority levels when its effective priority changes
+ * because of a Lock-time boost or Unlock-time un-boost.  Implemented as
+ * BlockTask + Priority assignment + ReadyTask  no State field change because
+ * the thread remains in the runnable set.
+ *
+ * Caller MUST hold the kernel critical section.  No-op if the new priority
+ * matches the current one.
+ *
+ * @param	pThread : Thread to migrate (must currently be in the run queue).
+ * @param	newPri  : New priority (1..TAKTOS_MAX_PRI-1).
+ */
+static TAKT_ALWAYS_INLINE void TaktMigratePriority(TaktOSThread_t *pThread, uint8_t newPri)
+{
+    if (pThread->Priority == newPri)
+    {
+        return;
+    }
+
+    TaktBlockTask(pThread);
+    pThread->Priority = newPri;
+    TaktReadyTask(pThread);
+}
 
 /**
  * @brief	Force a specific thread to run next (HandOff helper).

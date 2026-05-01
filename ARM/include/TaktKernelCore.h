@@ -56,10 +56,22 @@ SOFTWARE.
 //   - any reserved no-access stack-guard region used by the MPU-aware handler
 //   - any slack required to align pStackBottom to the guard-region boundary
 #if defined(__ARM_ARCH_6M__)
-#  define TAKTOS_STACK_GUARD_ALIGN         256u
 #  define TAKTOS_THREAD_INIT_FRAME_SIZE     64u
 #  define TAKTOS_THREAD_STACK_TOP_ALIGN      8u
-#  define TAKTOS_THREAD_GUARD_REGION_SIZE  256u
+   /*
+    * ARMv6-M targets such as STM32F03 / Cortex-M0 normally have no MPU.
+    * The software guard-word check does not need a 256-byte MPU region or
+    * 256-byte stack-bottom alignment.  Keep the default small for limited-
+    * SRAM MCUs and reserve the 256-byte region only when an ARMv6-M MPU
+    * stack guard is explicitly enabled by the board/port configuration.
+    */
+#  if defined(TAKTOS_MPU_STACK_GUARD) && (TAKTOS_MPU_STACK_GUARD != 0)
+#    define TAKTOS_STACK_GUARD_ALIGN        256u
+#    define TAKTOS_THREAD_GUARD_REGION_SIZE 256u
+#  else
+#    define TAKTOS_STACK_GUARD_ALIGN          8u
+#    define TAKTOS_THREAD_GUARD_REGION_SIZE   0u
+#  endif
 #elif defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__)
 #  define TAKTOS_STACK_GUARD_ALIGN          32u
 #  define TAKTOS_THREAD_INIT_FRAME_SIZE     68u
