@@ -1,0 +1,15 @@
+{
+	"InstallScripts" : 
+	[
+		"/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_832/cmake_install.cmake",
+		"/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_832/_sysbuild/cmake_install.cmake",
+		"/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_832/_sysbuild/sysbuild/images/cmake_install.cmake",
+		"/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_832/_sysbuild/sysbuild/images/bootloader/cmake_install.cmake",
+		"/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_832/_sysbuild/sysbuild/images/firmware_loader/cmake_install.cmake",
+		"/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_832/modules/nrf/cmake_install.cmake",
+		"/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_832/modules/mcuboot/cmake_install.cmake",
+		"/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_832/_sysbuild/sysbuild/images/boards/cmake_install.cmake",
+		"/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_832/_sysbuild/sysbuild/images/soc/cmake_install.cmake"
+	],
+	"Parallel" : false
+}

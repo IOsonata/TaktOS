@@ -1,0 +1,7 @@
+default: Zephyr_nRF54L15-DK_KvbSuite
+build_dir: /Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_832
+domains:
+  - name: Zephyr_nRF54L15-DK_KvbSuite
+    build_dir: /Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_832/Zephyr_nRF54L15-DK_KvbSuite
+flash_order:
+  - Zephyr_nRF54L15-DK_KvbSuite

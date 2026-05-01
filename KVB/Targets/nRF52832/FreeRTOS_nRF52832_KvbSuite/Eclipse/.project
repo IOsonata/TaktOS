@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<projectDescription>
+	<name>FreeRTOS_nRF52832_KvbSuite</name>
+	<comment>KVB benchmark suite on FreeRTOS for nRF52-DK (PCA10040) board.  Sibling of TaktOS_nRF52832_KvbSuite — same shared platform/test set, FreeRTOS swapped for TaktOS as the kernel under test.</comment>
+	<projects>
+	</projects>
+	<buildSpec>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.genmakebuilder</name>
+			<triggers>clean,full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
+		<buildCommand>
+			<name>org.eclipse.cdt.managedbuilder.core.ScannerConfigBuilder</name>
+			<triggers>full,incremental,</triggers>
+			<arguments>
+			</arguments>
+		</buildCommand>
+	</buildSpec>
+	<natures>
+		<nature>org.eclipse.cdt.core.cnature</nature>
+		<nature>org.eclipse.cdt.core.ccnature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
+		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
+	</natures>
+	<linkedResources>
+		<link>
+			<name>src</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+
+		<!-- Per-MCU shared (PARENT-2 = KVB/Targets/nRF52832/) -->
+		<link>
+			<name>src/board.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/include/board.h</locationURI>
+		</link>
+		<link>
+			<name>src/FreeRTOSConfig.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/include/FreeRTOSConfig.h</locationURI>
+		</link>
+		<link>
+			<name>src/kvb_platform_nrf52832.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/src/kvb_platform_nrf52832.cpp</locationURI>
+		</link>
+
+		<!-- Targets-tree shared (PARENT-3 = KVB/Targets/) -->
+		<link>
+			<name>src/main.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/src/main.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/kvb_platform_iosonata.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/src/kvb_platform_iosonata.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/kvb_freertos_hooks.c</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/src/kvb_freertos_hooks.c</locationURI>
+		</link>
+
+		<!-- KVB framework: core (PARENT-4 = KVB/) -->
+		<link>
+			<name>src/kvb_default_tests.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/src/core/kvb_default_tests.c</locationURI>
+		</link>
+		<link>
+			<name>src/kvb_log.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/src/core/kvb_log.c</locationURI>
+		</link>
+		<link>
+			<name>src/kvb_platform_default.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/src/core/kvb_platform_default.c</locationURI>
+		</link>
+		<link>
+			<name>src/kvb_registry.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/src/core/kvb_registry.c</locationURI>
+		</link>
+		<link>
+			<name>src/kvb_result.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/src/core/kvb_result.c</locationURI>
+		</link>
+		<link>
+			<name>src/kvb_runner.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/src/core/kvb_runner.c</locationURI>
+		</link>
+
+		<!-- KVB framework: tests -->
+		<link>
+			<name>src/kvb_test_sched.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/src/tests/sched/kvb_test_sched.c</locationURI>
+		</link>
+		<link>
+			<name>src/kvb_test_sync.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/src/tests/sync/kvb_test_sync.c</locationURI>
+		</link>
+		<link>
+			<name>src/kvb_test_ipc.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/src/tests/ipc/kvb_test_ipc.c</locationURI>
+		</link>
+		<link>
+			<name>src/kvb_test_time.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/src/tests/time/kvb_test_time.c</locationURI>
+		</link>
+
+		<!-- KVB framework: FreeRTOS port + Cortex-M platform layer -->
+		<link>
+			<name>src/kvb_port_freertos.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/ports/kernels/freertos/kvb_port_freertos.c</locationURI>
+		</link>
+		<link>
+			<name>src/kvb_platform_cortex_m.c</name>
+			<type>1</type>
+			<locationURI>PARENT-4-PROJECT_LOC/ports/platforms/cortex_m/kvb_platform_cortex_m.c</locationURI>
+		</link>
+
+		<!-- FreeRTOS kernel — pulled from IOsonata's external/FreeRTOS-Kernel/.
+		     Pure static allocation (configSUPPORT_STATIC_ALLOCATION = 1,
+		     configSUPPORT_DYNAMIC_ALLOCATION = 0, configTOTAL_HEAP_SIZE = 0).
+		     Mirrors the proven Benchmark/ThreadMetric/nRF52832 FreeRTOS
+		     reference build.  ARM_CM4F port. -->
+		<link>
+			<name>src/kernel</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>src/kernel/list.c</name>
+			<type>1</type>
+			<locationURI>IOCOMPOSER_HOME/external/FreeRTOS-Kernel/list.c</locationURI>
+		</link>
+		<link>
+			<name>src/kernel/queue.c</name>
+			<type>1</type>
+			<locationURI>IOCOMPOSER_HOME/external/FreeRTOS-Kernel/queue.c</locationURI>
+		</link>
+		<link>
+			<name>src/kernel/tasks.c</name>
+			<type>1</type>
+			<locationURI>IOCOMPOSER_HOME/external/FreeRTOS-Kernel/tasks.c</locationURI>
+		</link>
+		<!-- Virtual folder chain mirroring FreeRTOS-Kernel/portable/GCC/ARM_CM4F
+		     inside the project.  Replicates the layout used by the working
+		     FreeRTOS_nRF54L15_* TM projects.  Eclipse CDT requires every
+		     parent virtual folder to be declared before nested links resolve.
+		     A flat src/kernel/portasm.c link is silently ignored at managed-
+		     build refresh, which is what produced the missing-symbol link
+		     errors on the first attempt. -->
+		<link>
+			<name>src/kernel/portable</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>src/kernel/portable/GCC</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>src/kernel/portable/GCC/ARM_CM4F</name>
+			<type>2</type>
+			<locationURI>virtual:/virtual</locationURI>
+		</link>
+		<link>
+			<name>src/kernel/portable/GCC/ARM_CM4F/port.c</name>
+			<type>1</type>
+			<locationURI>IOCOMPOSER_HOME/external/FreeRTOS-Kernel/portable/GCC/ARM_CM4F/port.c</locationURI>
+		</link>
+		<!-- ARM_CM4F is the classic single-file port: port.c contains the
+		     full port including PendSV / SVC / SysTick handlers as
+		     __attribute__((naked)) functions.  No portasm.c exists in
+		     FreeRTOS-Kernel/portable/GCC/ARM_CM4F/.  The split into
+		     port.c + portasm.c is V11+ unified-port architecture territory
+		     (ARM_CM0, ARM_CM23, ARM_CM33, ARM_CM35P, ARM_CM55, ARM_CM85,
+		     ARM_CM4_NTZ).  Do not add a portasm.c link here. -->
+		<!-- portable/MemMang/heap_*.c is intentionally NOT linked.
+		     This target uses pure static allocation
+		     (configSUPPORT_DYNAMIC_ALLOCATION=0,
+		      configSUPPORT_STATIC_ALLOCATION=1,
+		      configTOTAL_HEAP_SIZE=0).  Same as the working
+		     Benchmark/ThreadMetric/nRF52832 FreeRTOS reference. -->
+	</linkedResources>
+</projectDescription>

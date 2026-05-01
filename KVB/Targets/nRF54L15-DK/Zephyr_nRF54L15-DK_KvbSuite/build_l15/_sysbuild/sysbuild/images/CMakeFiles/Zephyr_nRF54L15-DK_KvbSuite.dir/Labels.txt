@@ -1,0 +1,13 @@
+# Target labels
+ Zephyr_nRF54L15-DK_KvbSuite
+# Source files and their labels
+/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_l15/_sysbuild/sysbuild/images/CMakeFiles/Zephyr_nRF54L15-DK_KvbSuite
+/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_l15/_sysbuild/sysbuild/images/CMakeFiles/Zephyr_nRF54L15-DK_KvbSuite.rule
+/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_l15/_sysbuild/sysbuild/images/CMakeFiles/Zephyr_nRF54L15-DK_KvbSuite-complete.rule
+/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_l15/_sysbuild/sysbuild/images/Zephyr_nRF54L15-DK_KvbSuite-prefix/src/Zephyr_nRF54L15-DK_KvbSuite-stamp/Zephyr_nRF54L15-DK_KvbSuite-build.rule
+/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_l15/_sysbuild/sysbuild/images/Zephyr_nRF54L15-DK_KvbSuite-prefix/src/Zephyr_nRF54L15-DK_KvbSuite-stamp/Zephyr_nRF54L15-DK_KvbSuite-configure.rule
+/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_l15/_sysbuild/sysbuild/images/Zephyr_nRF54L15-DK_KvbSuite-prefix/src/Zephyr_nRF54L15-DK_KvbSuite-stamp/Zephyr_nRF54L15-DK_KvbSuite-download.rule
+/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_l15/_sysbuild/sysbuild/images/Zephyr_nRF54L15-DK_KvbSuite-prefix/src/Zephyr_nRF54L15-DK_KvbSuite-stamp/Zephyr_nRF54L15-DK_KvbSuite-install.rule
+/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_l15/_sysbuild/sysbuild/images/Zephyr_nRF54L15-DK_KvbSuite-prefix/src/Zephyr_nRF54L15-DK_KvbSuite-stamp/Zephyr_nRF54L15-DK_KvbSuite-mkdir.rule
+/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_l15/_sysbuild/sysbuild/images/Zephyr_nRF54L15-DK_KvbSuite-prefix/src/Zephyr_nRF54L15-DK_KvbSuite-stamp/Zephyr_nRF54L15-DK_KvbSuite-patch.rule
+/Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/nRF54L15-DK/Zephyr_nRF54L15-DK_KvbSuite/build_l15/_sysbuild/sysbuild/images/Zephyr_nRF54L15-DK_KvbSuite-prefix/src/Zephyr_nRF54L15-DK_KvbSuite-stamp/Zephyr_nRF54L15-DK_KvbSuite-update.rule
