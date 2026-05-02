@@ -32,8 +32,9 @@ KVB/Targets/nRF52832/
 │   ├── kvb_config_nrf52832.h            TaktOS variant
 │   ├── kvb_config_nrf52832_freertos.h   FreeRTOS variant
 │   ├── kvb_config_nrf52832_threadx.h    ThreadX variant
-│   ├── FreeRTOSConfig.h                 FreeRTOS kernel config
-│   └── tx_user.h                        ThreadX feature config
+│   └── FreeRTOSConfig.h                 FreeRTOS kernel config
+│       (ThreadX feature config lives in KVB/include/tx_user.h, shared
+│        across every KVB target)
 ├── src/
 │   ├── kvb_platform_nrf52832.cpp        board / CPU strings only
 │   └── tx_initialize_low_level.S        ThreadX SysTick + priority init
@@ -79,7 +80,7 @@ without any per-MCU plumbing.
 | Allocation strategy | inline-in-handle | static (no heap_4 needed) | port-private slot pool |
 | Optimisation | -Os | -Os | -Os |
 
-The ThreadX worker-stack asymmetry is the one disclosed difference,
+The ThreadX worker-stack asymmetry is the one documented difference,
 same reason as on STM32F0308 (`_txe_*` wrappers add a C call frame to
 every public API).  Everything else is byte-identical across the three
 kernels, including the IOsonata UART, the KVB framework version, and

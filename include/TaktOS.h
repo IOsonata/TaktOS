@@ -71,6 +71,8 @@ typedef enum {
                              //   no token/lock/item was transferred
     TAKTOS_ERR_NOMEM,
     TAKTOS_ERR_INVALID,
+    TAKTOS_ERR_ALIGN,        // pointer or size violates required alignment
+                             //   (e.g. queue pData / pStorage / ItemSize not 4-byte aligned)
 } TaktOSErr_t;
 
 //--- Thread states ---------------------------------------

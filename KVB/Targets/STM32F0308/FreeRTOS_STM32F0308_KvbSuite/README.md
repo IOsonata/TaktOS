@@ -8,7 +8,7 @@ test set. The only difference is the kernel under test: this project
 links the FreeRTOS kernel (sources from IOsonata's `external/FreeRTOS-Kernel/`)
 instead of the TaktOS_M0 static library.
 
-Comparable apples-to-apples cycle counts come out at the other end —
+Comparable like-for-like cycle counts come out at the other end —
 both kernels run identical worker thread counts, identical batch sizes,
 identical UART output buffering, and emit `[KVB] METRIC` lines in the
 same format consumed by `KVB/tools/parse_log.py`.

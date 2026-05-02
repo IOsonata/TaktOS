@@ -174,12 +174,12 @@ extern TaktKernelCtx_t g_TaktosCtx;
 //--- Bitmap helpers ---------------------------------------------
 // Must be called inside a critical section.
 
-static TAKT_ALWAYS_INLINE void TaktPrioBitmapSet(uint8_t Prio)
+TAKT_ALWAYS_INLINE void TaktPrioBitmapSet(uint8_t Prio)
 {
     g_TaktRunQueue.Bitmap |= (1u << Prio);
 }
 
-static TAKT_ALWAYS_INLINE void TaktPrioBitmapClear(uint8_t Prio)
+TAKT_ALWAYS_INLINE void TaktPrioBitmapClear(uint8_t Prio)
 {
     g_TaktRunQueue.Bitmap &= ~(1u << Prio);
 }
@@ -188,7 +188,7 @@ static TAKT_ALWAYS_INLINE void TaktPrioBitmapClear(uint8_t Prio)
 // The idle thread at priority 0 is always ready in normal operation so the
 // bitmap is never zero; a zero bitmap returns 0 as a safe fallback because
 // CLZ(0) == 32 on ARM and would wrap to 0xFF -> pHead[255] OOB.
-static TAKT_ALWAYS_INLINE uint8_t TaktPrioBitmapTop(void)
+TAKT_ALWAYS_INLINE uint8_t TaktPrioBitmapTop(void)
 {
     uint32_t bm = g_TaktRunQueue.Bitmap;
     if (bm == 0u)
@@ -201,7 +201,7 @@ static TAKT_ALWAYS_INLINE uint8_t TaktPrioBitmapTop(void)
 //--- UpdateNextThread  cached-top fast path ---------------------
 // Re-point g_TaktosCtx.pNextThread at the front of the current top-priority
 // queue. One pHead[] lookup, no CLZ in the hot path.
-static TAKT_ALWAYS_INLINE void TaktUpdateNextThread(void)
+TAKT_ALWAYS_INLINE void TaktUpdateNextThread(void)
 {
     g_TaktosCtx.pNextThread = g_TaktRunQueue.pHead[g_TaktRunQueue.TopPri]->pNext;
 }
@@ -220,7 +220,7 @@ static TAKT_ALWAYS_INLINE void TaktUpdateNextThread(void)
  *
  * @param	pThread : Thread to make ready.
  */
-static TAKT_ALWAYS_INLINE void TaktReadyTask(TaktOSThread_t *pThread)
+TAKT_ALWAYS_INLINE void TaktReadyTask(TaktOSThread_t *pThread)
 {
     uint8_t pri = pThread->Priority;
 
@@ -264,8 +264,16 @@ static TAKT_ALWAYS_INLINE void TaktReadyTask(TaktOSThread_t *pThread)
  *   - removing the last thread at top prio   : recompute TopPri once
  *
  * @param	pThread : Thread to block.
+ * @return	true on success, false on detected internal scheduler-ring
+ *          corruption (pThread->Priority does not match the ring it is
+ *          actually queued in).  The kernel reports the failure and
+ *          leaves the recovery policy to the caller  halt, log,
+ *          drive outputs to a safe state, attempt recovery, etc.
+ *          Callers must check the return and propagate up their
+ *          public API as TAKTOS_ERR_INVALID so the application sees
+ *          a clean error code.
  */
-void TaktBlockTask(TaktOSThread_t *pThread);
+bool TaktBlockTask(TaktOSThread_t *pThread);
 
 /**
  * @brief	Migrate a READY thread between priority queues  IPCP boost / unboost helper.
@@ -281,17 +289,24 @@ void TaktBlockTask(TaktOSThread_t *pThread);
  *
  * @param	pThread : Thread to migrate (must currently be in the run queue).
  * @param	newPri  : New priority (1..TAKTOS_MAX_PRI-1).
+ * @return	true on success, false if TaktBlockTask detected scheduler-ring
+ *          corruption.  Callers must propagate the false return up their
+ *          public API so the application can apply its recovery policy.
  */
-static TAKT_ALWAYS_INLINE void TaktMigratePriority(TaktOSThread_t *pThread, uint8_t newPri)
+TAKT_ALWAYS_INLINE bool TaktMigratePriority(TaktOSThread_t *pThread, uint8_t newPri)
 {
     if (pThread->Priority == newPri)
     {
-        return;
+        return true;
     }
 
-    TaktBlockTask(pThread);
+    if (!TaktBlockTask(pThread))
+    {
+        return false;
+    }
     pThread->Priority = newPri;
     TaktReadyTask(pThread);
+    return true;
 }
 
 /**
@@ -305,7 +320,7 @@ static TAKT_ALWAYS_INLINE void TaktMigratePriority(TaktOSThread_t *pThread, uint
  *
  * @param	pThread : Thread to designate as next-to-run.
  */
-static TAKT_ALWAYS_INLINE void TaktForceNextThread(TaktOSThread_t *pThread)
+TAKT_ALWAYS_INLINE void TaktForceNextThread(TaktOSThread_t *pThread)
 {
     if (pThread->Priority >= g_TaktRunQueue.TopPri)
     {

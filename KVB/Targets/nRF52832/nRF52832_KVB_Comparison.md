@@ -53,14 +53,14 @@ Suite outcome (all four kernels, 5 runs each):
 
 All four kernels pass every KVB test at the documented thresholds.
 Two of four — TaktOS and Zephyr — additionally satisfy the stricter
-at-least-N-ticks contract on TIME_SLEEP_001 (`elapsed_us ≥ 10000` for
+at-least-N-ticks rule on TIME_SLEEP_001 (`elapsed_us ≥ 10000` for
 a `sleep(10 ticks)` call at 1000 Hz tick). TaktOS does so by design
 (the kernel adds `+1u` at every timed-wait site); Zephyr does so
 because `k_sleep` rounds up similarly. FreeRTOS and ThreadX both
 clear KVB's 90 % floor (9000 µs) but undershoot the 10000 µs nominal
 by ~300 / ~570 µs respectively. See §6.
 
-Disclosure on the mutex tests: `SYNC_MUTEX_FAST_001` exercises
+Note on the mutex tests: `SYNC_MUTEX_FAST_001` exercises
 each kernel's plain mutex API with its native default protocol —
 no priority protocol on TaktOS, priority inheritance on FreeRTOS /
 ThreadX / Zephyr. `SYNC_MUTEX_PCP_FAST_001` exercises the priority-
@@ -169,24 +169,145 @@ parity:
   interrupted thread, and every thread return. MPU stack guard
   (`CONFIG_HW_STACK_PROTECTION`) is **off** to match the FreeRTOS,
   ThreadX, and TaktOS KVB ports' configurations on this target
-  (none of which use MPU). v2.2 disclosure: leaving Zephyr's MPU
-  on would over-burden Zephyr by ~80 cycles per context switch
-  vs the apples-to-apples MPU-off framing the other three use.
+  (none of which use MPU). v2.2 note: leaving Zephyr's MPU on
+  would over-burden Zephyr by ~80 cycles per context switch vs
+  the matched MPU-off framing the other three use.
 
 ### 3.4 Parameter / object validation
 
-- **TaktOS:** inline check at API entry (null + range), no extra
-  call frame.
-- **FreeRTOS:** `configASSERT` macro inlined at every call site
-  in the public API.
-- **ThreadX:** `_txe_*` wrapper functions interpose a real call
-  frame on every public API call and validate handles + args.
-- **Zephyr:** `CONFIG_ASSERT=y` with `CONFIG_ASSERT_LEVEL=2` —
-  inline `__ASSERT()` in every `k_*` API entry, validates handles
-  and arguments. Note: Zephyr does not track per-object validity
-  in this build (`CONFIG_OBJ_CORE=n`); see the v2.2 methodology
-  disclosure on the `invalid_obj` asymmetry between TaktOS / ThreadX
-  (= 1) and FreeRTOS / Zephyr (= 0).
+The four kernels draw the boundary between "kernel responsibility"
+and "application responsibility" at different places.  This is a
+design choice, not an implementation gap, and it affects the
+benchmark numbers because every check the kernel performs is
+cycles paid on every call.  The list below is from upstream source,
+hot-path APIs only (Init APIs check more on every kernel and are
+not on the benchmark hot loop).
+
+- **TaktOS:** the always-on hot-path checks at every public API
+  entry are: (1) NULL pointer on the handle (and `pData` on
+  `Queue Send` / `Queue Receive`); (2) non-owner unlock rejection
+  on every `MutexUnlock` (`pOwner != current` returns
+  `ERR_INVALID`, no `configASSERT`-style trap); (3) 4-byte
+  alignment check on `pData` in `Queue Send` / `Queue Receive`
+  (converts an unaligned-access HardFault on Cortex-M0 into a
+  clean `ERR_ALIGN`).  The Init APIs additionally validate range
+  parameters at construction time only: `MaxCount == 0` and
+  `Initial > MaxCount` in `SemInit`; `Ceiling == 0` and `Ceiling
+  >= TAKTOS_MAX_PRI` in `MutexInitProtect`; `ItemSize == 0`,
+  `Capacity == 0`, and 4-byte alignment of `ItemSize` /
+  `pStorage` in `QueueInit`.  Init checks are not on the
+  benchmark hot loop.
+
+  The slow / blocking paths (entered only when the API would
+  block the caller) add two cert-required kernel-fence checks:
+  ISR-context rejection inside `SemTake` / `MutexLock` / `Queue
+  Send` / `Queue Receive` / `ThreadSleepTicks` / `ThreadHandOff` /
+  self-`ThreadSuspend` (calling those from Handler mode would
+  block the preempted thread, not the ISR, corrupting the
+  scheduler), and two scheduler-ring invariant checks inside
+  `TaktBlockTask` that detect inconsistency between
+  `pThread->Priority` and the ring it is queued in.
+  `TaktBlockTask` returns `bool` (true on success, false on
+  detected corruption); every caller propagates the false-return
+  up as `TAKTOS_ERR_INVALID`.
+
+  TaktOS does not re-validate caller arguments beyond this list —
+  the caller's contract with the kernel is that it passes
+  well-formed arguments; validating those arguments is the
+  application's responsibility.  This is the IEC 61508 SIL 2 /
+  ISO 26262 ASIL D boundary TaktOS targets: fence the kernel
+  against the failures that would corrupt kernel state, stop
+  there, do not babysit the application.  Recovery policy on
+  every returned `ERR_INVALID` / `ERR_ALIGN` is the application's:
+  halt, log, drive outputs to a safe state, attempt recovery —
+  the kernel does not impose a fault-handling policy.  See
+  `include/TaktOSSem.h`, `include/TaktOSMutex.h`,
+  `include/TaktOSQueue.h` for the inline hot-path checks and
+  `src/taktos_*.cpp` for the slow-path `TaktOSInIsr()` guard
+  and the `TaktBlockTask` corruption-detect path.
+
+- **FreeRTOS V11.1+:** 3–4 inline `configASSERT()` invocations per
+  public API entry (`xQueueSemaphoreTake`: NULL + item-size
+  invariant + scheduler-state-vs-timeout; `xQueueGenericSend`:
+  NULL + data-pointer-vs-itemSize + overwrite-mode + scheduler-
+  state).  Inlined at the call site, no extra call frame.  Design
+  intent is conservative defence against caller misuse.  KVB
+  additionally adds a +30-cycle owner-equality pre-check on the
+  FreeRTOS `kvb_mutex_unlock` fast path so the
+  `SYNC_MUTEX_OWNERSHIP_001` test can return a status code instead
+  of trapping through `configASSERT` (§3.7).
+
+- **ThreadX 6.x:** `_txe_*` wrapper functions interpose a real C
+  call frame on every public API call.  `_txe_semaphore_get` /
+  `_txe_mutex_get` validate NULL + object-ID + wait-option vs
+  thread context + timer-thread exclusion + ISR posture, then
+  `BL`-call the corresponding `_tx_*` body.  Design intent is
+  exhaustive caller-misuse defence — the maximum-paranoia end of
+  the spectrum.  This is the heaviest per-call validation cost in
+  the suite and the single largest contributor to the
+  TaktOS-vs-ThreadX gap on `SYNC_SEM_FAST_001`.
+
+- **Zephyr 4.x (NCS v3.3.0 / `sdk-zephyr` rev `ncs-v3.3.0`):**
+  current Zephyr splits parameter validation across two mechanisms;
+  the KVB build pins both ON to match what the other three RTOSes
+  carry.
+
+  **(a) `CHECKIF()` returned-error layer** (`include/zephyr/sys/check.h`).
+  Controlled by the Kconfig choice "Error checking behavior for CHECK
+  macro", with three modes — `RUNTIME_ERROR_CHECKS` (default; runs
+  the check, returns `-EINVAL`), `ASSERT_ON_ERRORS` (traps via
+  `__ASSERT_NO_MSG`), and `NO_RUNTIME_CHECKS` (compiles out).  Pinned
+  `CONFIG_RUNTIME_ERROR_CHECKS=y` explicitly so prior build state /
+  menuconfig cannot leave the choice resolved differently.  Coverage
+  on the public surface is narrow: `k_sem_init` invalid count/limit;
+  `k_mutex_unlock` `owner == NULL` and `owner != _current`;
+  `k_msgq_cleanup` busy.  `z_impl_k_sem_give` and `z_impl_k_mutex_lock`
+  carry zero CHECKIF.
+
+  **(b) `__ASSERT()` trap-on-misuse layer.**  Controlled by
+  `CONFIG_ASSERT` (gates `__ASSERT` / `__ASSERT_NO_MSG` via
+  `__assert.h`'s `__ASSERT_ON`).  This is where most of the API-entry
+  runtime validation actually lives in current Zephyr: `k_sem_take`
+  ISR-vs-timeout; `k_mutex_lock` / `k_mutex_unlock` ISR plus lock-count
+  consistency; `k_msgq_put` / `k_msgq_get` ISR-vs-timeout plus internal
+  pointer.  Pinned `CONFIG_ASSERT=y` (`CONFIG_ASSERT_LEVEL=2`) so this
+  layer stays active — setting it `n` compiles every `__ASSERT` out
+  and leaves a strictly weaker validation surface than FreeRTOS
+  `configASSERT`, ThreadX `_txe_*`, or TaktOS's API-entry checks.
+
+  Caveat: `CONFIG_ASSERT=y` also enables `__ASSERT`s inside the
+  scheduler / spinlock / wait-queue helpers that the other three
+  RTOSes ship no equivalent of.  There is no Kconfig granularity to
+  keep the API-entry checks while dropping the internal-debug ones,
+  so the build accepts the parity-correct overhead — turning
+  `CONFIG_ASSERT=y` for the first time in this round dropped Zephyr
+  SEM throughput from 519 k to 205 k p/s, of which part is API-entry
+  parity work the others also pay and part is internal-debug
+  instrumentation the others do not.  The lighter alternative
+  (`CONFIG_ASSERT=n`) would leave only the narrow CHECKIF subset
+  active — strictly less validation than the other three RTOSes
+  carry — and would not measure parity.
+
+These are different design choices, not a quality gradient.  TaktOS
+and Zephyr place the parameter-validation boundary at the kernel
+edge and trust the caller; FreeRTOS adds a middle layer of
+caller-misuse defence; ThreadX adds an outer wrapper that re-
+validates everything every call.  The benchmark cost line shows
+exactly that: TaktOS and Zephyr at the lightest end, ThreadX at
+the heaviest, FreeRTOS in between.  The KVB build keeps each
+kernel's native validation regime in place — overriding any kernel
+to be lighter or heavier than its design point would not measure
+the kernel as it ships.
+
+Per-object validity tracking is a separate axis: TaktOS validates
+it via inline base-pointer sanity (`pSem`/`pMtx` is checked at the
+critical-section boundary, no separate ID field needed because the
+struct layout is fixed and caller-supplied); ThreadX validates it
+via the `tx_*_id` magic-number field inside `_txe_*`; FreeRTOS does
+not (V11+ relies on caller correctness); Zephyr does not in this
+build (`CONFIG_OBJ_CORE=n`).  The FEATURES line in each captured
+run reports this as `invalid_obj=1` (TaktOS, ThreadX) vs
+`invalid_obj=0` (FreeRTOS, Zephyr).
 
 ### 3.5 Memory allocation strategy
 
@@ -208,6 +329,21 @@ parity:
   for the test's lifetime.
 
 All four avoid runtime malloc inside benchmark loops.
+
+**Worker stack size — documented asymmetry.** `KVB_DEFAULT_STACK_SIZE`
+differs by kernel because each kernel's per-thread overhead differs:
+
+| Kernel         | KVB_DEFAULT_STACK_SIZE | Rationale                                        |
+|----------------|-----------------------:|:-------------------------------------------------|
+| TaktOS         |              512 bytes | TCB + guard region inline in the supplied block. |
+| FreeRTOS V11.3 |              512 bytes | StaticTask_t separate; usable stack is the full block. |
+| ThreadX 6.x    |             1024 bytes | `_txe_*` parameter validation + slot-pool indirection use more stack per call. |
+| Zephyr 4.2.99  |             1024 bytes | `K_THREAD_STACK_DEFINE` adds per-thread metadata (TLS slot, MPU guard region budget) outside the usable area; usable stack is sized to comfortably absorb Zephyr's deeper public-API call chain. |
+
+The KVB workloads use only a few hundred bytes of stack at peak, so
+none of the four configurations is stack-limited. The asymmetry is
+recorded here for completeness; not material for the throughput
+numbers.
 
 ### 3.6 Mutex protocol distinction
 
@@ -232,8 +368,8 @@ shapes differ (PCP is a single ceiling priority assignment, PI
 walks the wait chain on contention). Numbers are still meaningful
 as "what does the kernel do when you ask for a priority-boosted
 mutex on this hardware," but they are not measuring the same
-algorithm. Methodology disclosure included in v22 disclosure
-document distributed alongside this report.
+algorithm. Methodology note included in the v22 document
+distributed alongside this report.
 
 ### 3.7 Mutex ownership rejection mechanisms
 
@@ -254,22 +390,31 @@ non-owner unlock must be rejected. The KVB port surfaces this as
 - **Zephyr:** `k_mutex_unlock` returns `-EPERM` when called by a
   non-owner. The KVB port translates.
 
-The `+30 cycles` FreeRTOS pre-check is on the slow path of
-`SYNC_MUTEX_OWNERSHIP_001` only, not on the `SYNC_MUTEX_FAST_001`
-hot path. See §4.4.
+The `+30 cycles` FreeRTOS pre-check runs on **every** call to
+`kvb_mutex_unlock`, including the SYNC_MUTEX_FAST_001 hot loop —
+the pre-check is unconditional in `KVB/ports/kernels/freertos/
+kvb_port_freertos.c:410–418`, not gated on the test. At 64 MHz
+that is ~470 ns per unlock, roughly 4.5 % of the per-pair time
+(10.28 µs) measured for FreeRTOS in §4.4. Removing the pre-check
+would lift the FreeRTOS SYNC_MUTEX_FAST_001 number from
+97,238 p/s to ~101,500 p/s; TaktOS still leads (3.86× → ~3.70×).
+The pre-check is required because FreeRTOS V11+ otherwise traps
+non-owner unlock through `configASSERT` rather than returning an
+error code, and SYNC_MUTEX_OWNERSHIP_001 needs the error code.
 
-### 3.8 Zephyr-specific methodology disclosures
+### 3.8 Zephyr-specific methodology notes
 
-- **Cycle-counter source:** the KVB Zephyr port uses
-  `k_cycle_get_32()`, which on this build returns LFCLK-derived
-  ticks at `sys_clock_hw_cycles_per_sec()=32768`. Resolution is
-  ~30.5 µs per cycle, vs the DWT's ~15.6 ns per cycle on the other
-  three kernels. This is **not** material for 10-second-window
-  throughput comparisons (10 s / 30.5 µs = 327 k cycle bins, far
-  more than the ~5 ppm precision needed). It would be material
-  for sub-millisecond latency tests; KVB does not currently include
-  any. Switching the Zephyr port to read DWT directly via CMSIS
-  is on the open-work list — see §9.
+- **Cycle-counter source:** the KVB Zephyr port reads
+  `DWT->CYCCNT` directly via CMSIS on every Cortex-M3/M4/M7/M33
+  build (gated on `__CORTEX_M >= 3`, see
+  `KVB/Targets/Zephyr/KvbSuite/src/kvb_platform_zephyr.c`). On this
+  target that resolves to the 64 MHz CPU cycle counter, ~15.6 ns
+  per cycle — bit-identical timing source to the FreeRTOS / ThreadX /
+  TaktOS bare-metal KVB ports. The runtime PLATFORM line in the
+  captured logs confirms `cpu=ARMv7E-M @ 64 MHz DWT (nrf52832)
+  cycle_hz=64000000`. Targets without DWT (Cortex-M0/M0+/M23) fall
+  back to `k_cycle_get_32()`; that path is not exercised on
+  nRF52832.
 - **`KVB_THROUGHPUT_BATCH=256u`:** aligned with the other three
   kernels in v2.2. The previous 1024 value caused ~6 ppm jitter on
   Zephyr — immaterial but flagged.
@@ -279,14 +424,14 @@ hot path. See §4.4.
   validity in this build, so `validates_invalid_objects=0` in
   the FEATURES line. TaktOS and ThreadX both track per-object
   validity natively; FreeRTOS does not. Treated as a parity
-  asymmetry inherent to each kernel's design, disclosed but not
+  asymmetry inherent to each kernel's design, recorded but not
   patched.
 - **`CONFIG_TICKLESS_KERNEL=y`:** NCS board default for nrf52.
   With `CONFIG_TIMESLICING=n` and no sleeps in the inner test
   loops, tickless suppresses zero ticks during measurement
   windows because SysTick still fires at 1 kHz to drive
   `k_uptime_get` and the timeout heap. Asymmetry is essentially
-  zero in practice; flagged for transparency.
+  zero in practice; noted here for completeness.
 - **picolibc, no TLS, no thread-stack-info:** Zephyr build uses
   `CONFIG_PICOLIBC=y` (NCS default for nrf52),
   `CONFIG_THREAD_LOCAL_STORAGE=n`, `CONFIG_THREAD_STACK_INFO=n`,
@@ -302,7 +447,8 @@ hot path. See §4.4.
 - **FreeRTOS:** `KVB/Targets/nRF52832/include/kvb_config_nrf52832_freertos.h`,
   `KVB/Targets/nRF52832/include/FreeRTOSConfig.h`, Eclipse project file.
 - **ThreadX:** `KVB/Targets/nRF52832/include/kvb_config_nrf52832_threadx.h`,
-  `KVB/Targets/nRF52832/include/tx_user.h`, Eclipse project file.
+  `KVB/include/tx_user.h` (shared across every KVB target),
+  Eclipse project file.
 - **Zephyr:** `KVB/Targets/Zephyr/KvbSuite/prj.conf`,
   `KVB/Targets/Zephyr/KvbSuite/include/kvb_config_zephyr.h`,
   `KVB/Targets/Zephyr/KvbSuite/CMakeLists.txt`.
@@ -444,7 +590,11 @@ Reasons:
   details live in Zephyr's `kernel/mutex.c` and have not been further
   instrumented here. The measurement reports the upstream behaviour
   as built — recursive-by-default mutex with unconditional priority
-  inheritance, parameter validation enabled via `CONFIG_ASSERT=y`,
+  inheritance, `CONFIG_RUNTIME_ERROR_CHECKS=y` (CHECKIF returned-error
+  paths active, including `owner == NULL` / `owner != _current` in
+  `k_mutex_unlock`), `CONFIG_ASSERT=y` / `CONFIG_ASSERT_LEVEL=2`
+  (API-entry `__ASSERT()` checks active for ISR misuse and lock-count
+  consistency, plus the internal scheduler / spinlock asserts),
   stack-sentinel check active.
 
 The TaktOS-vs-Zephyr gap (2.20×) on this test is narrower than
@@ -544,7 +694,7 @@ behind at 2.07× behind TaktOS.
 Caller invokes `kvb_thread_sleep_ticks(10)` (= 10 ms at 1000 Hz tick).
 KVB's pass criterion is `elapsed_us >= min_expected_us` where
 `min_expected_us = 9000 µs` (90 % of nominal). TaktOS additionally
-specifies a stricter contract: at-least-N-ticks, i.e. `elapsed_us >=
+specifies a stricter rule: at-least-N-ticks, i.e. `elapsed_us >=
 nominal_us = 10000 µs`.
 
 | Kernel         | KVB result | Requested | Elapsed (µs)             | ≥ 10000 µs? |
@@ -615,7 +765,7 @@ The TIME_SLEEP_001 result is qualitatively different from the
 throughput findings — it shows a **behavioural** difference, not a
 performance one. KVB tests against a 9000 µs floor that all four
 meet. Two of four kernels — TaktOS and Zephyr — additionally satisfy
-the stricter at-least-N-ticks contract (TaktOS deterministically at
+the stricter at-least-N-ticks rule (TaktOS deterministically at
 10153 µs across all 5 runs; Zephyr at 11297 µs mean across 5 runs,
 every individual run above 10000 µs).
 
@@ -630,7 +780,7 @@ only Zephyr shows measurable run-to-run jitter (~0.1 % on throughput,
 ## 6. TIME_SLEEP_001 — strict bound: design vs chance
 
 The four kernels split cleanly into two camps on the at-least-N-ticks
-contract:
+rule:
 
 **Camp 1: meets strict bound by design — TaktOS, Zephyr.**
 TaktOS's `TaktOSThreadSleepTicks(N)` adds `+1u` at all 5 timed-wait
@@ -755,7 +905,8 @@ these numbers are committed under:
 - `KVB/ports/kernels/zephyr/`                          (Zephyr kernel port)
 - `KVB/Targets/src/`                                   (kernel-agnostic test runner + main)
 - `KVB/Targets/nRF52832/src/`                          (per-MCU platform glue)
-- `KVB/Targets/nRF52832/include/`                      (per-MCU configs, FreeRTOSConfig.h, tx_user.h)
+- `KVB/Targets/nRF52832/include/`                      (per-MCU configs, FreeRTOSConfig.h)
+- `KVB/include/tx_user.h`                              (ThreadX feature config, shared across every KVB target)
 
 Multi-run aggregation tool: `KVB/tools/compare_runs.py`.
 
@@ -793,14 +944,6 @@ Captured raw log: `KVB/Targets/nRF52832/KVB_Results_nRF52832.txt`
   every blocking acquire, scaling better under heavy contention).
   Scoped for KVB v0.2.
 
-- **Zephyr cycle-counter source upgrade.** Switching the Zephyr KVB
-  port to read DWT directly via CMSIS (`DWT->CYCCNT`) would tighten
-  resolution from ~30.5 µs (LFCLK-derived) to ~15 ns without
-  changing Zephyr's kernel timer config. ~10 LOC change in
-  `kvb_platform_zephyr.c`. Not required for the current
-  10-second-window benchmarks; useful if precision-sensitive
-  tests are added.
-
 - **Zephyr non-determinism.** Zephyr is the only kernel in the suite
   showing measurable run-to-run jitter (~0.1 % on throughput, ~3 %
   on TIME_SLEEP). Likely sources: tickless-idle re-entry timing,
@@ -818,8 +961,8 @@ Captured raw log: `KVB/Targets/nRF52832/KVB_Results_nRF52832.txt`
   (~200 LOC of DTS + Kconfig), or (b) re-running the M0 comparison
   on a Zephyr-supported M0 such as `nrf51dk_nrf51422` (Cortex-M0 @
   16 MHz), noting the clock difference. Option (a) preserves
-  apples-to-apples; option (b) is faster but requires a clock-
-  normalised analysis.
+  the matched-target framing; option (b) is faster but requires a
+  clock-normalised analysis.
 
 - **Port KVB to nRF54L15 (Cortex-M33 @ 128 MHz)** for further
   cross-architecture validation. Working FreeRTOS, ThreadX, and
@@ -950,7 +1093,7 @@ boot-time UART log corruption fixed.*
   configurations. v2.2 corrects this.
 
 - **v2.0 (2026-04-29).** Added Zephyr 4.2.99 as fourth kernel. New §3.7
-  (now §3.8) discloses Zephyr's LFCLK-based cycle counter. Updated
+  (now §3.8) describes Zephyr's LFCLK-based cycle counter. Updated
   §4.1 determinism (Zephyr is the only non-bit-identical kernel).
   Updated all per-test tables in §4 to include Zephyr row. Updated §5
   conclusions table to a 6-column ratio matrix. Reframed §6 as

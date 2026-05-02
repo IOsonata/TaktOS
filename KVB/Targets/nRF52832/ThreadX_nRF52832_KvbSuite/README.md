@@ -9,14 +9,15 @@ README covers the ThreadX-specific bits.
 
 ## Configuration
 
-- **`include/tx_user.h`** — ThreadX feature config.  `TX_ENABLE_STACK_CHECKING`,
-  `TX_TIMER_PROCESS_IN_ISR`, error checking ON.  Same settings as the
-  STM32F0308 build for cross-target comparability.
+- **`KVB/include/tx_user.h`** (shared across every KVB target) —
+  ThreadX feature config.  `TX_ENABLE_STACK_CHECKING`,
+  `TX_TIMER_PROCESS_IN_ISR`, error checking ON.  Identical for
+  STM32F0308, nRF52832, and any future port.
 - **`include/kvb_config_nrf52832_threadx.h`** — KVB-side tunings.
-  Worker stack at 1024 B (vs 512 B on TaktOS / FreeRTOS) — disclosed
+  Worker stack at 1024 B (vs 512 B on TaktOS / FreeRTOS) — documented
   asymmetry from the `_txe_*` parameter-validation wrappers.
 
-## Disclosed asymmetries
+## Documented asymmetries
 
 Same set as the STM32F0308 build, documented in the config file
 header:

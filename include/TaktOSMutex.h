@@ -143,8 +143,11 @@ TaktOSErr_t TaktOSMutexInitProtect(TaktOSMutex_t *pMtx, uint8_t Ceiling);
  * @param	savedPrimask   : Saved interrupt state from critical-section entry.
  * @param	current        : Pointer to the calling thread's TCB.
  * @param	timeoutTicks   : Timeout in ticks, or TAKTOS_WAIT_FOREVER.
- * @return	TAKTOS_OK on acquisition, TAKTOS_ERR_BUSY, TAKTOS_ERR_TIMEOUT, or
- *          TAKTOS_ERR_INTERRUPTED on failure.
+ * @return	TAKTOS_OK on acquisition, TAKTOS_ERR_BUSY, TAKTOS_ERR_TIMEOUT,
+ *          TAKTOS_ERR_INTERRUPTED on failure, or TAKTOS_ERR_INVALID if invoked
+ *          from ISR context (blocking is illegal from Handler mode  the
+ *          ISR-context guard exits the critical section and returns without
+ *          modifying any kernel state).
  */
 TaktOSErr_t TaktOSMutexLockSlowPath(TaktOSMutex_t *pMtx, uint32_t savedPrimask,
                                     TaktOSThread_t *current,
@@ -215,7 +218,7 @@ TaktOSErr_t TaktOSMutexUnlockSlow(TaktOSMutex_t *pMtx, uint32_t savedPrimask,
  *          for the full spec.  Out-of-line cases delegate to
  *          @ref TaktOSMutexLockSlow.
  */
-static TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSMutexLock(TaktOSMutex_t *pMtx,
+TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSMutexLock(TaktOSMutex_t *pMtx,
                                                      bool bBlocking,
                                                      uint32_t timeoutTicks)
 {
@@ -245,7 +248,7 @@ static TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSMutexLock(TaktOSMutex_t *pMtx,
  *          for the full spec.  Out-of-line cases delegate to
  *          @ref TaktOSMutexUnlockSlow.
  */
-static TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSMutexUnlock(TaktOSMutex_t *pMtx)
+TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSMutexUnlock(TaktOSMutex_t *pMtx)
 {
     if (pMtx == NULL)
     {
@@ -285,7 +288,11 @@ static TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSMutexUnlock(TaktOSMutex_t *pMtx)
  * @param	bBlocking     : true to block when owned by another thread.
  * @param	timeoutTicks  : Wait timeout in ticks (TAKTOS_WAIT_FOREVER to block indefinitely).
  * @return	TAKTOS_OK on success, otherwise TAKTOS_ERR_BUSY / TAKTOS_ERR_TIMEOUT /
- *          TAKTOS_ERR_INTERRUPTED / TAKTOS_ERR_INVALID.
+ *          TAKTOS_ERR_INTERRUPTED / TAKTOS_ERR_INVALID.  TAKTOS_ERR_INVALID is
+ *          returned when @p pMtx is null, when the lock would block but the
+ *          caller is in ISR context (blocking is illegal from Handler mode),
+ *          and when the IPCP precondition is violated (caller priority above
+ *          the mutex's ceiling).
  */
 TaktOSErr_t TaktOSMutexLock(TaktOSMutex_t *pMtx, bool bBlocking, uint32_t timeoutTicks);
 

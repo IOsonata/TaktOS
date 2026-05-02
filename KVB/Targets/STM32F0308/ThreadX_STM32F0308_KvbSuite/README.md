@@ -10,7 +10,7 @@ only difference is the kernel under test: this project links the Eclipse
 ThreadX kernel (sources from IOsonata's `external/threadx/`) instead of
 the TaktOS_M0 static library or the FreeRTOS-Kernel.
 
-Comparable apples-to-apples throughput numbers come out at the other end —
+Comparable like-for-like throughput numbers come out at the other end —
 all three kernels run identical worker-thread counts, identical batch
 sizes, identical UART output buffering, and emit `[KVB] METRIC` lines in
 the same format consumed by `KVB/tools/compare_runs.py`.

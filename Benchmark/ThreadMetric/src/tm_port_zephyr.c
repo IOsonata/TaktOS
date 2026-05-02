@@ -6,7 +6,7 @@
  * Implements the shared 23-function tm_api.h using Zephyr primitives
  * (k_thread, k_sem, k_mutex, k_msgq, k_mem_slab, irq_offload).
  *
- * Apples-to-apples with the FreeRTOS / TaktOS / ThreadX ports:
+ * Like-for-like with the FreeRTOS / TaktOS / ThreadX ports:
  *   - Same shared test files (basic_processing.c, mutex_barging_test.c, ...)
  *   - Same shared tm_api.h (void-entry thread signature)
  *   - Same TM_PORT_MAX_THREADS (10), TM_PORT_STACK_BYTES (1024), TICK_HZ (1000)

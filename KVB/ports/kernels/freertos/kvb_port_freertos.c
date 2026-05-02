@@ -238,6 +238,11 @@ KvbStatus kvb_thread_yield(void)
     return KVB_OK;
 }
 
+uint64_t kvb_kernel_tick_count(void)
+{
+    return (uint64_t)xTaskGetTickCount();
+}
+
 KvbStatus kvb_thread_sleep_ticks(uint32_t ticks)
 {
     vTaskDelay((TickType_t)ticks);

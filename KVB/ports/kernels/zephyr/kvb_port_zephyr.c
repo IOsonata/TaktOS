@@ -200,6 +200,11 @@ KvbStatus kvb_thread_yield(void)
     return KVB_OK;
 }
 
+uint64_t kvb_kernel_tick_count(void)
+{
+    return (uint64_t)k_uptime_ticks();
+}
+
 KvbStatus kvb_thread_sleep_ticks(uint32_t ticks)
 {
     k_sleep(K_TICKS(ticks));

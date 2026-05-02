@@ -84,8 +84,8 @@ The project also links the board-specific `threadx_initialize_low_level.S` from 
 - **Assertions / argument checks disabled** in all three kernels, matching production-typical settings.
 - **Per-line UART output** on LPUART1 at 115200 8N1 so every test's report reaches the VCP even across preemption boundaries.
 - **Thread-Metric harness** (`ThreadMetric/src/*`) is shared — all three kernels run the identical test source files byte-for-byte.
-- **Beningo 2024 reference**: the 2024 RTOS Performance Report tested STM32L4 (B-L475E-IOT01A) at 80 MHz, not G474. At 170 MHz, G474 counts will be roughly 2× higher. If you want strict apples-to-apples against Beningo's published numbers, change `system_stm32g474.c` to run at 80 MHz: PLLM=4, PLLN=40, PLLR=2, flash latency=2 WS, skip the Boost step. The rest of the bundle runs unchanged.
-- **PX5 is not included** — per project policy, PX5 cannot be tuned to apples-to-apples settings from its demo package, so publishing a measured PX5 number would not be fair. The Beningo 2024 figures for PX5 remain the reference when that comparison is needed.
+- **Beningo 2024 reference**: the 2024 RTOS Performance Report tested STM32L4 (B-L475E-IOT01A) at 80 MHz, not G474. At 170 MHz, G474 counts will be roughly 2× higher. If you want a strict like-for-like comparison against Beningo's published numbers, change `system_stm32g474.c` to run at 80 MHz: PLLM=4, PLLN=40, PLLR=2, flash latency=2 WS, skip the Boost step. The rest of the bundle runs unchanged.
+- **PX5 is not included** — per project policy, PX5 cannot be tuned to matched settings from its demo package, so publishing a measured PX5 number would not be fair. The Beningo 2024 figures for PX5 remain the reference when that comparison is needed.
 
 ## Test slot counts (TaktOS)
 

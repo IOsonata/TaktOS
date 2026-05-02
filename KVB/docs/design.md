@@ -1195,7 +1195,7 @@ The feature descriptor is part of the final report.
 
 ## 12. Fair Comparison Rules
 
-To publish comparative results, the following must be equivalent or explicitly disclosed.
+To publish comparative results, the following must be equivalent or explicitly stated.
 
 ### 12.1 Required Equivalence
 
@@ -1212,7 +1212,7 @@ To publish comparative results, the following must be equivalent or explicitly d
 - same measurement duration
 - same warmup duration
 
-### 12.2 Required Disclosure
+### 12.2 Required to Be Reported
 
 - kernel safety checks enabled/disabled
 - null pointer validation policy
@@ -1229,8 +1229,8 @@ To publish comparative results, the following must be equivalent or explicitly d
 
 A comparative result must be marked invalid if:
 
-- one kernel uses a different CPU clock without normalization and disclosure
-- one kernel uses different optimization flags without disclosure
+- one kernel uses a different CPU clock without normalization and a stated note
+- one kernel uses different optimization flags without a stated note
 - one kernel has a different test thread count
 - one kernel has a different queue depth/message size for queue tests
 - one kernel disables safety/error checking while another enables it, unless the report explicitly compares those modes
@@ -1330,7 +1330,7 @@ Deliverables:
 
 - priority inversion harness
 - error behavior tests
-- metadata disclosure for safety settings
+- metadata reporting for safety settings
 - report generator v1
 
 Initial tests:
@@ -1493,7 +1493,7 @@ Different kernels expose different APIs and semantics.
 Mitigation:
 
 - use explicit feature descriptor
-- use `UNSUPPORTED` honestly
+- use `UNSUPPORTED` when the kernel does not provide the feature
 - do not emulate missing behavior silently
 - document configuration-dependent behavior
 
@@ -1523,7 +1523,7 @@ Different safety settings can distort comparisons.
 
 Mitigation:
 
-- disclose all settings
+- list all settings
 - require comparable safety profiles
 - support named profiles such as `performance`, `balanced`, and `safety`
 

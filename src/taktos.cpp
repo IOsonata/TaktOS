@@ -126,7 +126,7 @@ extern "C" TAKT_WEAK bool TaktKernelHandlerAssign(uintptr_t HandlerBaseAddr)
 
 //--- Scheduler primitives  inline in TaktKernel.h --------------
 // TaktPrioBitmapSet/Clear/Top, TaktUpdateNextThread, TaktReadyTask,
-// TaktForceNextThread are all defined as static TAKT_ALWAYS_INLINE in
+// TaktForceNextThread are all defined as TAKT_ALWAYS_INLINE in
 // TaktKernel.h so every caller gets the body folded at the call site.
 //
 // TaktBlockTask is kept out-of-line here because its body (~120 bytes)
@@ -136,19 +136,23 @@ extern "C" TAKT_WEAK bool TaktKernelHandlerAssign(uintptr_t HandlerBaseAddr)
 
 /**
  * @brief	Remove a thread from the READY run queue and mark it BLOCKED.
- *          See TaktKernel.h for the full contract.
+ *          See TaktKernel.h for the full contract.  Returns true on
+ *          success, false on detected scheduler-ring corruption.
  */
-void TaktBlockTask(TaktOSThread_t *pThread)
+bool TaktBlockTask(TaktOSThread_t *pThread)
 {
     uint8_t pri = pThread->Priority;
     TaktOSThread_t *tail = g_TaktRunQueue.pHead[pri];
 
     if (tail == nullptr)
     {
-#ifdef TAKT_DEBUG_CHECKS
-        TAKT_TRAP();
-#endif
-        return;
+        /* Internal scheduler-state corruption: pThread->Priority points
+         * at a priority ring whose head is null.  The thread cannot be
+         * in this ring; the run queue and pThread are inconsistent.
+         * Report the failure to the caller; the caller decides whether
+         * to halt, log, drive outputs to a safe state, or attempt
+         * recovery.  Kernel does not impose a policy. */
+        return false;
     }
 
     if (tail == pThread && pThread->pNext == pThread)
@@ -185,10 +189,10 @@ void TaktBlockTask(TaktOSThread_t *pThread)
 
         if (prev == nullptr)
         {
-#ifdef TAKT_DEBUG_CHECKS
-            TAKT_TRAP();
-#endif
-            return;
+            /* Internal scheduler-state corruption: full ring walk did
+             * not find pThread, but pThread->Priority claims it is in
+             * this ring.  Report the failure; caller's policy. */
+            return false;
         }
 
         TaktOSThread_t *next = pThread->pNext;
@@ -206,6 +210,7 @@ void TaktBlockTask(TaktOSThread_t *pThread)
     }
 
     pThread->pNext = nullptr;
+    return true;
 }
 
 
@@ -246,10 +251,6 @@ void TaktBlockTask(TaktOSThread_t *pThread)
  *   discarded silently.  The caller's critical section (if any) is not
  *   disturbed because we never reach the CPSIE I.
  *
- *   Debug builds trap via TAKT_TRAP() before deferring so the call site is
- *   visible during development  both patterns are worth reviewing even if
- *   they now degrade gracefully rather than corrupting the scheduler.
- *
  * Singleton optimisation: only enter the critical section when there IS a
  * peer to yield to.  No lock at all when cur is the only thread at this
  * priority.
@@ -276,11 +277,6 @@ void TaktOSThreadYield(void)
     // blocked or was preempted in the interim, the stale request is discarded.
     // Neither case touches CPSIE, so the caller's critical section (if any)
     // is preserved intact until it releases it naturally.
-    //
-    // In debug builds (TAKT_DEBUG_CHECKS defined) a TAKT_TRAP() fires before
-    // deferring so the caller site is visible during development  calling
-    // Yield from an ISR or inside a lock is always a design smell worth
-    // reviewing, even if it now degrades gracefully.
 #if defined(TAKT_ARCH_CM0) || defined(TAKT_ARCH_CM4) || defined(TAKT_ARCH_CM7) || \
     defined(TAKT_ARCH_CM33) || defined(TAKT_ARCH_CM55)
     {
@@ -290,9 +286,6 @@ void TaktOSThreadYield(void)
 
         if ((ipsr & 0x1FFu) || (primask & 1u))
         {
-#ifdef TAKT_DEBUG_CHECKS
-            TAKT_TRAP();
-#endif
             s_DeferredYieldFor = g_TaktosCtx.pCurrent;
             return;
         }

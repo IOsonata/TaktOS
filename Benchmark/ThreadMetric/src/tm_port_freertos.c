@@ -9,7 +9,7 @@
  *
  * Shape: direct forward, no defensive checks  matches Microsoft's Zephyr
  * reference port byte-for-byte in shape, mirroring tm_port_taktos and
- * tm_port_threadx for apples-to-apples comparison.
+ * tm_port_threadx for like-for-like comparison.
  *
  * No architecture-specific code in this file  builds for ARM Cortex-M
  * and RISC-V RV32 alike (FreeRTOS port assembly comes from upstream

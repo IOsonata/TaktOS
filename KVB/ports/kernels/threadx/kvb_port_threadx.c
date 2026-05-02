@@ -449,6 +449,11 @@ KvbStatus kvb_thread_yield(void)
     return KVB_OK;
 }
 
+uint64_t kvb_kernel_tick_count(void)
+{
+    return (uint64_t)tx_time_get();
+}
+
 KvbStatus kvb_thread_sleep_ticks(uint32_t ticks)
 {
     UINT rc = tx_thread_sleep((ULONG)ticks);

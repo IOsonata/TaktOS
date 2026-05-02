@@ -48,7 +48,7 @@ Primary goals:
 - publish raw logs and machine-readable results
 - make every result reproducible from source
 - support multiple kernels and platforms
-- keep kernel ports thin and honest
+- keep kernel ports thin and direct
 - avoid hidden emulation of missing kernel behavior
 
 Initial kernel targets:
@@ -346,7 +346,7 @@ This prevents unfair or misleading comparisons. If a kernel does not support a p
 
 ## Fair Comparison Rules
 
-Published comparative results must disclose the configuration used for every kernel.
+Published comparative results must list the configuration used for every kernel.
 
 Required equivalence where possible:
 
@@ -363,7 +363,7 @@ Required equivalence where possible:
 - same measurement duration
 - same warmup duration
 
-Required disclosure:
+Required to be reported:
 
 - kernel safety checks enabled/disabled
 - null pointer validation policy
@@ -561,7 +561,7 @@ Contribution rules:
 - keep kernel ports thin
 - use native kernel primitives
 - do not hide missing behavior
-- report unsupported features honestly
+- report unsupported features as such, do not emulate
 - do not log inside hot benchmark loops
 - document all configuration assumptions
 - include raw logs for result submissions

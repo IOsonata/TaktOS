@@ -128,7 +128,7 @@
 		<link>
 			<name>src/tx_user.h</name>
 			<type>1</type>
-			<locationURI>PARENT-2-PROJECT_LOC/include/tx_user.h</locationURI>
+			<locationURI>PARENT-4-PROJECT_LOC/include/tx_user.h</locationURI>
 		</link>
 		<link>
 			<name>src/kernel/common</name>

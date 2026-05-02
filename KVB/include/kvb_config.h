@@ -65,6 +65,13 @@
 #define KVB_SLEEP_TEST_STRICT_MINIMUM 0
 #endif
 
+/* Maximum number of extra scheduler ticks accepted by TIME_SLEEP_001.
+   Tick-based sleep APIs may round to the next tick boundary; one extra tick
+   is expected on ports that report time using the native kernel tick count. */
+#ifndef KVB_SLEEP_TEST_MAX_EXTRA_TICKS
+#define KVB_SLEEP_TEST_MAX_EXTRA_TICKS 1u
+#endif
+
 /* Number of operations between time checks in throughput hot loops.  Larger
    values amortise the time-read cost across more measured ops, reducing
    measurement bias on fast kernel paths. */

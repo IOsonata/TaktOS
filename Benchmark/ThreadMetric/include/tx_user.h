@@ -14,7 +14,7 @@
  * the '#if NAME' form ("#if with no expression").
  */
 
-#define TX_DISABLE_ERROR_CHECKING               1
+/* TX_DISABLE_ERROR_CHECKING intentionally not defined for validation parity. */
 #define TX_DISABLE_PREEMPTION_THRESHOLD         1
 #define TX_DISABLE_NOTIFY_CALLBACKS             1
 #define TX_DISABLE_REDUNDANT_CLEARING           1
@@ -32,8 +32,11 @@
 /* #define TX_NOT_INTERRUPTABLE                  1 */
 
 #define TX_TIMER_TICKS_PER_SECOND               1000
+#define TX_MAX_PRIORITIES                       32u
 #define TX_TIMER_PROCESS_IN_ISR                 1
 #define TX_ENABLE_STACK_CHECKING                1
+#if defined(__VFP_FP__) && !defined(__SOFTFP__)
 #define TX_ENABLE_FPU_SUPPORT                   1
+#endif
 
 #endif

@@ -126,9 +126,9 @@ extern "C" {
  * Host/stub builds: no-op.
  */
 #if defined(TAKT_ARCH_STUB) || defined(__x86_64__) || defined(__i386__)
-static TAKT_ALWAYS_INLINE void TaktOSCtxSwitch(void) { /* host stub  no-op */ }
+TAKT_ALWAYS_INLINE void TaktOSCtxSwitch(void) { /* host stub  no-op */ }
 #else
-static TAKT_ALWAYS_INLINE void TaktOSCtxSwitch(void)
+TAKT_ALWAYS_INLINE void TaktOSCtxSwitch(void)
 {
     *((volatile unsigned int*)0xE000ED04u) = (1u << 28);
 }
@@ -151,7 +151,7 @@ static TAKT_ALWAYS_INLINE void TaktOSCtxSwitch(void)
 #if !defined(TAKT_ARCH_STUB) && !defined(__x86_64__) && !defined(__i386__)
 void TaktOSStartFirst(void);
 #else
-static TAKT_ALWAYS_INLINE void TaktOSStartFirst(void) {} /* host stub */
+TAKT_ALWAYS_INLINE void TaktOSStartFirst(void) {} /* host stub */
 #endif
 
 #ifdef __cplusplus

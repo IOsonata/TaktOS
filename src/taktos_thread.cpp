@@ -139,15 +139,25 @@ void TaktSleepListRemove(TaktOSThread_t *t)
  * Marks the calling thread BLOCKED, removes it from the run queue inside a
  * critical section, then pends PendSV / CLINT MSIP.  Inlined to avoid an
  * extra frame on slow-path callers that immediately return after this.
+ *
+ * Returns true on success, false if TaktBlockTask detected scheduler-ring
+ * corruption (state is restored to RUNNING and no context switch is
+ * pended; caller chooses the recovery policy).
  */
-static inline void TaktSuspendCurrentFast(void)
+static inline bool TaktSuspendCurrentFast(void)
 {
     uint32_t primask = TaktOSEnterCritical();
     TaktOSThread_t *cur = TaktOSCurrentThread();
     cur->State = TAKTOS_BLOCKED;
-    TaktBlockTask(cur);
+    if (!TaktBlockTask(cur))
+    {
+        cur->State = TAKTOS_RUNNING;
+        TaktOSExitCritical(primask);
+        return false;
+    }
     TaktOSExitCritical(primask);
     TaktOSCtxSwitch();
+    return true;
 }
 
 /**
@@ -249,7 +259,17 @@ TaktOSErr_t TaktOSThreadSuspend(hTaktOSThread_t hThread)
     // same register on a single-core MCU (no partial preemption of a comparison).
     if (hThread == TaktOSCurrentThread())
     {
-        TaktSuspendCurrentFast();
+        /* Cannot self-suspend from ISR  TaktOSCurrentThread() returns
+         * the preempted thread, and suspending it would corrupt the
+         * scheduler.  Cert boundary: reject. */
+        if (TAKT_UNLIKELY(TaktOSInIsr()))
+        {
+            return TAKTOS_ERR_INVALID;
+        }
+        if (!TaktSuspendCurrentFast())
+        {
+            return TAKTOS_ERR_INVALID;
+        }
         return TAKTOS_OK;
     }
 
@@ -321,7 +341,13 @@ TaktOSErr_t TaktOSThreadSuspend(hTaktOSThread_t hThread)
 
     // READY or RUNNING: remove from the run queue and block.
     hThread->State = TAKTOS_BLOCKED;
-    TaktBlockTask(hThread);
+    if (!TaktBlockTask(hThread))
+    {
+        /* Scheduler corruption.  Restore state. */
+        hThread->State = TAKTOS_READY;
+        TaktOSExitCritical(primask);
+        return TAKTOS_ERR_INVALID;
+    }
     TaktOSExitCritical(primask);
     return TAKTOS_OK;
 }
@@ -391,6 +417,18 @@ TaktOSErr_t TaktOSThreadSleepTicks(hTaktOSThread_t hThread, uint32_t ticks)
 
     bool isCurrent = (hThread == TaktOSCurrentThread());
 
+    /* Sleeping the current thread from an ISR would mark the preempted
+     * thread (which TaktOSCurrentThread() returns from Handler mode)
+     * SLEEPING and remove it from the run queue, corrupting the
+     * scheduler.  Cert boundary: detect and reject without touching
+     * state.  Sleeping a foreign thread from an ISR is also rejected
+     * because the ctx switch path below would still run on the wrong
+     * caller. */
+    if (TAKT_UNLIKELY(TaktOSInIsr()))
+    {
+        return TAKTOS_ERR_INVALID;
+    }
+
     uint32_t primask = TaktOSEnterCritical();
     // Guard: TaktBlockTask assumes t is in the run queue (READY).
     // Sleeping a SLEEPING or BLOCKED foreign thread would loop forever.
@@ -409,7 +447,14 @@ TaktOSErr_t TaktOSThreadSleepTicks(hTaktOSThread_t hThread, uint32_t ticks)
     hThread->WakeTick   = TaktOSTickCount() + ticks + 1u;
     hThread->State      = TAKTOS_SLEEPING;
     hThread->pWaitList = nullptr;   // plain sleep  not a timed kernel-object wait
-    TaktBlockTask(hThread);
+    if (!TaktBlockTask(hThread))
+    {
+        /* Scheduler corruption.  Roll back. */
+        hThread->State    = TAKTOS_READY;
+        hThread->WakeTick = 0u;
+        TaktOSExitCritical(primask);
+        return TAKTOS_ERR_INVALID;
+    }
     TaktSleepListAdd(hThread);
     TaktOSExitCritical(primask);
 
@@ -510,7 +555,15 @@ TaktOSErr_t TaktOSThreadDestroy(hTaktOSThread_t hThread)
     }
     else if (hThread->State == TAKTOS_READY)
     {
-        TaktBlockTask(hThread);
+        if (!TaktBlockTask(hThread))
+        {
+            /* Scheduler corruption.  Cannot proceed
+             * with Destroy  the thread is in an inconsistent state and
+             * the caller must surface the error to the application fault
+             * hook.  Do not stamp DEAD; do not clear the guard. */
+            TaktOSExitCritical(primask);
+            return TAKTOS_ERR_INVALID;
+        }
     }
 
     // Stamp DEAD before clearing the guard word, while still holding the lock.
@@ -544,6 +597,15 @@ TaktOSErr_t TaktOSThreadDestroy(hTaktOSThread_t hThread)
 TaktOSErr_t TaktOSThreadHandOff(hTaktOSThread_t hNext)
 {
     if (hNext == nullptr)
+    {
+        return TAKTOS_ERR_INVALID;
+    }
+
+    /* HandOff blocks the calling thread and switches to the target.
+     * Calling from an ISR would block the preempted thread (whichever
+     * was running when the ISR fired), corrupting the scheduler.  Cert
+     * boundary: reject. */
+    if (TAKT_UNLIKELY(TaktOSInIsr()))
     {
         return TAKTOS_ERR_INVALID;
     }
@@ -599,7 +661,16 @@ TaktOSErr_t TaktOSThreadHandOff(hTaktOSThread_t hNext)
     }
 
     cur->State = TAKTOS_BLOCKED;
-    TaktBlockTask(cur);
+    if (!TaktBlockTask(cur))
+    {
+        /* Scheduler corruption blocking the caller.  Roll back: caller
+         * stays runnable, hNext gets removed from the READY ring it was
+         * just placed in (it was originally not in the ring before this
+         * call, so undo the readying). */
+        cur->State = TAKTOS_RUNNING;
+        TaktOSExitCritical(primask);
+        return TAKTOS_ERR_INVALID;
+    }
 
     // Guarantee the handoff: TaktReadyTask inserts hNext at the tail of its
     // priority ring, but pNextThread always points to the front (oldest entry).

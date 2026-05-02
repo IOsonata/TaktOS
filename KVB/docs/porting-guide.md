@@ -216,9 +216,13 @@ CONFIG_TIMESLICING=n
 CONFIG_NUM_PREEMPT_PRIORITIES >= 5
 CONFIG_THREAD_STACK_INFO=y
 CONFIG_INIT_STACKS=y
+CONFIG_RUNTIME_ERROR_CHECKS=y
 CONFIG_ASSERT=y
+CONFIG_ASSERT_LEVEL=2
 CONFIG_MUTEX_PRIORITY_INHERITANCE=y
 ```
+
+Current Zephyr splits API-entry parameter validation across two mechanisms; both need to be enabled to match what the other KVB-supported kernels carry. `CONFIG_RUNTIME_ERROR_CHECKS=y` selects the runtime-check arm of Zephyr's "Error checking behavior for CHECK macro" Kconfig choice — pinning it explicitly is more robust than relying on `CONFIG_NO_RUNTIME_CHECKS=n`, because the latter is only the absence of one Kconfig and prior build state / menuconfig can leave the choice resolved differently. CHECKIF coverage on the public surface is narrow (`k_sem_init` count/limit, `k_mutex_unlock` non-owner / unlocked-mutex, `k_msgq_cleanup` busy). `CONFIG_ASSERT=y` keeps the `__ASSERT()` layer active, where most of Zephyr's API-entry validation actually lives (`k_sem_take` ISR/timeout, `k_mutex_lock` / `k_mutex_unlock` ISR + lock-count, `k_msgq_put` / `k_msgq_get` ISR/timeout + internal pointer); setting it `n` compiles all of these out and leaves a strictly weaker validation surface. The trade-off is that `CONFIG_ASSERT=y` also enables `__ASSERT`s inside scheduler / spinlock / wait-queue helpers that the other kernels have no equivalent of — there is no Kconfig granularity to split the two, so the build accepts the parity-correct overhead.
 
 ### TaktOS port notes
 

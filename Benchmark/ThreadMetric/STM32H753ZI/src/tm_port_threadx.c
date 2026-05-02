@@ -27,7 +27,7 @@
 #define TM_THREADX_MAX_SEMAPHORES    1
 #define TM_THREADX_MAX_MUTEXES       1
 #define TM_THREADX_MAX_MEMORY_POOLS  1
-/* Match the TaktOS port's 2048-byte stacks for apples-to-apples comparison
+/* Match the TaktOS port's 2048-byte stacks for like-for-like comparison
  * on H753 (128 KB DTCM is plenty).                                          */
 #define TM_THREADX_STACK_BYTES       2048u
 #define TM_THREADX_TICK_HZ           1000u

@@ -55,9 +55,9 @@ SOFTWARE.
 // multiple-definition errors when the header is included in multiple TUs.
 
 #if defined(__clang__) || defined(__GNUC__) || defined(__ICCARM__)
-#  define TAKT_ALWAYS_INLINE  __attribute__((always_inline)) inline
+#  define TAKT_ALWAYS_INLINE  static __attribute__((always_inline)) inline
 #else
-#  define TAKT_ALWAYS_INLINE  inline
+#  define TAKT_ALWAYS_INLINE  static inline
 #endif
 
 //  No-inline 

@@ -93,7 +93,7 @@ SOFTWARE.
  * @return  true on success, false if the stack is full (caller must reject
  *          the acquire with TAKTOS_ERR_INVALID).
  */
-static TAKT_ALWAYS_INLINE bool TaktPushHeldCeiling(TaktOSThread_t *pThread, uint8_t Ceiling)
+TAKT_ALWAYS_INLINE bool TaktPushHeldCeiling(TaktOSThread_t *pThread, uint8_t Ceiling)
 {
     if (pThread->HeldCeilingTop >= TAKTOS_MAX_HELD_PCP_MUTEXES)
     {
@@ -120,7 +120,7 @@ static TAKT_ALWAYS_INLINE bool TaktPushHeldCeiling(TaktOSThread_t *pThread, uint
  * the matching entry (typically the top, but may be any slot for nested-out-
  * of-order release patterns) and shifts subsequent entries down.
  */
-static TAKT_ALWAYS_INLINE void TaktPopHeldCeiling(TaktOSThread_t *pThread, uint8_t Ceiling)
+TAKT_ALWAYS_INLINE void TaktPopHeldCeiling(TaktOSThread_t *pThread, uint8_t Ceiling)
 {
     uint8_t i;
     for (i = pThread->HeldCeilingTop; i > 0u; i--)
@@ -147,7 +147,7 @@ static TAKT_ALWAYS_INLINE void TaktPopHeldCeiling(TaktOSThread_t *pThread, uint8
  * Returns max(BasePriority, max of all entries in HeldCeilings[0..HeldCeilingTop)).
  * When HeldCeilingTop == 0 this collapses to BasePriority alone.
  */
-static TAKT_ALWAYS_INLINE uint8_t TaktComputeEffectivePri(const TaktOSThread_t *pThread)
+TAKT_ALWAYS_INLINE uint8_t TaktComputeEffectivePri(const TaktOSThread_t *pThread)
 {
     uint8_t pri = pThread->BasePriority;
     for (uint8_t i = 0u; i < pThread->HeldCeilingTop; i++)
@@ -216,13 +216,31 @@ TaktOSErr_t TaktOSMutexInitProtect(TaktOSMutex_t *pMtx, uint8_t Ceiling)
 TaktOSErr_t TaktOSMutexLockSlowPath(TaktOSMutex_t *pMtx, uint32_t IntState,
                                     TaktOSThread_t *current, uint32_t TimeoutTicks)
 {
+    /* ISR-context guard.  Blocking from an ISR would block the preempted
+     * thread (passed as `current` by the caller's TaktOSCurrentThread()
+     * read), corrupting the scheduler.  Cert boundary: reject without
+     * touching state.  Slow path only  uncontended Lock does not run
+     * this check. */
+    if (TAKT_UNLIKELY(TaktOSInIsr()))
+    {
+        TaktOSExitCritical(IntState);
+        return TAKTOS_ERR_INVALID;
+    }
 
     current->State      = TAKTOS_BLOCKED;
     current->WakeReason = TAKT_WOKEN_BY_EVENT;
     current->WakeTick   = 0u;
     current->pWaitNext  = nullptr;
 
-    TaktBlockTask(current);
+    if (!TaktBlockTask(current))
+    {
+        /* Scheduler-ring corruption detected.  Restore state, exit
+         * the lock, return so the application gets a clean
+         * ERR_INVALID and applies its own recovery policy. */
+        current->State = TAKTOS_RUNNING;
+        TaktOSExitCritical(IntState);
+        return TAKTOS_ERR_INVALID;
+    }
     TaktWaitListInsert(&pMtx->WaitList, current);
 
     // Always store pWaitList so Resume/HandOff can cancel this wait.
@@ -368,7 +386,18 @@ TaktOSErr_t TaktOSMutexLockSlow(TaktOSMutex_t *pMtx, uint32_t state,
             const uint8_t boosted = TaktComputeEffectivePri(current);
             if (boosted != current->Priority)
             {
-                TaktMigratePriority(current, boosted);
+                if (!TaktMigratePriority(current, boosted))
+                {
+                    /* Scheduler corruption detected during the priority
+                     * boost.  Roll back the held-
+                     * ceiling push and the owner assignment so the mutex
+                     * is left in its pre-Lock state for the application
+                     * fault hook. */
+                    TaktPopHeldCeiling(current, ceiling);
+                    pMtx->pOwner = nullptr;
+                    TaktOSExitCritical(state);
+                    return TAKTOS_ERR_INVALID;
+                }
             }
 
             TaktOSExitCritical(state);
@@ -418,7 +447,16 @@ TaktOSErr_t TaktOSMutexUnlockSlow(TaktOSMutex_t *pMtx, uint32_t state,
         const uint8_t restored = TaktComputeEffectivePri(current);
         if (restored != current->Priority)
         {
-            TaktMigratePriority(current, restored);
+            if (!TaktMigratePriority(current, restored))
+            {
+                /* Scheduler corruption detected during the priority
+                 * un-boost.  Mutex ownership
+                 * stays with current  caller still holds the lock
+                 * conceptually; an application fault hook gets a
+                 * clean ERR_INVALID and can drive recovery. */
+                TaktOSExitCritical(state);
+                return TAKTOS_ERR_INVALID;
+            }
         }
     }
 

@@ -379,16 +379,18 @@ static void test_dead_state(void)
     CHECK(tC->State == TAKTOS_DEAD);
 }
 
-//  Suite: Yield caller-requirement check (Issue 3) 
-// Verifies the TAKT_DEBUG_CHECKS=1 assertion path by confirming the runtime
-// check is present.  On the host the PRIMASK read is a no-op (stub returns 0
-// meaning interrupts enabled), so the trap never fires here  but this
-// test confirms the code path compiles and the check is reachable.
+//  Suite: Yield caller-requirement check (Issue 3)
+// Verifies the deferred-yield path: TaktOSThreadYield called from Handler
+// mode or with PRIMASK masked stamps s_DeferredYieldFor and returns rather
+// than rotating the run queue immediately.  On the host the PRIMASK / IPSR
+// reads are no-ops (stub returns 0  thread mode, interrupts enabled), so
+// the deferred branch is not taken in this test  but this confirms the
+// code path compiles and the check is reachable.
 //
 // A separate on-target test (bench/stm32f407 or nRF52832) must call Yield
-// from inside a critical section with TAKT_DEBUG_CHECKS=1 and verify
-// TaktOSStackOverflowHandler / BKPT fires.  That is an on-target CI item,
-// not exercisable on the host.
+// from inside a critical section and verify s_DeferredYieldFor was stamped
+// without a context switch happening.  That is an on-target CI item, not
+// exercisable on the host.
 
 static void test_yield_caller_check(void)
 {

@@ -125,7 +125,7 @@ static void kvb_run_mutex_fast(KvbTestResult *result)
 }
 
 /* ------------------------------------------------------------------------
- * SYNC_MUTEX_PCP_FAST_001  apples-to-apples PI/PCP mutex fast path.
+ * SYNC_MUTEX_PCP_FAST_001  like-for-like PI/PCP mutex fast path.
  *
  * The default SYNC_MUTEX_FAST_001 test creates each kernel's canonical mutex.
  * That is asymmetric:

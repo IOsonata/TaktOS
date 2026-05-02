@@ -155,7 +155,7 @@ the published v2.0 report shows TaktOS vs FreeRTOS vs ThreadX numbers
 on that target.
 
 The Zephyr column adds Zephyr to the same comparison on whichever
-board you select for the Zephyr build.  Apples-to-apples requires the
+board you select for the Zephyr build.  Like-for-like requires the
 same MCU across all four kernels — for the nRF54L15 family that means
 also bringing up TaktOS / FreeRTOS / ThreadX native targets on the
 same board, which is a separate effort.

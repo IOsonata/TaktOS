@@ -44,6 +44,7 @@ SOFTWARE.
 #define __TAKTOSCRITICALSECTION_H__
 
 #include <stdint.h>
+#include <stdbool.h>
 #include "TaktCompiler.h"
 
 #ifdef __cplusplus
@@ -58,15 +59,16 @@ extern "C" {
 // scheduler state is protected by the test harness not running concurrently.
 #if defined(TAKT_ARCH_STUB) || defined(__x86_64__) || defined(__i386__)
 
-static TAKT_ALWAYS_INLINE uint32_t TaktOSEnterCritical(void) { return 0u; }
-static TAKT_ALWAYS_INLINE void     TaktOSExitCritical(uint32_t) {}
-static TAKT_ALWAYS_INLINE void     TaktOSDisableInterrupts(void) {}
-static TAKT_ALWAYS_INLINE void     TaktOSEnableInterrupts(void) {}
+TAKT_ALWAYS_INLINE uint32_t TaktOSEnterCritical(void) { return 0u; }
+TAKT_ALWAYS_INLINE void     TaktOSExitCritical(uint32_t) {}
+TAKT_ALWAYS_INLINE void     TaktOSDisableInterrupts(void) {}
+TAKT_ALWAYS_INLINE void     TaktOSEnableInterrupts(void) {}
+TAKT_ALWAYS_INLINE bool     TaktOSInIsr(void) { return false; }
 
 #else //  ARM Cortex-M target path 
 
 
-static TAKT_ALWAYS_INLINE uint32_t TaktOSEnterCritical(void) {
+TAKT_ALWAYS_INLINE uint32_t TaktOSEnterCritical(void) {
     uint32_t primask;
     __asm__ volatile (
         "MRS %0, PRIMASK \n"
@@ -76,7 +78,7 @@ static TAKT_ALWAYS_INLINE uint32_t TaktOSEnterCritical(void) {
     return primask;
 }
 
-static TAKT_ALWAYS_INLINE void TaktOSExitCritical(uint32_t saved) {
+TAKT_ALWAYS_INLINE void TaktOSExitCritical(uint32_t saved) {
     __asm__ volatile (
         "MSR PRIMASK, %0"
         :: "r"(saved) : "memory"
@@ -95,12 +97,24 @@ static TAKT_ALWAYS_INLINE void TaktOSExitCritical(uint32_t saved) {
  * with interrupts enabled; saves ~3 cycles vs the save-restore pattern by
  * allowing GCC to use only caller-save registers (r0r3), eliminating the
  * PUSH {r4,lr} / POP {r4,pc} function frame.                             */
-static TAKT_ALWAYS_INLINE void TaktOSDisableInterrupts(void) {
+TAKT_ALWAYS_INLINE void TaktOSDisableInterrupts(void) {
     __asm__ volatile ("CPSID I" ::: "memory");
 }
 
-static TAKT_ALWAYS_INLINE void TaktOSEnableInterrupts(void) {
+TAKT_ALWAYS_INLINE void TaktOSEnableInterrupts(void) {
     __asm__ volatile ("CPSIE I" ::: "memory");
+}
+
+/* Returns true when the caller is executing in Handler mode (any ISR or
+ * fault handler).  Implemented by reading IPSR  on Cortex-M, IPSR != 0
+ * iff the CPU is in Handler mode.  Used by the kernel's blocking APIs to
+ * reject misuse from ISR context (calling a blocking primitive from an
+ * ISR would block the preempted thread, not the ISR itself, corrupting
+ * the scheduler).  ~3 cycles, on the slow / blocking path only. */
+TAKT_ALWAYS_INLINE bool TaktOSInIsr(void) {
+    uint32_t ipsr;
+    __asm__ volatile ("MRS %0, IPSR" : "=r"(ipsr));
+    return (ipsr & 0x1FFu) != 0u;
 }
 
 #endif // TAKT_ARCH_STUB / x86 vs ARM

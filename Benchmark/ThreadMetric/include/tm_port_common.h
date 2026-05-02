@@ -16,9 +16,9 @@
  *
  *   - lets the same numerical-result set be produced on every supported MCU,
  *     including small-RAM Cortex-M0 targets like the STM32F030R8 (8 KB SRAM);
- *   - keeps every cross-RTOS comparison apples-to-apples (FreeRTOS / ThreadX /
+ *   - keeps every cross-RTOS comparison like-for-like (FreeRTOS / ThreadX /
  *     TaktOS all link the same byte budget);
- *   - keeps every cross-MCU comparison apples-to-apples (every MCU runs the
+ *   - keeps every cross-MCU comparison like-for-like (every MCU runs the
  *     same byte budget, regardless of how much RAM it has spare).
  *
  * Each value is wrapped in #ifndef/#endif so a future target with even
@@ -26,7 +26,7 @@
  * in its .cproject. Any such override MUST be applied identically to every
  * RTOS variant on that target so the cross-RTOS benchmark stays valid;
  * the resulting cross-MCU comparison against targets using the global
- * defaults must be disclosed in the report.
+ * defaults must be noted in the report.
  *
  * Per-MCU parameters that are not benchmark sizes (UART pins, core clock,
  * SW IRQ number, IRQ vector handler name) live in the target's board.h.

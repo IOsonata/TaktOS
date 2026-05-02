@@ -92,7 +92,8 @@ extern "C" {
  * @param	pStorage  : Pointer to the 4-byte-aligned backing byte buffer.
  * @param	ItemSize  : Size of one item in bytes  must be a non-zero multiple of 4.
  * @param	Capacity  : Maximum number of items the queue can hold.
- * @return	TAKTOS_OK on success, TAKTOS_ERR_INVALID on null / mis-aligned / bad size.
+ * @return	TAKTOS_OK on success, TAKTOS_ERR_INVALID on null / bad size,
+ *          TAKTOS_ERR_ALIGN if @p pStorage or @p ItemSize is not 4-byte aligned.
  */
 TaktOSErr_t TaktOSQueueInit(TaktOSQueue_t *pQue, void *pStorage, uint32_t ItemSize, uint32_t Capacity);
 
@@ -133,7 +134,11 @@ bool TaktQueueHandoffFromSender(TaktOSQueue_t *pQue);
  * @param	bBlocking     : true to block when the queue is full.
  * @param	TimeoutTicks  : Maximum ticks to block.
  * @return	TAKTOS_OK, TAKTOS_ERR_FULL, TAKTOS_ERR_TIMEOUT, TAKTOS_ERR_INTERRUPTED,
- *          or TAKTOS_ERR_INVALID.
+ *          TAKTOS_ERR_INVALID, or TAKTOS_ERR_ALIGN.  TAKTOS_ERR_INVALID
+ *          covers null pointer, and (when the call would block) ISR
+ *          caller  blocking is illegal from Handler mode; ISR callers
+ *          must use bBlocking=false / NO_WAIT.  TAKTOS_ERR_ALIGN
+ *          indicates @p pData is not 4-byte aligned.
  */
 TaktOSErr_t TaktOSQueueSend(TaktOSQueue_t *pQue, const void *pData, bool bBlocking, uint32_t TimeoutTicks);
 
@@ -148,7 +153,11 @@ TaktOSErr_t TaktOSQueueSend(TaktOSQueue_t *pQue, const void *pData, bool bBlocki
  * @param	bBlocking     : true to block when the queue is empty.
  * @param	TimeoutTicks  : Maximum ticks to block.
  * @return	TAKTOS_OK, TAKTOS_ERR_EMPTY, TAKTOS_ERR_TIMEOUT, TAKTOS_ERR_INTERRUPTED,
- *          or TAKTOS_ERR_INVALID.
+ *          TAKTOS_ERR_INVALID, or TAKTOS_ERR_ALIGN.  TAKTOS_ERR_INVALID
+ *          covers null pointer, and (when the call would block) ISR
+ *          caller  blocking is illegal from Handler mode; ISR callers
+ *          must use bBlocking=false / NO_WAIT.  TAKTOS_ERR_ALIGN
+ *          indicates @p pData is not 4-byte aligned.
  */
 TaktOSErr_t TaktOSQueueReceive(TaktOSQueue_t *pQue, void *pData, bool bBlocking, uint32_t TimeoutTicks);
 
@@ -164,7 +173,7 @@ TaktOSErr_t TaktOSQueueReceive(TaktOSQueue_t *pQue, void *pData, bool bBlocking,
  * @param	pSrc  : Source pointer (must be 4-byte aligned).
  * @param	Size  : Number of bytes to copy (must be a multiple of 4).
  */
-static TAKT_ALWAYS_INLINE void TaktQueueFastCopy(void *pDst, const void *pSrc, uint32_t Size) {
+TAKT_ALWAYS_INLINE void TaktQueueFastCopy(void *pDst, const void *pSrc, uint32_t Size) {
     if (TAKT_LIKELY(Size == 16u))
     {
         typedef struct { uint32_t w[4]; } b16;
@@ -206,7 +215,7 @@ static TAKT_ALWAYS_INLINE void TaktQueueFastCopy(void *pDst, const void *pSrc, u
  * @param	pQue : Pointer to queue.
  * @return	Pointer to the claimed write slot, or NULL if the queue is full.
  */
-static TAKT_ALWAYS_INLINE uint8_t *TaktQueueRingPut(TaktOSQueue_t *pQue) {
+TAKT_ALWAYS_INLINE uint8_t *TaktQueueRingPut(TaktOSQueue_t *pQue) {
     if (!pQue->Avail)
     {
     	return NULL;
@@ -235,7 +244,7 @@ static TAKT_ALWAYS_INLINE uint8_t *TaktQueueRingPut(TaktOSQueue_t *pQue) {
  * @param	pQue : Pointer to queue.
  * @return	Pointer to the next read slot, or NULL if the queue is empty.
  */
-static TAKT_ALWAYS_INLINE uint8_t *TaktQueueRingGet(TaktOSQueue_t *pQue) {
+TAKT_ALWAYS_INLINE uint8_t *TaktQueueRingGet(TaktOSQueue_t *pQue) {
     if (pQue->Avail == pQue->Capacity)
     {
     	return NULL;
@@ -297,22 +306,28 @@ TaktOSErr_t TaktOSQueueReceiveSlowPath(TaktOSQueue_t *pQue, void *pData, uint32_
  * @param	bBlocking     : true to block when the queue is full.
  * @param	TimeoutTicks  : Maximum ticks to block (TAKTOS_WAIT_FOREVER / TAKTOS_NO_WAIT).
  * @return	TAKTOS_OK, TAKTOS_ERR_FULL, TAKTOS_ERR_TIMEOUT, TAKTOS_ERR_INTERRUPTED,
- *          or TAKTOS_ERR_INVALID.
+ *          TAKTOS_ERR_INVALID, or TAKTOS_ERR_ALIGN.  TAKTOS_ERR_INVALID
+ *          covers null pointer, and (when the call would block) ISR
+ *          caller  blocking is illegal from Handler mode; ISR callers
+ *          must use bBlocking=false / NO_WAIT.  TAKTOS_ERR_ALIGN
+ *          indicates @p pData is not 4-byte aligned.
  */
-static TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSQueueSend(TaktOSQueue_t *pQue, const void *pData,
+TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSQueueSend(TaktOSQueue_t *pQue, const void *pData,
 													  bool bBlocking, uint32_t TimeoutTicks) {
     // Null check unconditional  null handles cause UB in both debug and release.
     if (pQue == NULL || pData == NULL)
     {
     	return TAKTOS_ERR_INVALID;
     }
-#ifdef TAKT_DEBUG_CHECKS
-    // Alignment check is a developer-error diagnostic only.
-    if (reinterpret_cast<uintptr_t>(pData) & 3u)
+    /* 4-byte alignment check on pData.  TaktQueueFastCopy walks the item
+     * as 32-bit words; a misaligned pData would HardFault inside the
+     * copy on ARMv6-M (M0/M0+) and trap or run slowly on ARMv7-M.  This
+     * one-instruction guard converts that into a clean error return
+     * with no kernel state touched.  Always on. */
+    if (((uintptr_t)pData) & 3u)
     {
-    	return TAKTOS_ERR_INVALID;
+    	return TAKTOS_ERR_ALIGN;
     }
-#endif
 
     uint32_t state = TaktOSEnterCritical();
 
@@ -366,22 +381,28 @@ static TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSQueueSend(TaktOSQueue_t *pQue, const
  * @param	bBlocking     : true to block when the queue is empty.
  * @param	TimeoutTicks  : Maximum ticks to block (TAKTOS_WAIT_FOREVER / TAKTOS_NO_WAIT).
  * @return	TAKTOS_OK, TAKTOS_ERR_EMPTY, TAKTOS_ERR_TIMEOUT, TAKTOS_ERR_INTERRUPTED,
- *          or TAKTOS_ERR_INVALID.
+ *          TAKTOS_ERR_INVALID, or TAKTOS_ERR_ALIGN.  TAKTOS_ERR_INVALID
+ *          covers null pointer, and (when the call would block) ISR
+ *          caller  blocking is illegal from Handler mode; ISR callers
+ *          must use bBlocking=false / NO_WAIT.  TAKTOS_ERR_ALIGN
+ *          indicates @p pData is not 4-byte aligned.
  */
-static TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSQueueReceive(TaktOSQueue_t *pQue, void *pData,
+TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSQueueReceive(TaktOSQueue_t *pQue, void *pData,
 														 bool bBlocking, uint32_t TimeoutTicks) {
     // Null check unconditional  null handles cause UB in both debug and release.
     if (pQue == NULL || pData == NULL)
     {
     	return TAKTOS_ERR_INVALID;
     }
-#ifdef TAKT_DEBUG_CHECKS
-    // Alignment check is a developer-error diagnostic only.
-    if (reinterpret_cast<uintptr_t>(pData) & 3u)
+    /* 4-byte alignment check on pData.  TaktQueueFastCopy walks the item
+     * as 32-bit words; a misaligned pData would HardFault inside the
+     * copy on ARMv6-M (M0/M0+) and trap or run slowly on ARMv7-M.  This
+     * one-instruction guard converts that into a clean error return
+     * with no kernel state touched.  Always on. */
+    if (((uintptr_t)pData) & 3u)
     {
-    	return TAKTOS_ERR_INVALID;
+    	return TAKTOS_ERR_ALIGN;
     }
-#endif
 
     uint32_t state = TaktOSEnterCritical();
     uint8_t* slot = TaktQueueRingGet(pQue);

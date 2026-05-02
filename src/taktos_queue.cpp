@@ -70,14 +70,17 @@ TaktOSErr_t TaktOSQueueInit(TaktOSQueue_t *pQue, void *pStorage,
     	return TAKTOS_ERR_INVALID;
     }
 
+    /* ItemSize and pStorage must both be 4-byte aligned: ring-buffer
+     * walks copy items as 32-bit words.  Report the alignment violation
+     * to the caller; the application chooses the recovery policy. */
     if (ItemSize & 3u)
     {
-    	TAKT_TRAP();
+    	return TAKTOS_ERR_ALIGN;
     }
 
     if (reinterpret_cast<uintptr_t>(pStorage) & 3u)
     {
-    	TAKT_TRAP();
+    	return TAKTOS_ERR_ALIGN;
     }
 
     uint8_t* buf     = static_cast<uint8_t*>(pStorage);
@@ -108,7 +111,7 @@ TaktOSErr_t TaktOSQueueInit(TaktOSQueue_t *pQue, void *pStorage,
  * @param	pSrc  : Source pointer (must be 4-byte aligned).
  * @param	Size  : Number of bytes to copy (must be a multiple of 4).
  */
-static TAKT_ALWAYS_INLINE void TaktQueueFastCopy(void *pDst, const void *pSrc, uint32_t Size) {
+TAKT_ALWAYS_INLINE void TaktQueueFastCopy(void *pDst, const void *pSrc, uint32_t Size) {
     if (TAKT_LIKELY(Size == 16u))
     {
         typedef struct { uint32_t w[4]; } b16;
@@ -150,7 +153,7 @@ static TAKT_ALWAYS_INLINE void TaktQueueFastCopy(void *pDst, const void *pSrc, u
  * @param	pQue : Pointer to queue.
  * @return	Pointer to the claimed write slot, or NULL if the queue is full.
  */
-static TAKT_ALWAYS_INLINE uint8_t *TaktQueueRingPut(TaktOSQueue_t *pQue) {
+TAKT_ALWAYS_INLINE uint8_t *TaktQueueRingPut(TaktOSQueue_t *pQue) {
     if (!pQue->Avail)
     {
     	return NULL;
@@ -179,7 +182,7 @@ static TAKT_ALWAYS_INLINE uint8_t *TaktQueueRingPut(TaktOSQueue_t *pQue) {
  * @param	pQue : Pointer to queue.
  * @return	Pointer to the next read slot, or NULL if the queue is empty.
  */
-static TAKT_ALWAYS_INLINE uint8_t *TaktQueueRingGet(TaktOSQueue_t *pQue) {
+TAKT_ALWAYS_INLINE uint8_t *TaktQueueRingGet(TaktOSQueue_t *pQue) {
     if (pQue->Avail == pQue->Capacity)
     {
     	return NULL;
@@ -255,7 +258,20 @@ TaktOSErr_t TaktOSQueueSendSlowPath(TaktOSQueue_t *pQue, const void *pData,
         return TAKTOS_OK;
     }
 
-    // Still full  block.  Store data pointer for direct handoff:
+    // Still full  block.
+    //
+    // ISR-context guard.  Blocking from an ISR would mark the preempted
+    // thread BLOCKED and corrupt the scheduler.  Cert boundary: reject.
+    // Reached only when no slot is free AND no receiver is waiting AND
+    // the caller asked to block  ISR-safe call patterns
+    // (timeout=NO_WAIT) bail out earlier in the inline fast path.
+    if (TAKT_UNLIKELY(TaktOSInIsr()))
+    {
+        TaktOSExitCritical(saved);
+        return TAKTOS_ERR_INVALID;
+    }
+
+    // Store data pointer for direct handoff:
     // TaktQueueHandoffFromSender will copy our item into the ring buffer
     // at the moment a receiver frees a slot, eliminating the re-compete race.
     TaktOSThread_t* cur = TaktOSCurrentThread();
@@ -265,7 +281,15 @@ TaktOSErr_t TaktOSQueueSendSlowPath(TaktOSQueue_t *pQue, const void *pData,
     cur->pWaitNext  = nullptr;
     cur->pMsg       = (void*)pData;   // receiver will copy from here
 
-    TaktBlockTask(cur);
+    if (!TaktBlockTask(cur))
+    {
+        /* Scheduler corruption.  Restore state
+         * and return so an application fault hook gets a clean error. */
+        cur->State = TAKTOS_RUNNING;
+        cur->pMsg  = nullptr;
+        TaktOSExitCritical(saved);
+        return TAKTOS_ERR_INVALID;
+    }
     TaktWaitListInsert(&pQue->SendList, cur);
 
     cur->pWaitList = &pQue->SendList;
@@ -340,7 +364,18 @@ TaktOSErr_t TaktOSQueueReceiveSlowPath(TaktOSQueue_t *pQue, void *pData,
         return TAKTOS_OK;
     }
 
-    // Still empty  block.  Store destination pointer for direct handoff:
+    // Still empty  block.
+    //
+    // ISR-context guard.  Reached only when no item is available AND the
+    // caller asked to block.  Blocking from an ISR would corrupt the
+    // scheduler  reject without touching state.
+    if (TAKT_UNLIKELY(TaktOSInIsr()))
+    {
+        TaktOSExitCritical(saved);
+        return TAKTOS_ERR_INVALID;
+    }
+
+    // Store destination pointer for direct handoff:
     // TaktQueueHandoffToReceiver will copy the sender's item directly here,
     // eliminating the re-compete race with other non-blocked receivers.
     TaktOSThread_t* cur = TaktOSCurrentThread();
@@ -350,7 +385,14 @@ TaktOSErr_t TaktOSQueueReceiveSlowPath(TaktOSQueue_t *pQue, void *pData,
     cur->pWaitNext  = nullptr;
     cur->pMsg       = pData;   // sender will copy to here
 
-    TaktBlockTask(cur);
+    if (!TaktBlockTask(cur))
+    {
+        /* Scheduler corruption.  Restore state. */
+        cur->State = TAKTOS_RUNNING;
+        cur->pMsg  = nullptr;
+        TaktOSExitCritical(saved);
+        return TAKTOS_ERR_INVALID;
+    }
     TaktWaitListInsert(&pQue->RecvList, cur);
     cur->pWaitList = &pQue->RecvList;
 
@@ -484,12 +526,14 @@ TaktOSErr_t TaktOSQueueSend(TaktOSQueue_t *pQue, const void *pData, bool bBlocki
     {
         return TAKTOS_ERR_INVALID;
     }
-#ifdef TAKT_DEBUG_CHECKS
+    /* 4-byte alignment check on pData.  TaktQueueFastCopy walks the
+     * item as 32-bit words; a misaligned pData would HardFault inside
+     * the copy on ARMv6-M and trap or run slowly on ARMv7-M.  Always-on
+     * guard returns ERR_ALIGN with no kernel state touched. */
     if (reinterpret_cast<uintptr_t>(pData) & 3u)
     {
-        return TAKTOS_ERR_INVALID;
+        return TAKTOS_ERR_ALIGN;
     }
-#endif
 
     uint32_t state = TaktOSEnterCritical();
 
@@ -537,12 +581,12 @@ TaktOSErr_t TaktOSQueueReceive(TaktOSQueue_t *pQue, void *pData, bool bBlocking,
     {
         return TAKTOS_ERR_INVALID;
     }
-#ifdef TAKT_DEBUG_CHECKS
+    /* 4-byte alignment check on pData.  Always-on  see TaktOSQueueSend
+     * above for the rationale. */
     if (reinterpret_cast<uintptr_t>(pData) & 3u)
     {
-    	return TAKTOS_ERR_INVALID;
+    	return TAKTOS_ERR_ALIGN;
     }
-#endif
 
     uint32_t state = TaktOSEnterCritical();
     uint8_t* slot = TaktQueueRingGet(pQue);

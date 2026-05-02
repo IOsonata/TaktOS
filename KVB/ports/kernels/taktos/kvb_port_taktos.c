@@ -46,6 +46,7 @@ static KvbStatus kvb_from_taktos_error(TaktOSErr_t err)
     case TAKTOS_ERR_BUSY:
         return KVB_ERR_WOULD_BLOCK;
     case TAKTOS_ERR_INVALID:
+    case TAKTOS_ERR_ALIGN:
         return KVB_ERR_INVALID_ARG;
     default:
         return KVB_ERR_KERNEL;
@@ -162,6 +163,11 @@ KvbStatus kvb_thread_yield(void)
     return KVB_OK;
 }
 
+uint64_t kvb_kernel_tick_count(void)
+{
+    return (uint64_t)TaktOSTickCount();
+}
+
 KvbStatus kvb_thread_sleep_ticks(uint32_t ticks)
 {
     hTaktOSThread_t cur = TaktOSCurrentThread();
@@ -237,7 +243,7 @@ KvbStatus kvb_mutex_create(KvbMutex *mutex, uint32_t flags)
      *
      * Reject flag combinations the plain mutex does not implement so that
      * tests cannot silently exercise emulated behaviour.  The supports_mutex_*
-     * fields in g_taktos_features below report this honestly so a test
+     * fields in g_taktos_features below report this directly so a test
      * can skip itself if it needs PI or recursion. */
     if (((flags & KVB_MUTEX_RECURSIVE) != 0u) ||
         ((flags & KVB_MUTEX_PI_REQUIRED) != 0u) ||

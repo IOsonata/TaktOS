@@ -160,6 +160,7 @@ KvbStatus kvb_thread_create(
     KvbPriority priority);
 
 KvbStatus kvb_thread_yield(void);
+uint64_t kvb_kernel_tick_count(void);
 KvbStatus kvb_thread_sleep_ticks(uint32_t ticks);
 KvbStatus kvb_thread_delete(KvbThread *thread);
 

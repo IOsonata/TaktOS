@@ -310,5 +310,5 @@ M7 spill pressure, comfortably under the 128 KB DTCM budget even in the
 - No PX5 comparison is published for this board: the PX5 demo package
   cannot be tuned to match the same optimization level, inlining, and
   kernel options as TaktOS/FreeRTOS/ThreadX. Running it as-is against a
-  fully tuned benchmark would not be an apples-to-apples comparison.
+  fully tuned benchmark would not be a like-for-like comparison.
   See the repo-top Methodology section.

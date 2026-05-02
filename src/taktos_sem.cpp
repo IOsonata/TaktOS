@@ -134,13 +134,34 @@ TAKT_COLD TAKT_NOINLINE TaktOSErr_t TaktOSSemGiveSlowPath(TaktOSSem_t *pSem, uin
 TAKT_COLD TAKT_NOINLINE TaktOSErr_t TaktOSSemTakeSlowPath(TaktOSSem_t *pSem, uint32_t Primask,
                                                           uint32_t timeoutTicks)
 {
+    /* ISR-context guard.  Blocking from an ISR would mark the preempted
+     * thread (whatever was running when the ISR fired) as BLOCKED and
+     * remove it from the run queue, corrupting the scheduler.  Cert
+     * boundary: detect and reject without touching any state.  Cost is
+     * one MRS IPSR + one branch (~3 cycles), on the slow path only  the
+     * fast path (count > 0 or non-blocking) does not run this check. */
+    if (TAKT_UNLIKELY(TaktOSInIsr()))
+    {
+        TaktOSExitCritical(Primask);
+        return TAKTOS_ERR_INVALID;
+    }
+
     TaktOSThread_t *current = TaktOSCurrentThread();
 
     current->State      = TAKTOS_BLOCKED;
     current->WakeReason = TAKT_WOKEN_BY_EVENT;
     current->pWaitNext  = nullptr;
 
-    TaktBlockTask(current);
+    if (!TaktBlockTask(current))
+    {
+        /* TaktBlockTask detected scheduler-ring corruption.  Restore
+         * the state field, exit the critical section, and return  the
+         * application gets a clean ERR_INVALID and applies its own
+         * recovery policy. */
+        current->State = TAKTOS_RUNNING;
+        TaktOSExitCritical(Primask);
+        return TAKTOS_ERR_INVALID;
+    }
     TaktWaitListInsert(&pSem->WaitList, current);
 
     // Always store pWaitList so Resume/HandOff can cancel this wait.

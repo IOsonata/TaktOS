@@ -143,11 +143,11 @@ All three kernels run with **stack guard validation always on**:
 - ThreadX: stack overflow checking enabled (`TX_ENABLE_STACK_CHECKING`),
   combined with the `_txe_*` parameter-validation wrappers
   (object-validity check). Worker stack budget bumped to 768 B per
-  thread on this target — disclosed asymmetry, see §3.4.
+  thread on this target — documented asymmetry, see §3.4.
 
 This is **deliberate**: each kernel's stack guard cost is a feature of
 the kernel, not optional instrumentation. Keeping the runtime safety
-checks enabled across all three keeps the comparison apples-to-apples —
+checks enabled across all three keeps the comparison like-for-like —
 every kernel pays for stack guard work on every switch.
 
 ### 3.4 Memory allocation strategy
@@ -170,7 +170,7 @@ every kernel pays for stack guard work on every switch.
   in BSS, indexed by handle, matching the pattern used by
   Microsoft's own Thread-Metric ThreadX reference port.
 - **ThreadX worker stack:** 768 B per worker thread, vs 256 B on TaktOS
-  and FreeRTOS. Disclosed asymmetry. The `_txe_*` parameter-validation
+  and FreeRTOS. Documented asymmetry. The `_txe_*` parameter-validation
   wrappers add a real C call frame to every public ThreadX API call
   (~30 B on M0 -Os), and that compounds with the deeper internal
   call chain in `tx_thread_relinquish`. 256 B has no margin for the
@@ -220,7 +220,7 @@ a single `KVB_ERR_NOT_OWNER` status code:
 So on this benchmark: **TaktOS and ThreadX measure pure native fast-path
 costs; FreeRTOS measures fast path plus the +30-cycle ownership pre-check
 the port has to add to make the OWNERSHIP test work without halting on
-configASSERT.** Disclosed; folded into the §4.4 analysis.
+configASSERT.** Documented; folded into the §4.4 analysis.
 
 ### 3.6 Configuration files
 
@@ -228,7 +228,7 @@ configASSERT.** Disclosed; folded into the §4.4 analysis.
 - `KVB/Targets/STM32F0308/include/kvb_config_stm32f0308_freertos.h`
 - `KVB/Targets/STM32F0308/include/kvb_config_stm32f0308.h` (TaktOS)
 - `KVB/Targets/STM32F0308/include/kvb_config_stm32f0308_threadx.h`
-- `KVB/Targets/STM32F0308/include/tx_user.h` (ThreadX feature gates)
+- `KVB/include/tx_user.h` (ThreadX feature gates  shared across every KVB target)
 
 ---
 
@@ -295,7 +295,7 @@ KVB ThreadX port: (1) the `_txe_*` parameter-validation wrappers add a
 real C call frame to every public ThreadX API call (~30 B + ~6 cycles
 on M0), and (2) the slot-pool indirection in the KVB ThreadX port
 adds two memory loads per `kvb_thread_yield`. The 1.48× FreeRTOS-over-
-ThreadX gap on this test is consistent with the disclosed ~30-cycle
+ThreadX gap on this test is consistent with the documented ~30-cycle
 validation overhead per call multiplied by the per-yield call count.
 This is a **legitimate kernel/port characteristic**, not an artifact
 to subtract — both behaviours ship in real ThreadX deployments.
@@ -608,7 +608,8 @@ these numbers are committed under:
 - `KVB/ports/kernels/threadx/`                             (ThreadX kernel port)
 - `KVB/Targets/src/`                                       (kernel-agnostic test runner + main)
 - `KVB/Targets/STM32F0308/src/`                            (per-MCU platform glue)
-- `KVB/Targets/STM32F0308/include/`                        (per-MCU configs, FreeRTOSConfig.h, tx_user.h)
+- `KVB/Targets/STM32F0308/include/`                        (per-MCU configs, FreeRTOSConfig.h)
+- `KVB/include/tx_user.h`                                  (ThreadX feature config, shared across every KVB target)
 
 Multi-run aggregation tool: `KVB/tools/compare_runs.py`. Takes one
 or more KVB UART log files per `--label` group, computes per-metric
@@ -756,7 +757,7 @@ To reproduce:
   these tests.
 
 - **v3.0 (2026-04-29).** Added Eclipse ThreadX 6.x as a third kernel.
-  Bumped run aggregate from 4 to 5 runs per kernel. Disclosed
+  Bumped run aggregate from 4 to 5 runs per kernel. Documented
   ThreadX KVB sem pool sizing (4 → 6).
 
 - **v2.0 (earlier).** TaktOS-vs-FreeRTOS only.

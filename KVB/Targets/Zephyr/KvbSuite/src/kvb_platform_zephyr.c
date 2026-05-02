@@ -115,14 +115,16 @@ uint64_t kvb_platform_cycle_count(void)
 
 uint64_t kvb_platform_time_us(void)
 {
-    uint32_t hz = kvb_platform_cycle_frequency_hz();
-    uint64_t cycles = kvb_platform_cycle_count();
-
-    if (hz == 0u) {
-        return 0u;
-    }
-
-    return (cycles * 1000000ull) / (uint64_t)hz;
+    /* Use Zephyr uptime for wall-clock measurements.
+     *
+     * The DWT CYCCNT path is useful for active-loop cycle counting, but it is
+     * not a stable wall-clock source across k_sleep()/idle on all Cortex-M33
+     * targets.  On nRF54L15 the debug/cycle counter can become discontinuous
+     * across idle, which makes TIME_SLEEP_001 report a large false elapsed
+     * duration.  Zephyr uptime is driven by the kernel timer and is the correct
+     * source for sleep-duration validation.
+     */
+    return (uint64_t)k_ticks_to_us_floor64(k_uptime_ticks());
 }
 
 void kvb_platform_log_write(const char *data, size_t len)
@@ -164,19 +166,30 @@ const char *kvb_platform_cpu_name(void)
 
 const char *kvb_platform_timing_source(void)
 {
-#if KVB_ZEPHYR_USE_DWT
-    return "DWT";
-#else
-    return "Zephyr k_cycle";
-#endif
+    return "Zephyr uptime";
 }
 
 const char *kvb_platform_safety_profile(void)
 {
-#if defined(CONFIG_HW_STACK_PROTECTION) && defined(CONFIG_STACK_SENTINEL) && defined(CONFIG_ASSERT)
-    return "stack_guard+sentinel+assert";
-#elif defined(CONFIG_STACK_SENTINEL) && defined(CONFIG_ASSERT)
-    return "sentinel+assert";
+    /* In current Zephyr, API-entry parameter validation is split
+     * across two mechanisms: CHECKIF() (gated by the "Error checking
+     * behavior for CHECK macro" Kconfig choice; KVB pins
+     * RUNTIME_ERROR_CHECKS=y) and __ASSERT() (gated by CONFIG_ASSERT;
+     * KVB pins CONFIG_ASSERT=y).  Both are required for parity with
+     * FreeRTOS configASSERT, ThreadX _txe_*, and TaktOS API-entry
+     * checks.  We report a combined tag that lists each layer that
+     * is actually compiled in.
+     */
+#if defined(CONFIG_HW_STACK_PROTECTION) && defined(CONFIG_STACK_SENTINEL) && \
+    defined(CONFIG_RUNTIME_ERROR_CHECKS) && defined(CONFIG_ASSERT)
+    return "stack_guard+sentinel+runtime_checks+assert";
+#elif defined(CONFIG_STACK_SENTINEL) && \
+    defined(CONFIG_RUNTIME_ERROR_CHECKS) && defined(CONFIG_ASSERT)
+    return "sentinel+runtime_checks+assert";
+#elif defined(CONFIG_RUNTIME_ERROR_CHECKS) && defined(CONFIG_ASSERT)
+    return "runtime_checks+assert";
+#elif defined(CONFIG_RUNTIME_ERROR_CHECKS)
+    return "runtime_checks";
 #elif defined(CONFIG_ASSERT)
     return "assert";
 #else

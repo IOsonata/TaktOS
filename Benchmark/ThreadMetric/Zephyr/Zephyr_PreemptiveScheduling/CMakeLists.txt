@@ -8,7 +8,7 @@
 #
 # Sources pulled from ThreadMetric/src and ThreadMetric/include  the same
 # C files used by the FreeRTOS / TaktOS / ThreadX Eclipse projects, ensuring
-# apples-to-apples workload across all RTOSes.
+# matched workload across all RTOSes.
 #
 # Single source of truth for Zephyr config: ../common/prj.conf  edit there,
 # all 7 projects pick up the change. CONF_FILE must be set BEFORE

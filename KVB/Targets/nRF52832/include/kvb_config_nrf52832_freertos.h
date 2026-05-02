@@ -13,14 +13,14 @@
  *   FreeRTOS kernel infrastructure (idle TCB + stack, scheduler state)
  *                                                       ~= 0.6 KB
  *   Runner thread     (StaticTask_t + 2048 B stack)     ~= 2.1 KB
- *   Worker tasks (3)  3 * (StaticTask_t + 768 B stack)  ~= 2.6 KB
- *   Mutex-owner task  (StaticTask_t + 768 B stack)      ~= 0.9 KB
+ *   Worker tasks (3)  3 * (StaticTask_t + 512 B stack)  ~= 1.8 KB
+ *   Mutex-owner task  (StaticTask_t + 512 B stack)      ~= 0.6 KB
  *   IOsonata UART TxFIFO (UARTFIFOSIZE = 256) + state   ~= 0.5 KB
  *   Queue + sem + mutex storage (StaticQueue_t etc)     ~= 0.4 KB
  *   KVB statics (registry 16 * 4 B + result + log)      ~= 0.4 KB
  *   ISR/main MSP + bss headroom                         ~= 1.5 KB
  *   ----------------------------------------------------------------------
- *   Total                                               ~= 9.0 / 64.0 KB
+ *   Total                                               ~= 7.4 / 64.0 KB
  *
  * Same UART, same shared platform layer, same KVB framework as the TaktOS
  * counterpart — only kernel selection and a couple of per-kernel runner
@@ -33,8 +33,10 @@
  * with newlib full vsnprintf; the firmware truncated mid-line during
  * SYNC_MUTEX_FAST_001 metric emission.  2048 B has generous headroom
  * and the SRAM budget is large enough to absorb it without trade-off.
- * Worker stacks bumped to 768 B (from 512 B) for the same reason inside
- * test workers, and to match the STM32F0308 ThreadX worker stack.
+ * Worker stacks at 512 B match the TaktOS variant on this target —
+ * the FreeRTOS/TaktOS worker stack pair is documented in §3.5 of the
+ * KVB Comparison report as the lower of the two paired sizes
+ * (ThreadX/Zephyr use 1024 B for their per-thread overhead reasons).
  *
  * Note: the KVB_LOG_BUFFER_SIZE buffer itself does NOT live on the
  * runner stack.  It is a single static buffer in BSS (src/core/kvb_log.c,

@@ -82,7 +82,7 @@ void tm_mutex_fairness_initialize(void)
      * At TM priority 2 the reporter preempts workers when it wakes, creating
      * a brief measurement disturbance.  At TM priority 10 it joins the
      * round-robin and gets its natural yield slot  no preemption, no
-     * disturbance.  Truly lowest priority (TM 31) risks starvation on
+     * disturbance.  Strictly lowest priority (TM 31) risks starvation on
      * strict-priority schedulers where workers always occupy the ready queue. */
     TM_CHECK(tm_thread_create(TM_MUTEX_REPORTER_ID, 10, tm_mutex_reporter));
     TM_CHECK(tm_thread_resume(TM_MUTEX_REPORTER_ID));

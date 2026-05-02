@@ -64,8 +64,9 @@
  *  port unconditionally enables the FPU in vPortEnableFPU during scheduler
  *  start, regardless of any configENABLE_FPU macro.  KVB tests are
  *  integer-only, so the FPU never actually gets touched after enable; the
- *  cost is one CR write at boot.  We compile with -mfloat-abi=softfp + FPv4-SP-D16
- *  to match the IOsonata nRF52832 library's calling convention.
+ *  cost is one CR write at boot.  We compile with -mfloat-abi=hard +
+ *  -mfpu=fpv4-sp-d16, matching the TaktOS / ThreadX / Zephyr KVB ports
+ *  on this target (see Eclipse .cproject `fpu.abi.hard`).
  *
  *  Lazy stacking: portmacro.h's portTASK_USES_FLOATING_POINT() macro lets
  *  individual tasks opt in to FPU context save on context switch.  KVB's
@@ -82,12 +83,13 @@
 #define configSUPPORT_STATIC_ALLOCATION         1
 #define configTOTAL_HEAP_SIZE                   ( ( size_t ) 0 )
 
-/* No vApplicationGetIdleTaskMemory / vApplicationGetTimerTaskMemory
- * callbacks supplied — FreeRTOS V11.3 provides default static idle-task
- * storage internally when configSUPPORT_STATIC_ALLOCATION=1 and no
- * application callback is defined.  Same configuration as the working
- * ThreadMetric nRF52832 FreeRTOS reference projects in
- * Benchmark/ThreadMetric/nRF52832/. */
+/* In FreeRTOS-Kernel V11+, configKERNEL_PROVIDED_STATIC_MEMORY defaults to
+ * 1, which makes tasks.c emit its own vApplicationGetIdleTaskMemory and
+ * vApplicationGetTimerTaskMemory.  KVB ships an application-side
+ * vApplicationGetIdleTaskMemory in src/kvb_freertos_hooks.c (its TCB and
+ * stack are dimensioned to KVB needs), so we disable the kernel-provided
+ * default to avoid a multiple-definition link error. */
+#define configKERNEL_PROVIDED_STATIC_MEMORY     0
 
 #define configCHECK_FOR_STACK_OVERFLOW          2
 #define configUSE_MALLOC_FAILED_HOOK            0

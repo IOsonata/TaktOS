@@ -20,7 +20,7 @@ README covers the FreeRTOS-specific bits.
   matching the TaktOS counterpart.  Same tick rate (1000 Hz), same
   measurement window (10 s), same throughput batch (256), same UART
   FIFO size (256 B), same runner stack (1024 B), same worker stack
-  (512 B).  Apples-to-apples vs the TaktOS variant by construction.
+  (512 B).  Like-for-like vs the TaktOS variant by construction.
 
 ## Dependencies
 

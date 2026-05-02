@@ -892,49 +892,49 @@ Finished building: ThreadX_nRF52832_KvbSuite.siz
 ========================================================================
 
 
--- Zephyr version: 4.2.99 (/opt/nordic/ncs/v3.2.4/zephyr), build: ncs-v3.2.4
-[164/164] Linking C executable zephyr/zephyr.elf
+-- Zephyr version: 4.3.99 (/opt/nordic/ncs/v3.3.0/zephyr), build: ncs-v3.3.0
+[171/171] Linking C executable zephyr/zephyr.elf
 Memory region         Used Size  Region Size  %age Used
-           FLASH:       45224 B       512 KB      8.63%
-             RAM:       10320 B        64 KB     15.75%
+           FLASH:       45692 B       512 KB      8.72%
+             RAM:       10304 B        64 KB     15.72%
         IDT_LIST:          0 GB        32 KB      0.00%
-Generating files from /Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/Zephyr/KvbSuite/build_832/KvbSuite/zephyr/zephyr.elf for board: nrf52dk
+Generating files from /Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/Zephyr/KvbSuite/build_832/KvbSuite/zephyr/zephyr.elf for board: nrf52dk/nrf52832
 
 
-*** Booting nRF Connect SDK v3.2.4-4c3fc0d44534 ***
-*** Using Zephyr OS v4.2.99-9673eec75908 ***
+*** Booting nRF Connect SDK v3.3.0-ba167d9f3db4 ***
+*** Using Zephyr OS v4.3.99-fd9204a02d52 ***
 [KVB] BEGIN RUN
 [KVB] VERSION 0.1.0-private
-[KVB] KERNEL name=Zephyr version=4.2.99
+[KVB] KERNEL name=Zephyr version=4.3.99
 [KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=0
-[KVB] PLATFORM board=nrf52dk cpu=ARMv7E-M @ 64 MHz DWT (nrf52832) clock_hz=64000000 cycle_hz=64000000 tick_hz=1000 compiler=gcc version="12.2.0"
+[KVB] PLATFORM board=nrf52dk cpu=ARMv7E-M @ 64 MHz Zephyr uptime (nrf52832) clock_hz=64000000 cycle_hz=64000000 tick_hz=1000 compiler=gcc version="12.2.0"
 [KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16 stack_size=1024 runner_stack_size=2048
-[KVB] BUILD opt=size fpu=on float_abi=hard timing=DWT safety="sentinel+assert" heap=off
+[KVB] BUILD opt=size fpu=on float_abi=hard timing=Zephyr uptime safety="sentinel+runtime_checks+assert" heap=off
 [KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
 [KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
 [KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1679142 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=559714 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=559714 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1709517 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=569839 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=569839 unit=iterations
 [KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
 [KVB] END id=SCHED_COOP_001 state=PASS
 [KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
 [KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=2051840 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000351 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=205176 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1770240 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000000 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=177024 unit=pairs_per_sec
 [KVB] END id=SYNC_SEM_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=1707776 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001222 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=170756 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=1459456 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001000 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=145931 unit=pairs_per_sec
 [KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=1680384 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000100 unit=us
-[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=168036 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=1550592 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000000 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=155059 unit=pairs_per_sec
 [KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pi_variant value=1 unit=
 [KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
@@ -943,9 +943,9 @@ Generating files from /Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/Ze
 [KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
 [KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
 [KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=701696 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10000426 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=70166 unit=pairs_per_sec
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=566528 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10000000 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=56652 unit=pairs_per_sec
 [KVB] END id=IPC_QUEUE_FAST_001 state=PASS
 [KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
 [KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
@@ -953,44 +953,45 @@ Generating files from /Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/Ze
 [KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
 [KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
 [KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=11126 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_expected_us value=15000 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=11000 unit=us
 [KVB] END id=TIME_SLEEP_001 state=PASS
 [KVB] SUMMARY pass=7 fail=0 unsupported=0 skipped=0 invalid=0 total=7
 [KVB] END RUN
-*** Booting nRF Connect SDK v3.2.4-4c3fc0d44534 ***
-*** Using Zephyr OS v4.2.99-9673eec75908 ***
+*** Booting nRF Connect SDK v3.3.0-ba167d9f3db4 ***
+*** Using Zephyr OS v4.3.99-fd9204a02d52 ***
 [KVB] BEGIN RUN
 [KVB] VERSION 0.1.0-private
-[KVB] KERNEL name=Zephyr version=4.2.99
+[KVB] KERNEL name=Zephyr version=4.3.99
 [KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=0
-[KVB] PLATFORM board=nrf52dk cpu=ARMv7E-M @ 64 MHz DWT (nrf52832) clock_hz=64000000 cycle_hz=64000000 tick_hz=1000 compiler=gcc version="12.2.0"
+[KVB] PLATFORM board=nrf52dk cpu=ARMv7E-M @ 64 MHz Zephyr uptime (nrf52832) clock_hz=64000000 cycle_hz=64000000 tick_hz=1000 compiler=gcc version="12.2.0"
 [KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16 stack_size=1024 runner_stack_size=2048
-[KVB] BUILD opt=size fpu=on float_abi=hard timing=DWT safety="sentinel+assert" heap=off
+[KVB] BUILD opt=size fpu=on float_abi=hard timing=Zephyr uptime safety="sentinel+runtime_checks+assert" heap=off
 [KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
 [KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
 [KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1679770 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=559923 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=559924 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1709506 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=569835 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=569836 unit=iterations
 [KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
 [KVB] END id=SCHED_COOP_001 state=PASS
 [KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
 [KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=2050816 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000136 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=205078 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1770496 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10001000 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=177031 unit=pairs_per_sec
 [KVB] END id=SYNC_SEM_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=1708544 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10000338 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=170848 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=1459968 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10000000 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=145996 unit=pairs_per_sec
 [KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=1680384 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000135 unit=us
-[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=168036 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=1552640 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10001000 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=155248 unit=pairs_per_sec
 [KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pi_variant value=1 unit=
 [KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
@@ -999,9 +1000,9 @@ Generating files from /Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/Ze
 [KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
 [KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
 [KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=701696 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10000441 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=70166 unit=pairs_per_sec
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=567040 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10002000 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=56692 unit=pairs_per_sec
 [KVB] END id=IPC_QUEUE_FAST_001 state=PASS
 [KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
 [KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
@@ -1009,44 +1010,45 @@ Generating files from /Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/Ze
 [KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
 [KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
 [KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=11314 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_expected_us value=15000 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=11000 unit=us
 [KVB] END id=TIME_SLEEP_001 state=PASS
 [KVB] SUMMARY pass=7 fail=0 unsupported=0 skipped=0 invalid=0 total=7
 [KVB] END RUN
-*** Booting nRF Connect SDK v3.2.4-4c3fc0d44534 ***
-*** Using Zephyr OS v4.2.99-9673eec75908 ***
+*** Booting nRF Connect SDK v3.3.0-ba167d9f3db4 ***
+*** Using Zephyr OS v4.3.99-fd9204a02d52 ***
 [KVB] BEGIN RUN
 [KVB] VERSION 0.1.0-private
-[KVB] KERNEL name=Zephyr version=4.2.99
+[KVB] KERNEL name=Zephyr version=4.3.99
 [KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=0
-[KVB] PLATFORM board=nrf52dk cpu=ARMv7E-M @ 64 MHz DWT (nrf52832) clock_hz=64000000 cycle_hz=64000000 tick_hz=1000 compiler=gcc version="12.2.0"
+[KVB] PLATFORM board=nrf52dk cpu=ARMv7E-M @ 64 MHz Zephyr uptime (nrf52832) clock_hz=64000000 cycle_hz=64000000 tick_hz=1000 compiler=gcc version="12.2.0"
 [KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16 stack_size=1024 runner_stack_size=2048
-[KVB] BUILD opt=size fpu=on float_abi=hard timing=DWT safety="sentinel+assert" heap=off
+[KVB] BUILD opt=size fpu=on float_abi=hard timing=Zephyr uptime safety="sentinel+runtime_checks+assert" heap=off
 [KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
 [KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
 [KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1678735 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=559578 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=559579 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1710549 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=570183 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=570183 unit=iterations
 [KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
 [KVB] END id=SCHED_COOP_001 state=PASS
 [KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
 [KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=2049024 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000940 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=204883 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1770240 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000000 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=177024 unit=pairs_per_sec
 [KVB] END id=SYNC_SEM_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=1707776 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001240 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=170756 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=1459968 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001000 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=145982 unit=pairs_per_sec
 [KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=1680640 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000620 unit=us
-[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=168053 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=1551616 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000000 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=155161 unit=pairs_per_sec
 [KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pi_variant value=1 unit=
 [KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
@@ -1055,9 +1057,9 @@ Generating files from /Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/Ze
 [KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
 [KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
 [KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=701696 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10000415 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=70166 unit=pairs_per_sec
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=567040 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10002000 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=56692 unit=pairs_per_sec
 [KVB] END id=IPC_QUEUE_FAST_001 state=PASS
 [KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
 [KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
@@ -1065,44 +1067,45 @@ Generating files from /Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/Ze
 [KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
 [KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
 [KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=11135 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_expected_us value=15000 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=11000 unit=us
 [KVB] END id=TIME_SLEEP_001 state=PASS
 [KVB] SUMMARY pass=7 fail=0 unsupported=0 skipped=0 invalid=0 total=7
 [KVB] END RUN
-*** Booting nRF Connect SDK v3.2.4-4c3fc0d44534 ***
-*** Using Zephyr OS v4.2.99-9673eec75908 ***
+*** Booting nRF Connect SDK v3.3.0-ba167d9f3db4 ***
+*** Using Zephyr OS v4.3.99-fd9204a02d52 ***
 [KVB] BEGIN RUN
 [KVB] VERSION 0.1.0-private
-[KVB] KERNEL name=Zephyr version=4.2.99
+[KVB] KERNEL name=Zephyr version=4.3.99
 [KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=0
-[KVB] PLATFORM board=nrf52dk cpu=ARMv7E-M @ 64 MHz DWT (nrf52832) clock_hz=64000000 cycle_hz=64000000 tick_hz=1000 compiler=gcc version="12.2.0"
+[KVB] PLATFORM board=nrf52dk cpu=ARMv7E-M @ 64 MHz Zephyr uptime (nrf52832) clock_hz=64000000 cycle_hz=64000000 tick_hz=1000 compiler=gcc version="12.2.0"
 [KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16 stack_size=1024 runner_stack_size=2048
-[KVB] BUILD opt=size fpu=on float_abi=hard timing=DWT safety="sentinel+assert" heap=off
+[KVB] BUILD opt=size fpu=on float_abi=hard timing=Zephyr uptime safety="sentinel+runtime_checks+assert" heap=off
 [KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
 [KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
 [KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1679990 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=559996 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=559997 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1710445 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=570148 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=570149 unit=iterations
 [KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
 [KVB] END id=SCHED_COOP_001 state=PASS
 [KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
 [KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=2046976 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000543 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=204686 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1770240 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000000 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=177024 unit=pairs_per_sec
 [KVB] END id=SYNC_SEM_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=1707776 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10000227 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=170773 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=1459456 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10000000 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=145945 unit=pairs_per_sec
 [KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=1681664 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10001514 unit=us
-[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=168140 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=1551104 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000000 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=155110 unit=pairs_per_sec
 [KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pi_variant value=1 unit=
 [KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
@@ -1111,9 +1114,9 @@ Generating files from /Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/Ze
 [KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
 [KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
 [KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=701696 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10000431 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=70166 unit=pairs_per_sec
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=566784 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10002000 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=56667 unit=pairs_per_sec
 [KVB] END id=IPC_QUEUE_FAST_001 state=PASS
 [KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
 [KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
@@ -1121,44 +1124,45 @@ Generating files from /Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/Ze
 [KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
 [KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
 [KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=11464 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_expected_us value=15000 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=11000 unit=us
 [KVB] END id=TIME_SLEEP_001 state=PASS
 [KVB] SUMMARY pass=7 fail=0 unsupported=0 skipped=0 invalid=0 total=7
 [KVB] END RUN
-*** Booting nRF Connect SDK v3.2.4-4c3fc0d44534 ***
-*** Using Zephyr OS v4.2.99-9673eec75908 ***
+*** Booting nRF Connect SDK v3.3.0-ba167d9f3db4 ***
+*** Using Zephyr OS v4.3.99-fd9204a02d52 ***
 [KVB] BEGIN RUN
 [KVB] VERSION 0.1.0-private
-[KVB] KERNEL name=Zephyr version=4.2.99
+[KVB] KERNEL name=Zephyr version=4.3.99
 [KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=0
-[KVB] PLATFORM board=nrf52dk cpu=ARMv7E-M @ 64 MHz DWT (nrf52832) clock_hz=64000000 cycle_hz=64000000 tick_hz=1000 compiler=gcc version="12.2.0"
+[KVB] PLATFORM board=nrf52dk cpu=ARMv7E-M @ 64 MHz Zephyr uptime (nrf52832) clock_hz=64000000 cycle_hz=64000000 tick_hz=1000 compiler=gcc version="12.2.0"
 [KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16 stack_size=1024 runner_stack_size=2048
-[KVB] BUILD opt=size fpu=on float_abi=hard timing=DWT safety="sentinel+assert" heap=off
+[KVB] BUILD opt=size fpu=on float_abi=hard timing=Zephyr uptime safety="sentinel+runtime_checks+assert" heap=off
 [KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
 [KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
 [KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1679529 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=559843 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=559843 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1709504 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=569834 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=569835 unit=iterations
 [KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
 [KVB] END id=SCHED_COOP_001 state=PASS
 [KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
 [KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=2048512 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000006 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=204851 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1770496 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10001000 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=177031 unit=pairs_per_sec
 [KVB] END id=SYNC_SEM_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=1707776 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001205 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=170757 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=1458944 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001000 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=145879 unit=pairs_per_sec
 [KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=1680384 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000111 unit=us
-[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=168036 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=1551104 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000000 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=155110 unit=pairs_per_sec
 [KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pi_variant value=1 unit=
 [KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
@@ -1167,9 +1171,9 @@ Generating files from /Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/Ze
 [KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
 [KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
 [KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=701696 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10000406 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=70166 unit=pairs_per_sec
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=567040 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10002000 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=56692 unit=pairs_per_sec
 [KVB] END id=IPC_QUEUE_FAST_001 state=PASS
 [KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
 [KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
@@ -1177,8 +1181,11 @@ Generating files from /Users/hoan/swdev/private/I-SYST/TaktOS_Dev/KVB/Targets/Ze
 [KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
 [KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
 [KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=11447 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_expected_us value=15000 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=11000 unit=us
 [KVB] END id=TIME_SLEEP_001 state=PASS
 [KVB] SUMMARY pass=7 fail=0 unsupported=0 skipped=0 invalid=0 total=7
 [KVB] END RUN
+
+
 

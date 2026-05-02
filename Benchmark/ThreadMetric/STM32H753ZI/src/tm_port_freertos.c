@@ -30,7 +30,7 @@
 #define TM_FREERTOS_MAX_POOLS        1
 
 /* 128 KB DTCM-RAM available. Match the TaktOS port's 2048-byte stacks for
- * apples-to-apples comparison on the same board.
+ * like-for-like comparison on the same board.
  *   9 threads x 512 words x 4 bytes = 18 KB total stack area.               */
 #define TM_FREERTOS_STACK_WORDS      512u
 #define TM_FREERTOS_QUEUE_DEPTH      10u

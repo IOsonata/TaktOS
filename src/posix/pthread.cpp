@@ -754,7 +754,14 @@ int pthread_setschedparam(pthread_t t, int, const struct sched_param* p)
     uint32_t primask = TaktOSEnterCritical();
     if (slot->thread->State == TAKTOS_READY)
     {
-        TaktBlockTask(slot->thread);
+        if (!TaktBlockTask(slot->thread))
+        {
+            /* Scheduler corruption.  Surface the
+             * error via POSIX errno path. */
+            TaktOSExitCritical(primask);
+            errno = EINVAL;
+            return EINVAL;
+        }
         slot->thread->Priority = (uint8_t)p->sched_priority;
         TaktReadyTask(slot->thread);
     }

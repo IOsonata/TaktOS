@@ -115,7 +115,10 @@ TaktOSErr_t TaktOSSemGiveSlowPath(TaktOSSem_t *pSem, uint32_t IntState);
  * @param	IntState      : Saved interrupt state from critical-section entry.
  * @param	TimeoutTicks  : Maximum ticks to wait, or TAKTOS_WAIT_FOREVER.
  * @return	TAKTOS_OK on token acquisition, TAKTOS_ERR_TIMEOUT if the deadline
- *          expired, or TAKTOS_ERR_INTERRUPTED if woken by an external Resume.
+ *          expired, TAKTOS_ERR_INTERRUPTED if woken by an external Resume, or
+ *          TAKTOS_ERR_INVALID if invoked from ISR context (blocking is illegal
+ *          from Handler mode  the ISR-context guard exits the critical section
+ *          and returns without modifying any kernel state).
  */
 TaktOSErr_t TaktOSSemTakeSlowPath(TaktOSSem_t *pSem, uint32_t IntState, uint32_t TimeoutTicks);
 
@@ -135,7 +138,7 @@ TaktOSErr_t TaktOSSemTakeSlowPath(TaktOSSem_t *pSem, uint32_t IntState, uint32_t
  */
 // Give  add one token. blocking param reserved for v1.1; pass false.
 // ISR-safe: uses critical section internally.
-static TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSSemGive(TaktOSSem_t *pSem, bool bBlocking)
+TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSSemGive(TaktOSSem_t *pSem, bool bBlocking)
 {
     (void)bBlocking;
 
@@ -197,9 +200,11 @@ static TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSSemGive(TaktOSSem_t *pSem, bool bBlo
  *                         indefinitely; TAKTOS_NO_WAIT for immediate return).
  * @return	TAKTOS_OK on token acquisition, TAKTOS_ERR_EMPTY if non-blocking and
  *          empty, TAKTOS_ERR_TIMEOUT on deadline expiry, TAKTOS_ERR_INTERRUPTED
- *          if woken by an external Resume, or TAKTOS_ERR_INVALID on null pointer.
+ *          if woken by an external Resume, or TAKTOS_ERR_INVALID on null pointer
+ *          or when invoked from ISR context with blocking requested.  An ISR
+ *          that needs Take must use bBlocking=false / TimeoutTicks=NO_WAIT.
  */
-static TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSSemTake(TaktOSSem_t *pSem, bool bBlocking, uint32_t TimeoutTicks)
+TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSSemTake(TaktOSSem_t *pSem, bool bBlocking, uint32_t TimeoutTicks)
 {
     // Null check unconditional  null handles cause UB in both debug and release.
     if (pSem == NULL)

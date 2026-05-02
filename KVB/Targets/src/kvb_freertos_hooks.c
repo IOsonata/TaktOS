@@ -28,7 +28,18 @@
  * configSUPPORT_STATIC_ALLOCATION = 1.  Under dynamic-allocation builds
  * (heap_4.c present, configTOTAL_HEAP_SIZE > 0) FreeRTOS allocates the
  * idle task internally, so this hook is dead code in that mode and we
- * guard it out completely to avoid pulling unused buffers into BSS. */
+ * guard it out completely to avoid pulling unused buffers into BSS.
+ *
+ * The weak attribute lets this hook coexist with FreeRTOS-Kernel V11+
+ * builds where configKERNEL_PROVIDED_STATIC_MEMORY = 1 makes tasks.c
+ * emit a strong vApplicationGetIdleTaskMemory of its own.  When both
+ * are present the linker keeps the strong kernel-provided one and
+ * silently drops this weak fallback  no multiple-definition error.
+ * On older kernels (V10.x) and on V11+ builds with
+ * configKERNEL_PROVIDED_STATIC_MEMORY = 0, this weak definition is
+ * the one the linker sees, so the symbol is still provided.  Same
+ * pattern Benchmark/ThreadMetric/src/tm_port_freertos.c uses for the
+ * same reason. */
 #if (configSUPPORT_STATIC_ALLOCATION == 1)
 
 /* Static idle task buffers.  The minimum stack size for the idle task is
@@ -47,6 +58,7 @@ static StaticTask_t s_idle_tcb __attribute__((aligned(portBYTE_ALIGNMENT)));
 static StackType_t  s_idle_stack[configMINIMAL_STACK_SIZE]
     __attribute__((aligned(portBYTE_ALIGNMENT)));
 
+__attribute__((weak))
 void vApplicationGetIdleTaskMemory(StaticTask_t **ppxIdleTaskTCBBuffer,
                                    StackType_t  **ppxIdleTaskStackBuffer,
                                    uint32_t      *pulIdleTaskStackSize)

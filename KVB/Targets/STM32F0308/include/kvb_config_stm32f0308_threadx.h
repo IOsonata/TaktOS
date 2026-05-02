@@ -19,10 +19,10 @@
  *   ----------------------------------------------------------------------
  *   Total                                                       ~= 7.9 / 8.0 KB
  *
- * Tight but within budget.  All numbers disclosed in the published
+ * Tight but within budget.  All numbers documented in the published
  * report's methodology section.
  *
- * Disclosed asymmetries vs TaktOS / FreeRTOS:
+ * Documented asymmetries vs TaktOS / FreeRTOS:
  *
  *   1. Worker stack: 768 B (vs 256 B on the other two kernels).  Reason:
  *      ThreadX's _txe_* parameter-validation wrappers add a real C call
@@ -80,7 +80,7 @@
  * formatting is the dominant frame; 1024 B remains comfortable. */
 #define KVB_RUNNER_STACK_SIZE   1024u
 
-/* Worker stack - 768 B (vs 256 B on TaktOS/FreeRTOS).  Disclosed
+/* Worker stack - 768 B (vs 256 B on TaktOS/FreeRTOS).  Documented
  * asymmetry, kernel-structural - see header docstring. */
 #define KVB_DEFAULT_STACK_SIZE  768u
 

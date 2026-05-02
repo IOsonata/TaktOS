@@ -91,8 +91,13 @@ hTaktOSThread_t TaktOSThreadCreate(void *pStackMem, uint32_t StackMemSize,
 /**
  * @brief	Suspend a thread.
  *
+ * Self-suspend (@p hThread == TaktOSCurrentThread()) blocks the caller and
+ * may not be invoked from ISR context  the kernel rejects it with
+ * TAKTOS_ERR_INVALID rather than corrupting the run queue.
+ *
  * @param	hThread : Thread handle.
- * @return	TAKTOS_OK on success, TAKTOS_ERR_INVALID if @p hThread is invalid.
+ * @return	TAKTOS_OK on success, TAKTOS_ERR_INVALID if @p hThread is invalid
+ *          or self-suspend is invoked from ISR context.
  */
 TaktOSErr_t TaktOSThreadSuspend(hTaktOSThread_t hThread);
 
@@ -108,9 +113,15 @@ TaktOSErr_t TaktOSThreadSuspend(hTaktOSThread_t hThread);
  * passthrough, tick-driven state machines, micro-benchmarks).  When the
  * caller has milliseconds, use TaktOSThreadSleep() instead.
  *
+ * Sleep blocks the target thread (or the calling thread if @p hThread is
+ * the current thread) and therefore may not be invoked from ISR context.
+ * The kernel rejects the call with TAKTOS_ERR_INVALID before touching any
+ * scheduler state.
+ *
  * @param	hThread : Thread handle.
  * @param	Ticks   : Minimum ticks to sleep.  Zero returns immediately.
- * @return	TAKTOS_OK on success, TAKTOS_ERR_INVALID on invalid handle/state.
+ * @return	TAKTOS_OK on success, TAKTOS_ERR_INVALID on invalid handle/state
+ *          or when invoked from ISR context.
  */
 TaktOSErr_t TaktOSThreadSleepTicks(hTaktOSThread_t hThread, uint32_t Ticks);
 
@@ -155,8 +166,13 @@ TaktOSErr_t TaktOSThreadDestroy(hTaktOSThread_t hThread);
  * priority is already in the ready queue, in which case that higher-priority
  * thread runs first (correct priority scheduling, not a violation).
  *
+ * Blocks the caller and therefore may not be invoked from ISR context;
+ * the kernel rejects an ISR caller with TAKTOS_ERR_INVALID before any
+ * scheduler state is touched.
+ *
  * @param	hNext : Target thread handle.
- * @return	TAKTOS_OK on success, TAKTOS_ERR_INVALID on invalid handle/state.
+ * @return	TAKTOS_OK on success, TAKTOS_ERR_INVALID on invalid handle/state
+ *          or when invoked from ISR context.
  */
 TaktOSErr_t TaktOSThreadHandOff(hTaktOSThread_t hNext);
 

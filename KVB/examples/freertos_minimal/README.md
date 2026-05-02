@@ -13,4 +13,4 @@ Build requirements:
 - compile `KVB/ports/kernels/freertos/kvb_port_freertos.c`
 - compile one platform port, for example `KVB/ports/platforms/cortex_m/kvb_platform_cortex_m.c`
 
-For apples-to-apples validation, configure FreeRTOS with comparable tick rate, stack checking, queue depth, mutex priority inheritance, and assertion behavior.
+For like-for-like validation, configure FreeRTOS with comparable tick rate, stack checking, queue depth, mutex priority inheritance, and assertion behavior.
