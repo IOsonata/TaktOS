@@ -11,7 +11,7 @@ Provides:
     Cortex-M exception frame so PendSV can restore it on first switch-in.
 
 Supports Cortex-M0/M0+, M4/M4F, M7/M7F, M33, M55.
-FPU context (S0S15 lazy stack, S16S31 explicit) is handled here when
+FPU context (S0–S15 lazy stack, S16–S31 explicit) is handled here when
 TAKT_FPU_FULL_SAVE is defined.
 
 Safety boundary: IN  branch + line coverage on target.

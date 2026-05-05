@@ -248,9 +248,8 @@ TaktOSErr_t TaktOSMutexLockSlowPath(TaktOSMutex_t *pMtx, uint32_t IntState,
 
     if (TimeoutTicks != TAKTOS_WAIT_FOREVER)
     {
-        // +1u: see comment in TaktOSThreadSleep.  Wait covers at least
-        // TimeoutTicks full tick-periods regardless of phase.
-        current->WakeTick = TaktOSTickCount() + TimeoutTicks + 1u;
+        // Tick timeout expires when the global tick reaches now + TimeoutTicks.
+        current->WakeTick = TaktOSTickCount() + TimeoutTicks;
         TaktSleepListAdd(current);
     }
     // WAIT_FOREVER: WakeTick already 0 from the init above.

@@ -29,7 +29,7 @@ Only the kernel under test differs.
 | SYNC_MUTEX_FAST_001 (p/s)|   176,040 |          78,097 |      88,352 |          **2.25×** |         **1.99×** |
 | SYNC_MUTEX_OWNERSHIP_001 |      PASS |            PASS |        PASS |             parity |            parity |
 | IPC_QUEUE_FAST_001 (p/s) |    79,104 |          39,316 |      64,623 |          **2.01×** |         **1.22×** |
-| TIME_SLEEP_001           |  PASS @10476 µs | PASS @10005 µs | PASS @9537 µs | strict-bound: TaktOS+FreeRTOS PASS, ThreadX FAIL | strict-bound only-PASS |
+| TIME_SLEEP_001           |  PASS @10476 µs (+4.76%) | PASS @10005 µs (+0.05%) | PASS @9537 µs (−4.63%) | see §6 — two design camps | |
 
 Suite outcome (all three kernels):
 - TaktOS:          6 PASS / 0 FAIL / 6 total
@@ -37,13 +37,26 @@ Suite outcome (all three kernels):
 - ThreadX 6.x:     6 PASS / 0 FAIL / 6 total
 
 All three kernels pass every KVB test at the documented thresholds.
-TIME_SLEEP_001 has new behavior in this measurement: with the
-KVB test-cleanup fix landed (see §3.5 / §9), FreeRTOS V11.3 now
-satisfies the stricter at-least-N-ticks contract by a 5 µs margin
-(10005 µs ≥ 10000 µs nominal). TaktOS remains comfortably above the
-strict bound. Only ThreadX undershoots at 9537 µs — within KVB's
-documented 90 % threshold (9000 µs floor) but not the strict bound.
-See §6.
+On `TIME_SLEEP_001`, the kernels split into two design camps that
+produce opposite biases on absolute sleep accuracy:
+
+- **At-least-N-ticks camp (TaktOS).** Guarantees actual ≥ requested.
+  Cost: actual is biased long by up to one tick. TaktOS lands at
+  10476 µs (+4.76 % over).
+- **As-close-as-possible camp (FreeRTOS, ThreadX).** Can return
+  short by up to one tick depending on where in the current tick
+  the call lands. FreeRTOS lands at 10005 µs (+0.05 % over —
+  tick-edge perfect on this run); ThreadX lands at
+  9537 µs (−4.63 % short).
+
+Ranked by **absolute timing accuracy** vs the 10000 µs request:
+**FreeRTOS (+0.05 %) is closest** (tick-edge perfect on this
+firmware), then ThreadX (−4.63 %) and TaktOS (+4.76 %) at roughly
+equal absolute distance, on opposite sides of the target. Ranked by
+**at-least-N-ticks guarantee**: TaktOS satisfies it by design;
+FreeRTOS satisfies it on this run by 5 µs (depends on tick alignment,
+not guaranteed); ThreadX does not satisfy it. Both rankings are
+useful; which matters depends on the application — see §6.
 
 `p/s` = wait/post or send/recv pairs per second. Numbers are aggregated
 over 5 separate runs per kernel; per-metric run-to-run variance is
@@ -143,11 +156,11 @@ All three kernels run with **stack guard validation always on**:
 - ThreadX: stack overflow checking enabled (`TX_ENABLE_STACK_CHECKING`),
   combined with the `_txe_*` parameter-validation wrappers
   (object-validity check). Worker stack budget bumped to 768 B per
-  thread on this target — documented asymmetry, see §3.4.
+  thread on this target — disclosed asymmetry, see §3.4.
 
 This is **deliberate**: each kernel's stack guard cost is a feature of
 the kernel, not optional instrumentation. Keeping the runtime safety
-checks enabled across all three keeps the comparison like-for-like —
+checks enabled across all three keeps the comparison apples-to-apples —
 every kernel pays for stack guard work on every switch.
 
 ### 3.4 Memory allocation strategy
@@ -170,7 +183,7 @@ every kernel pays for stack guard work on every switch.
   in BSS, indexed by handle, matching the pattern used by
   Microsoft's own Thread-Metric ThreadX reference port.
 - **ThreadX worker stack:** 768 B per worker thread, vs 256 B on TaktOS
-  and FreeRTOS. Documented asymmetry. The `_txe_*` parameter-validation
+  and FreeRTOS. Disclosed asymmetry. The `_txe_*` parameter-validation
   wrappers add a real C call frame to every public ThreadX API call
   (~30 B on M0 -Os), and that compounds with the deeper internal
   call chain in `tx_thread_relinquish`. 256 B has no margin for the
@@ -220,7 +233,7 @@ a single `KVB_ERR_NOT_OWNER` status code:
 So on this benchmark: **TaktOS and ThreadX measure pure native fast-path
 costs; FreeRTOS measures fast path plus the +30-cycle ownership pre-check
 the port has to add to make the OWNERSHIP test work without halting on
-configASSERT.** Documented; folded into the §4.4 analysis.
+configASSERT.** Disclosed; folded into the §4.4 analysis.
 
 ### 3.6 Configuration files
 
@@ -228,7 +241,7 @@ configASSERT.** Documented; folded into the §4.4 analysis.
 - `KVB/Targets/STM32F0308/include/kvb_config_stm32f0308_freertos.h`
 - `KVB/Targets/STM32F0308/include/kvb_config_stm32f0308.h` (TaktOS)
 - `KVB/Targets/STM32F0308/include/kvb_config_stm32f0308_threadx.h`
-- `KVB/include/tx_user.h` (ThreadX feature gates  shared across every KVB target)
+- `KVB/Targets/STM32F0308/include/tx_user.h` (ThreadX feature gates)
 
 ---
 
@@ -295,7 +308,7 @@ KVB ThreadX port: (1) the `_txe_*` parameter-validation wrappers add a
 real C call frame to every public ThreadX API call (~30 B + ~6 cycles
 on M0), and (2) the slot-pool indirection in the KVB ThreadX port
 adds two memory loads per `kvb_thread_yield`. The 1.48× FreeRTOS-over-
-ThreadX gap on this test is consistent with the documented ~30-cycle
+ThreadX gap on this test is consistent with the disclosed ~30-cycle
 validation overhead per call multiplied by the per-yield call count.
 This is a **legitimate kernel/port characteristic**, not an artifact
 to subtract — both behaviours ship in real ThreadX deployments.
@@ -443,18 +456,33 @@ validation overhead, FreeRTOS general-purpose queue substrate.
 Caller invokes `kvb_thread_sleep_ticks(10)` (= 10 ms at 1000 Hz tick).
 KVB's pass criterion is `elapsed_us >= min_expected_us` where
 `min_expected_us = 9000 µs` (90 % of nominal). TaktOS additionally
-specifies a stricter contract: at-least-N-ticks, i.e. `elapsed_us >=
+specifies a stricter rule: at-least-N-ticks, i.e. `elapsed_us >=
 nominal_us = 10000 µs`.
 
-| Kernel          | KVB result | Requested | Elapsed (µs) | ≥ 10000 µs? |
-|-----------------|:----------:|----------:|-------------:|:-----------:|
-| TaktOS          |   PASS     |    10 ms  |        10476 |   ✓ yes     |
-| FreeRTOS V11.3  |   PASS     |    10 ms  |        10005 |   ✓ yes (5 µs margin) |
-| ThreadX 6.x     |   PASS     |    10 ms  |         9537 |   ✗ no      |
+| Kernel          | KVB result | Requested | Elapsed (µs) | Error vs 10000 µs target | ≥ 10000 µs? |
+|-----------------|:----------:|----------:|-------------:|-------------------------:|:-----------:|
+| TaktOS          |   PASS     |    10 ms  |        10476 |               +476 (+4.76 %) |   ✓ yes |
+| FreeRTOS V11.3  |   PASS     |    10 ms  |        10005 |                  +5 (+0.05 %) |   ✓ yes (5 µs above bound — depends on tick alignment) |
+| ThreadX 6.x     |   PASS     |    10 ms  |         9537 |               −463 (−4.63 %) |   ✗ no  |
 
-**All three kernels pass KVB's documented threshold. TaktOS exceeds
-the stricter at-least-N-ticks contract comfortably; FreeRTOS V11.3
-satisfies it by a 5 µs margin. ThreadX undershoots by 463 µs.** See §6.
+The two columns measure different things. **Error vs target** is
+absolute timing accuracy — closer to zero is better. **≥ 10000 µs?**
+is the at-least-N-ticks guarantee — a one-sided lower bound where
+"shorter than requested" is the failure mode and "longer than
+requested" is acceptable.
+
+Ranked by absolute accuracy: **FreeRTOS (+0.05 %) > ThreadX (−4.63 %)
+> TaktOS (+4.76 %)**. FreeRTOS is tick-edge perfect on
+this firmware. ThreadX and TaktOS land at roughly equal absolute
+distance from target on opposite sides.
+
+Ranked by at-least-N-ticks guarantee: **TaktOS satisfies it by
+design** (the kernel adds `+1u` at every timed-wait site,
+guaranteeing actual ≥ requested regardless of where in the current
+tick the call lands). **FreeRTOS satisfies it on this run by 5 µs**
+— a margin within the tick-edge alignment noise; a small change to
+test preamble timing could push the FreeRTOS sleep below 10000 µs.
+**ThreadX does not satisfy it**, undershooting by 463 µs.
 
 This is a **kernel-quality finding**, not a benchmark performance
 metric, and the picture has changed in this measurement compared to
@@ -467,24 +495,25 @@ work between scheduler start and the SLEEP measurement starting tick.
 That work shifts the moment when `kvb_thread_sleep_ticks(10)` is
 called inside the tick period — it now lands closer to a tick edge on
 the FreeRTOS path, which under the V11.3 `vTaskDelay` semantics happens
-to land just past a tick boundary, giving a measured 10005 µs. The
-algorithm still has the same off-by-one shape; it just gets lucky on
-which side of the boundary the call hits.
+to land just past a tick boundary, giving a measured 10005 µs
+(+0.05 % from target). The Camp 2 (as-close-as-possible) algorithm
+still has the same off-by-one shape; it just gets near-perfect
+absolute accuracy on this firmware because the call entry happens to
+align very close to a tick edge.
 
 ThreadX shifted in the same direction (9229 → 9537, +308 µs) but did
-not cross the strict bound, because its baseline shortfall was larger.
-The 9537 µs corresponds to ~9.5 tick periods elapsed before wake — the
-same partial-tick mechanism described in §6, just with different
-fixed startup work between the wallclock-read and the sleep entry.
+not cross the 10000 µs lower bound, because its baseline shortfall was
+larger. The 9537 µs corresponds to ~9.5 tick periods elapsed before
+wake — the same partial-tick mechanism described in §6, just with
+different fixed startup work between the wallclock-read and the sleep
+entry.
 
-TaktOS's `TaktOSThreadSleepTicks(N)` continues to pass the strict bound
-deterministically because the kernel adds `+1u` to `WakeTick` at every
-timed-wait site, guaranteeing N full tick periods elapse before wake
-regardless of where in the current period the call lands. **TaktOS is
-the only kernel under test that meets the strict bound by design**;
-FreeRTOS meets it on this run by a 5 µs margin (i.e., depends on
-where in the tick the call happens to land), and ThreadX does not
-meet it at all on this run.
+TaktOS's `TaktOSThreadSleepTicks(N)` continues to pass the at-least-N-
+ticks lower bound deterministically — its absolute accuracy of +4.76 %
+is the cost of guaranteeing actual ≥ requested. Under the as-close-as-
+possible philosophy ThreadX uses, TaktOS would be biased the other way
+(short by up to one tick) but slightly closer to target on average.
+Neither approach is universally better; see §6.
 
 ---
 
@@ -522,14 +551,16 @@ The TIME_SLEEP_001 result is qualitatively different — it shows a
 **behavioural** difference, not a performance one. TaktOS's
 specification says "sleep for at least N ticks"; FreeRTOS's and
 ThreadX's specifications both say "sleep for between 0 and N tick
-periods" — the same partial-tick semantics. KVB tests against a
-9000 µs floor that all three meet. On this measurement run TaktOS
-satisfies the stricter at-least-N-ticks contract by a comfortable
-476 µs margin; FreeRTOS V11.3 satisfies it by only a 5 µs margin
-(within tick-edge noise — see §6); ThreadX undershoots by 463 µs.
-**Only TaktOS guarantees the strict bound by design**; the
-FreeRTOS PASS is a matter of where in the tick the test happens to
-land.
+periods" — same partial-tick semantics, different acceptable ranges.
+KVB tests against a 9000 µs floor that all three meet. By absolute
+timing accuracy: **FreeRTOS lands closest to the 10000 µs target**
+(+0.05 %, tick-edge perfect on this firmware); ThreadX (−4.63 %)
+and TaktOS (+4.76 %) land at roughly equal absolute distance from
+target on opposite sides. By at-least-N-ticks guarantee: only TaktOS
+satisfies it deterministically; FreeRTOS satisfies it on this run
+by 5 µs (depends on tick alignment); ThreadX does not. Both
+rankings are useful; which matters depends on the application —
+see §6.
 
 The determinism observation in §4.1 is independently meaningful:
 all three kernels are bit-perfectly reproducible across power
@@ -543,55 +574,100 @@ platform are representative.
 
 ---
 
-## 6. FreeRTOS and ThreadX TIME_SLEEP_001 off-by-one
+## 6. TIME_SLEEP_001 — two design philosophies
 
+The three kernels split into two design camps on how `sleep(N ticks)`
+is implemented. Each camp produces a different absolute-timing-error
+signature; neither is universally "more correct."
+
+**Camp 1: at-least-N-ticks. TaktOS.**
+TaktOS's `TaktOSThreadSleepTicks(N)` adds `+1u` at all 5 timed-wait
+sites: `WakeTick = TaktOSTickCount() + ticks + 1u`. This guarantees
+at least `ticks` full tick periods elapse before wake regardless of
+where in the current period the call lands. The cost of this
+guarantee is **a long-bias of up to one tick**. TaktOS lands at
+10476 µs (+4.76 % over) on this firmware. The exact long-bias
+depends on where in the current tick the sleep call is invoked
+relative to the next tick edge.
+
+**Camp 2: as-close-as-possible. FreeRTOS, ThreadX.**
 `vTaskDelay(xTicksToDelay)` in FreeRTOS schedules wakeup at
 `xConstTickCount + xTicksToDelay`, where `xConstTickCount` is the
 tick count at the time `vTaskDelay` is called. If the SysTick is
 already partway through the current tick period when `vTaskDelay`
-is called, the next tick fires partway through that period —
+is called, the next tick fires partway through that period — so
 fewer than `xTicksToDelay` full tick periods have elapsed by the
-time the task wakes.
+time the task wakes. `tx_thread_sleep(timer_ticks)` in ThreadX has
+the same shape and same issue.
 
-`tx_thread_sleep(timer_ticks)` in ThreadX has the same shape and the
-same problem. Wakeup is scheduled at `current_tick + timer_ticks`,
-where `current_tick` is the value when `tx_thread_sleep` is called
-— same partial-tick gap on entry, same off-by-one on exit.
+The bias is **short-by-up-to-one-tick** rather than long-by-up-to-
+one-tick. On this firmware, FreeRTOS lands at 10005 µs (+0.05 %,
+tick-edge perfect — entered the call within ~5 µs of a
+tick boundary); ThreadX lands at 9537 µs (−4.63 % short, entered
+the call ~463 µs into a tick period).
 
-Worst case for both: `Sleep(N)` returns after `(N-1)` ticks +
-`(time_until_next_tick)`. For `N=10` at 1000 Hz tick:
-- FreeRTOS observed 10005 µs → `vTaskDelay(10)` happened to land
-  effectively on a tick boundary (call entry within a ~5 µs window
-  before tick edge). PASSes the strict 10000 µs bound by 5 µs.
-- ThreadX observed 9537 µs → `tx_thread_sleep(10)` invoked ~463 µs
-  into a tick period; the next 10 ticks finished 463 µs early.
+**Absolute timing accuracy ranking** (closest to 10000 µs target):
 
-The bit-perfect reproducibility of these figures across all 5 runs
-of each kernel confirms this is deterministic behaviour on this
-firmware, not flaky measurement.
+| Kernel   | Elapsed | Error vs target  | |
+|----------|--------:|-----------------:|---|
+| FreeRTOS |   10005 |   +5 µs (+0.05 %) | most accurate (tick-edge perfect) |
+| ThreadX  |    9537 | −463 µs (−4.63 %) | |
+| TaktOS   |   10476 | +476 µs (+4.76 %) | least accurate, but on the at-least-N-ticks side |
 
-The FreeRTOS PASS in this run depends on where in the tick the test
-infrastructure happens to place the sleep call. A change to the test
-preamble that shifts the call position by ~10 µs would push FreeRTOS
-back below 10000 µs. **The strict bound is met by chance, not by
-design.** TaktOS meets it by design — the kernel adds `+1u` to
-`WakeTick` at every timed-wait site, guaranteeing N full tick periods
-elapse before wake regardless of where in the current period the call
-lands. The cost is one extra tick of latency in the worst case (best
-case unchanged).
+**At-least-N-ticks guarantee ranking** (one-sided lower bound):
 
-This is a real, defensible TaktOS quality advantage: a stricter sleep
-specification, deterministic lower bound. KVB's documented threshold
-(9000 µs floor for a 10000 µs nominal) is met by all three kernels;
-on this measurement run, FreeRTOS V11.3 passes the strict bound by
-5 µs (chance) and ThreadX undershoots by 463 µs. Only TaktOS meets
-the strict bound across all measurements regardless of preamble
-timing.
+| Kernel   | Elapsed | ≥ 10000 µs? |
+|----------|--------:|:-----------:|
+| TaktOS   |   10476 | ✓ yes (deterministically, by design) |
+| FreeRTOS |   10005 | ✓ yes (by 5 µs — depends on tick alignment) |
+| ThreadX  |    9537 | ✗ no |
 
-For applications where FreeRTOS's or ThreadX's looser sleep semantics
-are a problem, the standard workaround is to call `vTaskDelay(N+1)` /
-`tx_thread_sleep(N+1)` — shifting the responsibility onto the caller.
-TaktOS handles this inside the kernel.
+These two rankings both matter; which one ranks higher depends on
+the application:
+
+- **Periodic-loop or phase-accuracy applications** (audio sample
+  rates, control-loop period stability, deadline-meeting in a
+  rate-monotonic schedule): absolute accuracy matters more. The
+  Camp 2 (FreeRTOS/ThreadX) short-bias is symmetric on average
+  across many periods — long sleeps and short sleeps cancel
+  statistically, so total elapsed time over many iterations is
+  closer to the nominal period than the Camp 1 long-bias. The
+  Camp 1 long-bias compounds: every sleep is at least as long as
+  requested, never shorter, so total elapsed drifts later over time.
+- **Minimum-delay applications** (regulatory minimum off-time on
+  switching converters, watchdog kick maximum interval, debounce
+  delay floor, hardware settle-time floor): the at-least-N-ticks
+  guarantee matters more. A sleep that returns short by 463 µs
+  could violate a hardware-mandated minimum delay; the Camp 1
+  guarantee that actual ≥ requested rules this class of bug out
+  by construction.
+
+**The FreeRTOS 5 µs over-shoot on this firmware comes from
+random tick alignment.** A change to the test preamble that shifts
+the call position by ~10 µs would push FreeRTOS back below 10000 µs.
+The PASS in this run depends on where in the tick the test
+infrastructure happens to place the sleep call. FreeRTOS's
+`vTaskDelay` semantics do **not** guarantee a lower bound; they
+guarantee tick-aligned wakeup at `current_tick + N`, which can
+be anywhere between `(N-1)·tick_period` and `N·tick_period` after
+the call entry. Worst case: `Sleep(N)` returns after `(N-1)` ticks
++ `(time_until_next_tick)`.
+
+**The bit-perfect reproducibility** of these figures across all 5
+runs of each kernel confirms this is deterministic behaviour on
+this firmware, not flaky measurement. Same firmware produces same
+in-tick offset for each sleep entry; wakes hit the same tick edges
+every run.
+
+For applications where Camp 2's short-bias is a problem, the
+standard workaround is to call `vTaskDelay(N+1)` /
+`tx_thread_sleep(N+1)` — shifting one tick of long-bias onto the
+caller. This converts FreeRTOS / ThreadX from Camp 2 to Camp 1 at
+the call site. Conversely, if TaktOS's long-bias is a problem,
+the workaround is to call `sleep(N-1)` and accept the short-bias
+risk. Both adjustments are local to the call site; the kernel's
+choice of design camp determines which adjustment is needed and
+where.
 
 ---
 
@@ -608,8 +684,7 @@ these numbers are committed under:
 - `KVB/ports/kernels/threadx/`                             (ThreadX kernel port)
 - `KVB/Targets/src/`                                       (kernel-agnostic test runner + main)
 - `KVB/Targets/STM32F0308/src/`                            (per-MCU platform glue)
-- `KVB/Targets/STM32F0308/include/`                        (per-MCU configs, FreeRTOSConfig.h)
-- `KVB/include/tx_user.h`                                  (ThreadX feature config, shared across every KVB target)
+- `KVB/Targets/STM32F0308/include/`                        (per-MCU configs, FreeRTOSConfig.h, tx_user.h)
 
 Multi-run aggregation tool: `KVB/tools/compare_runs.py`. Takes one
 or more KVB UART log files per `--label` group, computes per-metric
@@ -666,14 +741,19 @@ To reproduce:
   to any other test. The TaktOS lead would tighten from 2.25× to
   approximately 2.14×.
 
-- **TIME_SLEEP_001 FreeRTOS strict-bound margin (5 µs).** The
-  FreeRTOS V11.3 PASS at the strict bound depends on where in the
-  current tick the test infrastructure happens to land the
-  `vTaskDelay(10)` call. A small change to the test preamble or
-  surrounding test order would shift this either side of 10000 µs.
-  This isn't a defect but it's a fragile result; the fact that
-  TaktOS PASSes by 476 µs and FreeRTOS PASSes by 5 µs in the same
-  measurement reflects a real difference in design intent. See §6.
+- **TIME_SLEEP_001 FreeRTOS lower-bound alignment (5 µs).** The
+  FreeRTOS V11.3 result of 10005 µs places it 5 µs above the
+  10000 µs at-least-N-ticks lower bound. By absolute timing accuracy
+  this is the closest sleep result in the suite (tick-edge perfect
+  at +0.05 % from the 10 ms target). However,
+  the FreeRTOS lower-bound PASS depends on where in the current
+  tick the test infrastructure happens to land the `vTaskDelay(10)`
+  call. A small change to the test preamble or surrounding test
+  order would shift FreeRTOS either side of 10000 µs without
+  changing its average accuracy. TaktOS PASSes the lower bound by
+  476 µs deterministically; FreeRTOS PASSes by 5 µs probabilistically.
+  Different design choices, different absolute-accuracy outcomes.
+  See §6.
 
 - **Closed: kernel object cleanup leaks.** Earlier KVB tests created
   stack-local kernel objects (`KvbSemaphore sem`, `KvbMutex mutex`,
@@ -757,7 +837,7 @@ To reproduce:
   these tests.
 
 - **v3.0 (2026-04-29).** Added Eclipse ThreadX 6.x as a third kernel.
-  Bumped run aggregate from 4 to 5 runs per kernel. Documented
+  Bumped run aggregate from 4 to 5 runs per kernel. Disclosed
   ThreadX KVB sem pool sizing (4 → 6).
 
 - **v2.0 (earlier).** TaktOS-vs-FreeRTOS only.

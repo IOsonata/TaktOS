@@ -102,12 +102,11 @@ hTaktOSThread_t TaktOSThreadCreate(void *pStackMem, uint32_t StackMemSize,
 TaktOSErr_t TaktOSThreadSuspend(hTaktOSThread_t hThread);
 
 /**
- * @brief	Put a thread to sleep for at least the given number of ticks.
+ * @brief	Put a thread to sleep for the given number of kernel ticks.
  *
- * The call returns no earlier than @p Ticks full tick-periods after entry.
- * Because the call may land partway through a tick window, the kernel
- * waits one extra SysTick fire to guarantee the minimum elapsed time —
- * typical actual sleep duration is between Ticks and Ticks + 1 ticks.
+ * The thread becomes ready when the global tick reaches now + @p Ticks.
+ * This keeps the tick API aligned with timeout semantics: SleepTicks(1)
+ * waits for the next tick, SleepTicks(2) waits for two tick advances, etc.
  *
  * Use this form when the caller naturally thinks in ticks (timeout
  * passthrough, tick-driven state machines, micro-benchmarks).  When the
@@ -177,12 +176,40 @@ TaktOSErr_t TaktOSThreadDestroy(hTaktOSThread_t hThread);
 TaktOSErr_t TaktOSThreadHandOff(hTaktOSThread_t hNext);
 
 /**
+ * @brief	Stack guard word value.
+ *
+ * Written at thread creation by TaktOSThreadCreate(); checked every tick by
+ * TaktKernelTickHandler() on cores without a hardware stack limit (M0/M4/M7
+ * with no MPU bound).  Public so the tick-path inline below can reference it.
+ */
+#define TAKTOS_GUARD_WORD     0xDEADBEEFu
+
+/**
+ * @brief	Offset from the TCB base to the stack guard word.
+ *
+ * The guard sits immediately after the TCB structure; see
+ * TaktOSThreadCreate() in src/taktos_thread.cpp for the layout.
+ */
+#define TAKTOS_GUARD_OFFSET   sizeof(TaktOSThread_t)
+
+/**
  * @brief	Check stack guard word for stack overflow / memory corruption detection.
+ *
+ * Inlined: this runs every tick in TaktKernelTickHandler() on M4/M7 without an
+ * MPU-bound kernel handler, and the body is a single load + compare.  Inlining
+ * eliminates the BL/BX call frame (~5 cycles) and removes the cold-fetch risk
+ * for a function called once per millisecond — measurable in RT_TICK_JITTER
+ * even at 64 MHz with ICACHE on.
  *
  * @param	hThread : Thread handle.
  * @return	true if the guard word is intact, false if overflow or corruption is detected.
  */
-bool TaktOSThreadGuardCheck(hTaktOSThread_t hThread);
+TAKT_ALWAYS_INLINE bool TaktOSThreadGuardCheck(hTaktOSThread_t hThread)
+{
+    const uint32_t *guard =
+        (const uint32_t*)((const uint8_t*)hThread + TAKTOS_GUARD_OFFSET);
+    return (*guard == TAKTOS_GUARD_WORD);
+}
 
 /**
  * @brief	Stack overflow hook  weak symbol, application may override.

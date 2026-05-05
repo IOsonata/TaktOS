@@ -275,7 +275,7 @@ static void kvb_run_mutex_ownership(KvbTestResult *result)
 {
     /* Owner stack sized via KVB_THREAD_BUF_SIZE  same usable stack on
        every kernel port. */
-    static KVB_THREAD_STACK_DEFINE(owner_stack, KVB_DEFAULT_STACK_SIZE);
+    static KVB_THREAD_STACK_DEFINE(owner_stack, KVB_SYNC_THREAD_STACK_SIZE);
     KvbMutex mutex;
     KvbSemaphore locked_sem;
     KvbSemaphore release_sem;

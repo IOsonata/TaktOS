@@ -8,7 +8,8 @@ sem_trywait / sem_timedwait / sem_post.
 
 PSE51 requires only unnamed semaphores (sem_init / sem_destroy).
 Named semaphores (sem_open) are PSE52+ and require a filesystem.
-sem_t wraps TaktOSSem_t directly.
+sem_t is an int handle into a fixed-size pool of TaktOSSem_t objects
+(size TAKT_POSIX_MAX_SEMS).
 
 QM  outside cert boundary.
 

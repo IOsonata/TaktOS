@@ -15,9 +15,9 @@
     ((KVB_RUNNER_STACK_SIZE + sizeof(StackType_t) - 1u) / sizeof(StackType_t))
 #endif
 
+#if (configSUPPORT_STATIC_ALLOCATION == 1)
 static StackType_t g_kvb_runner_stack[KVB_FREERTOS_RUNNER_STACK_WORDS]
     __attribute__((aligned(portBYTE_ALIGNMENT)));
-#if (configSUPPORT_STATIC_ALLOCATION == 1)
 static StaticTask_t g_kvb_runner_tcb __attribute__((aligned(portBYTE_ALIGNMENT)));
 #endif
 static KvbRunnerEntry g_runner_entry;
@@ -200,6 +200,9 @@ KvbStatus kvb_thread_create(
     if (stack_words == 0u) {
         return KVB_ERR_INVALID_ARG;
     }
+    if (stack_words < (uint32_t)configMINIMAL_STACK_SIZE) {
+        stack_words = (uint32_t)configMINIMAL_STACK_SIZE;
+    }
 
 #if (configSUPPORT_STATIC_ALLOCATION == 1)
     if (stack_mem == 0) {
@@ -298,6 +301,24 @@ KvbStatus kvb_sem_post(KvbSemaphore *sem)
     }
 
     return (xSemaphoreGive(sem->handle) == pdTRUE) ? KVB_OK : KVB_ERR_KERNEL;
+}
+
+KvbStatus kvb_sem_post_from_isr(KvbSemaphore *sem)
+{
+    BaseType_t higher_priority_task_woken = pdFALSE;
+    BaseType_t ok;
+
+    if (sem == 0 || sem->handle == NULL) {
+        return KVB_ERR_INVALID_ARG;
+    }
+
+    ok = xSemaphoreGiveFromISR(sem->handle, &higher_priority_task_woken);
+    if (ok != pdTRUE) {
+        return KVB_ERR_KERNEL;
+    }
+
+    portYIELD_FROM_ISR(higher_priority_task_woken);
+    return KVB_OK;
 }
 
 KvbStatus kvb_sem_delete(KvbSemaphore *sem)

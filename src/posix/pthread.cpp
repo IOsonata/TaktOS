@@ -265,10 +265,13 @@ int pthread_create(pthread_t* thread, const pthread_attr_t* attr,
 
     if (attr && attr->stack_addr && attr->stack_size > 0u)
     {
-        // Caller-supplied stack: note we can't embed the TCB there safely
-        // (alignment and lifetime unknown). Use slot mem for TCB, caller mem
-        // for stack only  not fully POSIX but adequate for PSE51 targets.
-        stack_mem = slot->mem;   // keep TCB in slot
+        // Caller-supplied stack: NOT honoured in v1.0.  The TCB and the stack
+        // come from the slot's static memory block; attr->stack_addr and
+        // attr->stack_size are ignored.  Storing them there would require
+        // ownership/lifetime guarantees the POSIX layer cannot enforce on a
+        // freestanding target.  Returning to the slot mem keeps the call
+        // succeed/fail behaviour identical to the default path.
+        stack_mem = slot->mem;
         stack_sz  = sizeof(slot->mem);
     }
 

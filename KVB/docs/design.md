@@ -511,9 +511,12 @@ KvbStatus kvb_timer_delete(KvbTimer *timer);
 ### 7.7 Interrupt API
 
 ```c
-KvbStatus kvb_irq_test_source_init(void (*handler)(void *arg), void *arg);
-KvbStatus kvb_irq_test_source_trigger(void);
-KvbStatus kvb_irq_test_source_disable(void);
+typedef void (*KvbPlatformIrqHandler)(void *arg);
+
+KvbStatus kvb_platform_irq_probe_init(KvbPlatformIrqHandler handler, void *arg);
+KvbStatus kvb_platform_irq_probe_trigger(void);
+KvbStatus kvb_platform_irq_probe_disable(void);
+const char *kvb_platform_irq_probe_name(void);
 ```
 
 Notes:
@@ -863,7 +866,7 @@ Expected:
 
 ### 9.4 IRQ - Interrupt Interaction Tests
 
-#### IRQ_WAKE_001 - ISR-to-Thread Wake Latency
+#### RT_IRQ_MASK_001 - IRQ Response and ISR-to-Thread Latency
 
 Purpose:
 
@@ -882,10 +885,9 @@ Validation:
 
 Metrics:
 
-- interrupt entry timestamp
-- post timestamp
-- thread-run timestamp
-- ISR-to-thread latency min/avg/max/p99
+- trigger-to-IRQ entry latency min/avg/max
+- IRQ-entry-to-thread-run latency min/avg/max
+- trigger-to-thread-run latency min/avg/max
 
 #### IRQ_API_LEGALITY_001 - ISR API Rule Validation
 

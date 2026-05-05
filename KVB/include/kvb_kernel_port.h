@@ -167,6 +167,7 @@ KvbStatus kvb_thread_delete(KvbThread *thread);
 KvbStatus kvb_sem_create(KvbSemaphore *sem, uint32_t initial_count, uint32_t max_count);
 KvbStatus kvb_sem_wait(KvbSemaphore *sem, uint32_t timeout_ticks);
 KvbStatus kvb_sem_post(KvbSemaphore *sem);
+KvbStatus kvb_sem_post_from_isr(KvbSemaphore *sem);
 KvbStatus kvb_sem_delete(KvbSemaphore *sem);
 
 KvbStatus kvb_mutex_create(KvbMutex *mutex, uint32_t flags);

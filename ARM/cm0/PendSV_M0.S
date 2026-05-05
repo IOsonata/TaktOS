@@ -112,7 +112,7 @@
 
 
         /* TaktOSCtxSwitch removed from assembly.
-         * Now always_inline in ARM/include/TaktCriticalSection.h:
+         * Now always_inline in ARM/include/TaktOSCriticalSection.h:
          *   *((volatile unsigned int*)0xE000ED04u) = (1u << 28);
          * Saves ~5cy BL/BX overhead at every call site.            */
 

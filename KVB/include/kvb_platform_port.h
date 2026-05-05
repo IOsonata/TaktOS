@@ -4,13 +4,23 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "kvb_kernel_port.h"
+
 #ifdef __cplusplus
 extern "C" {
 #endif
 
 uint64_t kvb_platform_cycle_count(void);
+uint32_t kvb_platform_cycle_count32(void);
 uint32_t kvb_platform_cycle_frequency_hz(void);
 uint64_t kvb_platform_time_us(void);
+
+typedef void (*KvbPlatformIrqHandler)(void *arg);
+
+KvbStatus kvb_platform_irq_probe_init(KvbPlatformIrqHandler handler, void *arg);
+KvbStatus kvb_platform_irq_probe_trigger(void);
+KvbStatus kvb_platform_irq_probe_disable(void);
+const char *kvb_platform_irq_probe_name(void);
 
 void kvb_platform_log_write(const char *data, size_t len);
 void kvb_platform_log_flush(void);

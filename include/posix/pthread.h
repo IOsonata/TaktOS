@@ -6,8 +6,10 @@
 Covers the IEEE 1003.1-2017 PSE51 thread API:
   pthread_create / join / detach / exit / self / equal / once
   pthread_attr_t  (stack, priority, detach state)
-  pthread_mutex_t (normal + priority-inheritance via TaktOS Mutex)
-  pthread_cond_t  (condition variable via Sem + Mutex)
+  pthread_mutex_t (over plain TaktOS Mutex; protocol attribute stored but
+                   not enforced  PRIO_NONE / PRIO_INHERIT both behave as
+                   plain mutex; PRIO_PROTECT returns ENOTSUP in v1.0)
+  pthread_cond_t  (condition variable via TaktOSSem + waiter count)
 
 QM  outside cert boundary.
 
@@ -81,10 +83,12 @@ typedef int  pthread_once_t;     // 0 = uninitialised, 1 = in progress, 2 = done
 #define PTHREAD_MUTEX_ERRORCHECK   1   // mapped to NORMAL (single-process)
 #define PTHREAD_MUTEX_RECURSIVE    2   // not supported  ENOTSUP
 
-//  Mutex protocol (priority inheritance) 
+//  Mutex protocol 
 #define PTHREAD_PRIO_NONE          0
-#define PTHREAD_PRIO_INHERIT       1   // default  maps to TaktOS Mutex
-#define PTHREAD_PRIO_PROTECT       2   // ceiling  not in v1.0
+#define PTHREAD_PRIO_INHERIT       1   // default; stored as attribute but
+                                       //   treated as plain in v1.0 (no
+                                       //   priority inheritance enforced)
+#define PTHREAD_PRIO_PROTECT       2   // ceiling  not in v1.0  ENOTSUP
 
 //  Thread attribute 
 typedef struct {
@@ -370,17 +374,19 @@ int  pthread_mutexattr_settype     (pthread_mutexattr_t* attr, int type);
 int  pthread_mutexattr_gettype     (const pthread_mutexattr_t* attr, int* type);
 
 /**
- * @brief	Set the priority-inheritance protocol in a mutex attribute object.
+ * @brief	Set the priority protocol attribute on a mutex attribute object.
  *
  * @param	attr      : Mutex attribute object.
- * @param	protocol  : PTHREAD_PRIO_NONE or PTHREAD_PRIO_INHERIT.
+ * @param	protocol  : PTHREAD_PRIO_NONE or PTHREAD_PRIO_INHERIT (both stored;
+ *                     v1.0 treats both as plain mutex with no priority
+ *                     adjustment at lock/unlock).
  *                     PTHREAD_PRIO_PROTECT returns ENOTSUP (v1.0).
  * @return	0 on success, EINVAL on bad arguments, ENOTSUP for ceiling protocol.
  */
 int  pthread_mutexattr_setprotocol (pthread_mutexattr_t* attr, int protocol);
 
 /**
- * @brief	Get the priority-inheritance protocol from a mutex attribute object.
+ * @brief	Get the priority protocol attribute from a mutex attribute object.
  *
  * @param	attr      : Mutex attribute object (const).
  * @param	protocol  : Receives the protocol value.

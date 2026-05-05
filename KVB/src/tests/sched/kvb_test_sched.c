@@ -37,9 +37,9 @@ static void kvb_run_sched_coop(KvbTestResult *result)
 {
     /* Each worker stack is sized via KVB_THREAD_BUF_SIZE so that every
        kernel — including kernels that store the TCB inside the caller-
-       supplied block — receives KVB_DEFAULT_STACK_SIZE bytes of usable
+       supplied block — receives KVB_SCHED_WORKER_STACK_SIZE bytes of usable
        stack. */
-    static KVB_THREAD_STACK_ARRAY_DEFINE(stacks, KVB_WORKER_THREAD_COUNT, KVB_DEFAULT_STACK_SIZE);
+    static KVB_THREAD_STACK_ARRAY_DEFINE(stacks, KVB_WORKER_THREAD_COUNT, KVB_SCHED_WORKER_STACK_SIZE);
     KvbThread threads[KVB_WORKER_THREAD_COUNT];
     KvbSchedWorkerCtx ctx[KVB_WORKER_THREAD_COUNT];
     KvbSemaphore start_sem;

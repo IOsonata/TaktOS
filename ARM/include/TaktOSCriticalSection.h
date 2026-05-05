@@ -95,7 +95,7 @@ TAKT_ALWAYS_INLINE void TaktOSExitCritical(uint32_t saved) {
  *
  * Correct use case: TaktOSThreadYield()  must be called from Thread mode
  * with interrupts enabled; saves ~3 cycles vs the save-restore pattern by
- * allowing GCC to use only caller-save registers (r0r3), eliminating the
+ * allowing GCC to use only caller-save registers (r0–r3), eliminating the
  * PUSH {r4,lr} / POP {r4,pc} function frame.                             */
 TAKT_ALWAYS_INLINE void TaktOSDisableInterrupts(void) {
     __asm__ volatile ("CPSID I" ::: "memory");

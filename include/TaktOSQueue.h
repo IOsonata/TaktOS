@@ -15,9 +15,10 @@ Alignment requirements:
   supported targets.  Alignment cannot be silently relaxed.  Use
   __attribute__((aligned(4))) on all queue backing buffers.
 
-Buffer sizing macro:
-    static uint8_t qbuf[CFIFO_TOTAL_MEMSIZE(8, sizeof(MyMsg_t))]
-                        __attribute__((aligned(4)));
+Buffer sizing:
+    static uint8_t qbuf[CAPACITY * sizeof(MyMsg_t)] __attribute__((aligned(4)));
+  i.e. Capacity items, each ItemSize bytes, contiguous; queue metadata is
+  separate (TaktOSQueue_t).
 
 Send / Receive hot paths are inlined; slow paths (blocking, timeout) are in
 taktos_queue.cpp.
@@ -85,8 +86,8 @@ extern "C" {
 /**
  * @brief	Initialize a queue object.
  *
- * The backing buffer must be 4-byte aligned and sized with the helper macro:\n
- *   uint8_t buf[CFIFO_TOTAL_MEMSIZE(capacity, itemSize)] __attribute__((aligned(4)));
+ * The backing buffer must be 4-byte aligned and sized as Capacity * ItemSize:\n
+ *   uint8_t buf[capacity * itemSize] __attribute__((aligned(4)));
  *
  * @param	pQue      : Pointer to caller-allocated queue object.
  * @param	pStorage  : Pointer to the 4-byte-aligned backing byte buffer.

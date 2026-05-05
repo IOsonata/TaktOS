@@ -13,8 +13,8 @@ Clock note:
   supplying the correct value for the target device.
 
 Run queue semantics:
-  head[pri] = TAIL of the circular singly-linked list.
-    head[pri]->next = FRONT = next-to-run candidate.
+  pHead[pri] = TAIL of the circular singly-linked list.
+    pHead[pri]->pNext = FRONT = next-to-run candidate.
     Insert: O(1)  new node becomes new tail, no list walk.
     Yield:  O(1)  current moves from front to back (new tail).
     Block:  O(n)  must find predecessor (unavoidable, singly-linked).
@@ -55,6 +55,9 @@ SOFTWARE.
 #include "TaktOSThread.h"
 #include "TaktCompiler.h"
 #include "TaktKernelTick.h"
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+#include "TaktOSWakeTrace.h"
+#endif
 
 //--- Run queue  definition is in TaktKernel.h (inline primitives) ---
 
@@ -78,6 +81,65 @@ static bool s_KernelMpuActive;        // true when arch bound MPU-aware kernel h
 static volatile TaktOSThread_t *s_DeferredYieldFor = nullptr;
 
 TaktKernelCtx_t g_TaktosCtx;
+
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+//--- Wake trace diagnostics --------------------------------------
+
+extern "C" TaktOSWakeTrace_t g_TaktWakeTrace;
+TaktOSWakeTrace_t g_TaktWakeTrace;
+
+static inline uint32_t TaktWakeTraceCycleCount(void)
+{
+#if defined(TAKT_ARCH_STUB) || defined(__x86_64__) || defined(__i386__) || defined(__riscv)
+    return 0u;
+#else
+    return *((volatile uint32_t*)0xE0001004u);   // DWT CYCCNT
+#endif
+}
+
+extern "C" uint32_t TaktOSWakeTraceSupported(void)
+{
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+    return 1u;
+#else
+    return 0u;
+#endif
+}
+
+extern "C" void TaktOSWakeTraceReset(void)
+{
+    g_TaktWakeTrace.Sequence = 0u;
+    g_TaktWakeTrace.TickCount = 0u;
+    g_TaktWakeTrace.ExpiredCount = 0u;
+    g_TaktWakeTrace.SwitchRequested = 0u;
+    g_TaktWakeTrace.CurrentPriority = 0u;
+    g_TaktWakeTrace.NextPriority = 0u;
+    g_TaktWakeTrace.TickEntryCycles = 0u;
+    g_TaktWakeTrace.AfterWakeCycles = 0u;
+    g_TaktWakeTrace.BeforePendSVCycles = 0u;
+    g_TaktWakeTrace.PendSVEntryCycles = 0u;
+    g_TaktWakeTrace.PendSVReturnCycles = 0u;
+}
+
+extern "C" void TaktOSWakeTraceEnable(uint32_t Enable)
+{
+    if (Enable != 0u)
+    {
+        TaktOSWakeTraceReset();
+        g_TaktWakeTrace.Enabled = 1u;
+    }
+    else
+    {
+        g_TaktWakeTrace.Enabled = 0u;
+    }
+}
+
+extern "C" const TaktOSWakeTrace_t *TaktOSWakeTraceSnapshot(void)
+{
+    return &g_TaktWakeTrace;
+}
+
+#endif
 
 //--- Context block  ABI ---------------------------
 // These offsets are consumed by PendSV/ctx_switch assembly.  Only valid on
@@ -136,7 +198,7 @@ extern "C" TAKT_WEAK bool TaktKernelHandlerAssign(uintptr_t HandlerBaseAddr)
 
 /**
  * @brief	Remove a thread from the READY run queue and mark it BLOCKED.
- *          See TaktKernel.h for the full contract.  Returns true on
+ *          See TaktKernel.h for the full spec.  Returns true on
  *          success, false on detected scheduler-ring corruption.
  */
 bool TaktBlockTask(TaktOSThread_t *pThread)
@@ -219,19 +281,19 @@ bool TaktBlockTask(TaktOSThread_t *pThread)
  * For cooperative yield, the goal is to match FreeRTOS's zero-overhead
  * Thread-mode path: one ICSR write to pend PendSV.
  *
- * The challenge: next_thread is precomputed and PendSV reads it directly,
+ * The challenge: pNextThread is precomputed and PendSV reads it directly,
  * so we must rotate the circular list (move current to tail) before PendSV
  * fires.  We still need a critical section to protect the two-word update
- * (head[] and next_thread) against a concurrent SysTick that could write
- * next_thread to a higher-priority thread between the two stores.
+ * (pHead[] and pNextThread) against a concurrent SysTick that could write
+ * pNextThread to a higher-priority thread between the two stores.
  *
  * Critical section design  unconditional CPSID I / CPSIE I:
  *   TaktOSDisableInterrupts() / TaktOSEnableInterrupts() are used here
  *   instead of the MRS/MSR PRIMASK save-restore pattern.  The reason is
  *   performance: with save-restore, GCC cannot fit all live values in the
- *   four caller-save registers (r0r3) and must spill to a callee-save
+ *   four caller-save registers (r0–r3) and must spill to a callee-save
  *   register (r4), generating PUSH {r4,lr} / POP {r4,pc}.  Combined with
- *   MRS and MSR instruction costs, this adds ~1012 cycles per yield on
+ *   MRS and MSR instruction costs, this adds ~10–12 cycles per yield on
  *   Cortex-M4/M33  a measurable regression on TM2 cooperative scheduling.
  *
  * Caller rules and how they are enforced:
@@ -330,9 +392,13 @@ void TaktOSThreadYield(void)
  *   - Stores KernClockHz, TickHz, and TickClockSrc for use by TaktOSStart().
  *   - KernClockHz is the input clock of the tick peripheral, NOT the CPU clock.
  *
- * @param	KernClockHz  : Tick peripheral input clock in Hz.
- * @param	TickHz       : Desired kernel tick rate in Hz.
- * @param	TickClockSrc : Tick clock source selector.
+ * @param	KernClockHz   : Tick peripheral input clock in Hz.
+ * @param	TickHz        : Desired kernel tick rate in Hz.
+ * @param	TickClockSrc  : Tick clock source selector.
+ * @param	HandlerBaseAddr : Architecture-defined exception/trap handler base
+ *                          address (ARM: RAM vector-table base for application
+ *                          override, 0 to keep statically linked handlers).
+ *                          See TaktOS.h for the full per-architecture spec.
  * @return	TAKTOS_OK on success, TAKTOS_ERR_INVALID if arguments are out of range.
  */
 TaktOSErr_t TaktOSInit(uint32_t KernClockHz, uint32_t TickHz,
@@ -444,7 +510,7 @@ uint32_t TaktOSGetTickHz(void)
  * Critical section is required.  SysTick runs at lowest priority (0xFF) so
  * any user ISR with a numerically lower priority value can preempt it.  If
  * that ISR calls a kernel API (TaktOSSemGive, TaktOSThreadResume, etc.) it
- * enters TaktReadyTask/TaktBlockTask, which mutate g_rq and next_thread
+ * enters TaktReadyTask/TaktBlockTask, which mutate g_TaktRunQueue and pNextThread
  * concurrently with TaktThreadWakeTick doing the same  classic race.
  *
  * Pattern matches TaktOSSemGive: hold PRIMASK across all scheduler state
@@ -452,24 +518,38 @@ uint32_t TaktOSGetTickHz(void)
  * then pend PendSV outside.  TaktOSCtxSwitch() is a single ICSR store and
  * is safe to call without a lock.
  */
-extern "C" void TaktKernelTickHandler(void)
+extern "C" __attribute__((aligned(16))) void TaktKernelTickHandler(void)
 {
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+    if (g_TaktWakeTrace.Enabled != 0u)
+    {
+        g_TaktWakeTrace.Sequence = g_TaktWakeTrace.Sequence + 1u;
+        g_TaktWakeTrace.TickEntryCycles = TaktWakeTraceCycleCount();
+        g_TaktWakeTrace.ExpiredCount = 0u;
+        g_TaktWakeTrace.SwitchRequested = 0u;
+        g_TaktWakeTrace.TickCount = g_TickCount + 1u;
+        g_TaktWakeTrace.CurrentPriority = g_TaktosCtx.pCurrent ? g_TaktosCtx.pCurrent->Priority : 0u;
+        g_TaktWakeTrace.NextPriority = g_TaktosCtx.pNextThread ? g_TaktosCtx.pNextThread->Priority : 0u;
+        g_TaktWakeTrace.AfterWakeCycles = 0u;
+        g_TaktWakeTrace.BeforePendSVCycles = 0u;
+        g_TaktWakeTrace.PendSVEntryCycles = 0u;
+        g_TaktWakeTrace.PendSVReturnCycles = 0u;
+    }
+#endif
+
     uint32_t primask = TaktOSEnterCritical();
 
     g_TickCount++;
     TaktThreadWakeTick(g_TickCount);
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+    if (g_TaktWakeTrace.Enabled != 0u)
+    {
+        g_TaktWakeTrace.AfterWakeCycles = TaktWakeTraceCycleCount();
+    }
+#endif
     // current is always valid after TaktOSStart  no null check needed
     bool needSwitch = (g_TaktosCtx.pNextThread->Priority > g_TaktosCtx.pCurrent->Priority);
 
-    // Deferred yield  consume the flag set by TaktOSThreadYield() when
-    // called from an ISR.  Perform the same round-robin rotation that Yield
-    // would have done in Thread mode: move pCurrent to the tail of its
-    // priority ring so pNextThread becomes the next peer.
-    //
-    // Only rotate if pCurrent has a peer at the same priority (pNext != self).
-    // If a higher-priority switch is already pending (needSwitch is true),
-    // the rotation still happens  the current thread is moved to tail so
-    // when it eventually runs again it yields to its priority peers correctly.
     // Deferred yield  consume the request set by TaktOSThreadYield() when
     // called from an ISR or inside a critical section.  Only honour it if
     // pCurrent is still the thread that requested it; if the requesting thread
@@ -511,6 +591,16 @@ extern "C" void TaktKernelTickHandler(void)
 #endif
 
     TaktOSExitCritical(primask);
+
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+    if (g_TaktWakeTrace.Enabled != 0u)
+    {
+        g_TaktWakeTrace.SwitchRequested = needSwitch ? 1u : 0u;
+        g_TaktWakeTrace.CurrentPriority = g_TaktosCtx.pCurrent ? g_TaktosCtx.pCurrent->Priority : 0u;
+        g_TaktWakeTrace.NextPriority = g_TaktosCtx.pNextThread ? g_TaktosCtx.pNextThread->Priority : 0u;
+        g_TaktWakeTrace.BeforePendSVCycles = TaktWakeTraceCycleCount();
+    }
+#endif
 
     if (needSwitch)
     {

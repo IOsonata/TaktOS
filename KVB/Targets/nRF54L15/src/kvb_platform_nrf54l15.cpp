@@ -27,6 +27,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "nrf.h"
+
 #include "kvb_platform_port.h"
 #include "kvb_config.h"
 
@@ -40,4 +42,54 @@ extern "C" const char *kvb_platform_board_name(void)
 extern "C" const char *kvb_platform_cpu_name(void)
 {
     return "Cortex-M33 @ 128 MHz (nRF54L15)";
+}
+
+
+/* ----- IRQ probe ------------------------------------------------------- */
+
+/*
+ * Use the same spare software interrupt selected by the nRF54L15
+ * Thread-Metric board support: SWI00, IRQ number 28.
+ *
+ * Do not use EGU10_IRQn here. Some Nordic MDK/header combinations used by
+ * the IOsonata nRF54L15 Eclipse projects do not expose EGU10_IRQn, while
+ * SWI00_IRQHandler and IRQ 28 are already used successfully by the existing
+ * nRF54L15 benchmark target.
+ */
+#define KVB_NRF54L15_IRQ_PROBE_IRQ_N 28u
+
+extern "C" KvbStatus kvb_platform_cortex_m_irq_probe_init(uint32_t irq_n,
+                                                           uint32_t priority,
+                                                           KvbPlatformIrqHandler handler,
+                                                           void *arg);
+extern "C" KvbStatus kvb_platform_cortex_m_irq_probe_trigger(void);
+extern "C" KvbStatus kvb_platform_cortex_m_irq_probe_disable(void);
+extern "C" void kvb_platform_cortex_m_irq_probe_handler(void);
+
+extern "C" KvbStatus kvb_platform_irq_probe_init(KvbPlatformIrqHandler handler, void *arg)
+{
+    return kvb_platform_cortex_m_irq_probe_init(KVB_NRF54L15_IRQ_PROBE_IRQ_N,
+                                                KVB_IRQ_PROBE_PRIORITY,
+                                                handler,
+                                                arg);
+}
+
+extern "C" KvbStatus kvb_platform_irq_probe_trigger(void)
+{
+    return kvb_platform_cortex_m_irq_probe_trigger();
+}
+
+extern "C" KvbStatus kvb_platform_irq_probe_disable(void)
+{
+    return kvb_platform_cortex_m_irq_probe_disable();
+}
+
+extern "C" const char *kvb_platform_irq_probe_name(void)
+{
+    return "NVIC SWI00";
+}
+
+extern "C" void SWI00_IRQHandler(void)
+{
+    kvb_platform_cortex_m_irq_probe_handler();
 }

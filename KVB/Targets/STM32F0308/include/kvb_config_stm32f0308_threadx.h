@@ -80,9 +80,16 @@
  * formatting is the dominant frame; 1024 B remains comfortable. */
 #define KVB_RUNNER_STACK_SIZE   1024u
 
-/* Worker stack - 768 B (vs 256 B on TaktOS/FreeRTOS).  Documented
- * asymmetry, kernel-structural - see header docstring. */
-#define KVB_DEFAULT_STACK_SIZE  768u
+/* Helper-thread stacks are smaller than the runner stack because these
+ * threads do not format log output.  ThreadX still needs more stack than
+ * the TaktOS/FreeRTOS helper threads on this target, but the RT tests now
+ * share two helper stack buffers across the whole RT group instead of
+ * reserving per-test static stacks. */
+#define KVB_DEFAULT_STACK_SIZE       768u
+#define KVB_TEST_THREAD_STACK_SIZE   384u
+#define KVB_SCHED_WORKER_STACK_SIZE  384u
+#define KVB_RT_THREAD_STACK_SIZE     384u
+#define KVB_SYNC_THREAD_STACK_SIZE   384u
 
 #define KVB_WORKER_THREAD_COUNT 3u
 
@@ -104,6 +111,16 @@
 #define KVB_MAX_REGISTERED_TESTS 16u
 #define KVB_THROUGHPUT_BATCH    256u
 
+#define KVB_ENABLE_RT_TESTS          1u
+#define KVB_RT_LATENCY_ITERATIONS    64u
+#define KVB_RT_JITTER_ITERATIONS     32u
+
+/* STM32F0308 is Cortex-M0, so there is no DWT cycle counter.
+ * The STM32F0308 platform port provides a SysTick-derived microsecond
+ * timebase, and the RT tests use that fallback with reduced iteration
+ * counts and shared helper stacks. This keeps the canonical KVB test set
+ * active on the 8 KB SRAM target. */
+
 /* Port-private pool sizes - sized to cumulative peak across the suite
  * because no test calls kvb_sem_delete / kvb_mutex_delete (slots
  * accumulate for the lifetime of the run).
@@ -123,9 +140,9 @@
  * BSS impact of bumping sem pool 4 -> 6 on Cortex-M0: +2 * sizeof(TX_
  * SEMAPHORE + bool + padding) ~= +160 B, fits inside the 0.3 KB
  * headroom documented in the memory budget above. */
-#define KVB_THREADX_THREAD_POOL_SIZE   4u
-#define KVB_THREADX_SEM_POOL_SIZE      6u
-#define KVB_THREADX_MUTEX_POOL_SIZE    2u
-#define KVB_THREADX_QUEUE_POOL_SIZE    2u
+#define KVB_THREADX_THREAD_POOL_SIZE   3u
+#define KVB_THREADX_SEM_POOL_SIZE   4u
+#define KVB_THREADX_MUTEX_POOL_SIZE   1u
+#define KVB_THREADX_QUEUE_POOL_SIZE   1u
 
 #endif /* KVB_CONFIG_STM32F0308_THREADX_H */

@@ -296,9 +296,8 @@ TaktOSErr_t TaktOSQueueSendSlowPath(TaktOSQueue_t *pQue, const void *pData,
 
     if (TimeoutTicks != TAKTOS_WAIT_FOREVER)
     {
-        // +1u: see comment in TaktOSThreadSleep.  Wait covers at least
-        // TimeoutTicks full tick-periods regardless of phase.
-        cur->WakeTick = TaktOSTickCount() + TimeoutTicks + 1u;
+        // Tick timeout expires when the global tick reaches now + TimeoutTicks.
+        cur->WakeTick = TaktOSTickCount() + TimeoutTicks;
         TaktSleepListAdd(cur);
     }
     else
@@ -398,9 +397,8 @@ TaktOSErr_t TaktOSQueueReceiveSlowPath(TaktOSQueue_t *pQue, void *pData,
 
     if (TimeoutTicks != TAKTOS_WAIT_FOREVER)
     {
-        // +1u: see comment in TaktOSThreadSleep.  Wait covers at least
-        // TimeoutTicks full tick-periods regardless of phase.
-        cur->WakeTick = TaktOSTickCount() + TimeoutTicks + 1u;
+        // Tick timeout expires when the global tick reaches now + TimeoutTicks.
+        cur->WakeTick = TaktOSTickCount() + TimeoutTicks;
         TaktSleepListAdd(cur);
     }
     else

@@ -56,6 +56,16 @@
 #define KVB_DWT_CTRL_CYCCNTENA  (1u << 0)
 #endif
 
+#define KVB_NVIC_ISER  ((volatile uint32_t *)0xE000E100u)
+#define KVB_NVIC_ICER  ((volatile uint32_t *)0xE000E180u)
+#define KVB_NVIC_ISPR  ((volatile uint32_t *)0xE000E200u)
+#define KVB_NVIC_ICPR  ((volatile uint32_t *)0xE000E280u)
+#define KVB_NVIC_IPR   ((volatile uint32_t *)0xE000E400u)
+
+#ifndef KVB_IRQ_PROBE_PRIORITY
+#define KVB_IRQ_PROBE_PRIORITY 0xC0u
+#endif
+
 #if (KVB_CORTEX_M_ENABLE_DWT != 0)
 /* DWT cycle counter state.  These are read and written only by
    kvb_platform_cycle_count() and kvb_cortex_m_cycle_init(), both of which
@@ -118,6 +128,16 @@ uint64_t kvb_platform_cycle_count(void)
 #endif
 }
 
+uint32_t kvb_platform_cycle_count32(void)
+{
+#if (KVB_CORTEX_M_ENABLE_DWT != 0)
+    kvb_cortex_m_cycle_init();
+    return KVB_DWT_CYCCNT;
+#else
+    return 0u;
+#endif
+}
+
 uint32_t kvb_platform_cycle_frequency_hz(void)
 {
 #if (KVB_CORTEX_M_ENABLE_DWT != 0)
@@ -141,4 +161,96 @@ uint64_t kvb_platform_time_us(void)
 #else
     return kvb_platform_cortex_m_fallback_time_us();
 #endif
+}
+
+
+/* -------------------------------------------------------------------------- *
+ * Cortex-M IRQ probe helper
+ * -------------------------------------------------------------------------- */
+
+typedef struct {
+    KvbPlatformIrqHandler handler;
+    void *arg;
+    uint32_t irq_n;
+    uint8_t ready;
+} KvbCortexMIrqProbe;
+
+static KvbCortexMIrqProbe g_irq_probe;
+
+static void kvb_cortex_m_barrier(void)
+{
+    __asm volatile ("dsb 0xF" ::: "memory");
+    __asm volatile ("isb 0xF" ::: "memory");
+}
+
+static void kvb_cortex_m_irq_set_priority(uint32_t irq_n, uint32_t priority)
+{
+    uint32_t index = irq_n >> 2;
+    uint32_t shift = (irq_n & 3u) * 8u;
+    uint32_t mask = 0xFFu << shift;
+    uint32_t value = KVB_NVIC_IPR[index];
+
+    value = (value & ~mask) | ((priority & 0xFFu) << shift);
+    KVB_NVIC_IPR[index] = value;
+}
+
+KvbStatus kvb_platform_cortex_m_irq_probe_init(uint32_t irq_n,
+                                               uint32_t priority,
+                                               KvbPlatformIrqHandler handler,
+                                               void *arg)
+{
+    if (handler == 0) {
+        return KVB_ERR_INVALID_ARG;
+    }
+
+    g_irq_probe.handler = handler;
+    g_irq_probe.arg = arg;
+    g_irq_probe.irq_n = irq_n;
+    g_irq_probe.ready = 1u;
+
+    kvb_cortex_m_irq_set_priority(irq_n, priority);
+    KVB_NVIC_ICPR[irq_n >> 5] = (1u << (irq_n & 31u));
+    KVB_NVIC_ISER[irq_n >> 5] = (1u << (irq_n & 31u));
+    kvb_cortex_m_barrier();
+
+    return KVB_OK;
+}
+
+KvbStatus kvb_platform_cortex_m_irq_probe_trigger(void)
+{
+    uint32_t irq_n;
+
+    if (g_irq_probe.ready == 0u) {
+        return KVB_ERR_UNSUPPORTED;
+    }
+
+    irq_n = g_irq_probe.irq_n;
+    KVB_NVIC_ISPR[irq_n >> 5] = (1u << (irq_n & 31u));
+    kvb_cortex_m_barrier();
+
+    return KVB_OK;
+}
+
+KvbStatus kvb_platform_cortex_m_irq_probe_disable(void)
+{
+    uint32_t irq_n;
+
+    if (g_irq_probe.ready == 0u) {
+        return KVB_ERR_UNSUPPORTED;
+    }
+
+    irq_n = g_irq_probe.irq_n;
+    KVB_NVIC_ICER[irq_n >> 5] = (1u << (irq_n & 31u));
+    KVB_NVIC_ICPR[irq_n >> 5] = (1u << (irq_n & 31u));
+    g_irq_probe.ready = 0u;
+    kvb_cortex_m_barrier();
+
+    return KVB_OK;
+}
+
+void kvb_platform_cortex_m_irq_probe_handler(void)
+{
+    if (g_irq_probe.handler != 0) {
+        g_irq_probe.handler(g_irq_probe.arg);
+    }
 }

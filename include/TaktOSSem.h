@@ -21,7 +21,7 @@ self-contained (12 bytes) and statically allocated.
     gSem.Give(false);
     gSem.Take(true, 100u);
 
-GiveFromISR hot path is inlined; slow paths (contention, timeout) are in
+The Give fast path is inlined; slow paths (contention, timeout) are in
 taktos_sem.cpp.
 
 Safety boundary: IN  MC/DC coverage required.
@@ -136,8 +136,6 @@ TaktOSErr_t TaktOSSemTakeSlowPath(TaktOSSem_t *pSem, uint32_t IntState, uint32_t
  * @return	TAKTOS_OK on success, TAKTOS_ERR_FULL if the count is already at
  *          MaxCount, TAKTOS_ERR_INVALID if @p pSem is null.
  */
-// Give  add one token. blocking param reserved for v1.1; pass false.
-// ISR-safe: uses critical section internally.
 TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSSemGive(TaktOSSem_t *pSem, bool bBlocking)
 {
     (void)bBlocking;
@@ -182,9 +180,6 @@ TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSSemGive(TaktOSSem_t *pSem, bool bBlocking)
     return TaktOSSemGiveSlowPath(pSem, state);
 }
 
-// Take  consume one token.
-// blocking=false / timeoutTicks=TAKTOS_NO_WAIT: return immediately if empty.
-// blocking=true  / timeoutTicks=TAKTOS_WAIT_FOREVER: block indefinitely.
 /**
  * @brief	Take (wait on) a semaphore  consume one token.
  *

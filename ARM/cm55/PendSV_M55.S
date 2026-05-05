@@ -71,10 +71,10 @@
  * ─────────────────────────────────────────────────────────────────────────────
  *  Phase                                              Cycles (TRM)
  *  HW exception entry (auto-stack)                       12
- *  SW body (identical to M33 base case)               ~31cy
+ *  SW body (identical to M33 base case)               ~39cy
  *  HW exception return                                   10
  *                                                     ────
- *  Total (no optional gates)                          ~53cy
+ *  Total (no optional gates)                          ~61cy
  *
  *  +MVE  (TAKTOS_MVE_CONTEXT=1):             +~72cy (8 VSTRW + STMDB VPR save;
  *                                                     8 VLDRW + LDM + VMSR restore)
@@ -146,7 +146,7 @@
 
 
         /* TaktOSCtxSwitch removed from assembly.
-         * Now always_inline in ARM/include/TaktCriticalSection.h:
+         * Now always_inline in ARM/include/TaktOSCriticalSection.h:
          *   *((volatile unsigned int*)0xE000ED04u) = (1u << 28);
          * Saves ~5cy BL/BX overhead at every call site.            */
 
@@ -156,7 +156,7 @@
  * PendSV_Handler — steady-state context switch
  *
  * MVE frame layout when TAKTOS_MVE_CONTEXT=1 (below the GP frame):
- *   [VPR (1 word)] [Q0–Q7 (8 × 16 bytes = 128 bytes)] ← below STMDB {r4-r11}
+ *   [VPR (1 word)] [Q0–Q7 (8 × 16 bytes = 128 bytes)] ← below STMDB {r4-r11, lr}
  *   VPR is saved as a GP word via VMRS + STMDB so it sits at the top
  *   of the MVE block; Q0 is at the lowest address (last pre-dec store).
  *   Restore is VLDRW Q0..Q7 post-inc, then LDM VPR — mirror order.
@@ -226,7 +226,7 @@ PendSV_Handler:
         LDM     r0!, {r3}               /* VPR word                          */
         VMSR    VPR, r3
         /* r3 was clobbered by VPR restore above. r1 (g_TaktosCtx) survived
-         * all restores (LDMIA writes r4-r11, VLDRW writes q0-q7 only).    */
+         * all restores (LDMIA writes r4-r11 and lr, VLDRW writes q0-q7).  */
         LDR     r3, [r1, #CTX_CURRENT]     /* reload next TCB ptr          */
 #endif
 

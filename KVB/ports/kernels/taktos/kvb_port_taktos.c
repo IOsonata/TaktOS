@@ -218,6 +218,15 @@ KvbStatus kvb_sem_post(KvbSemaphore *sem)
     return kvb_from_taktos_error(TaktOSSemGive(&sem->sem, false));
 }
 
+KvbStatus kvb_sem_post_from_isr(KvbSemaphore *sem)
+{
+    if (sem == 0) {
+        return KVB_ERR_INVALID_ARG;
+    }
+
+    return kvb_from_taktos_error(TaktOSSemGive(&sem->sem, false));
+}
+
 KvbStatus kvb_sem_delete(KvbSemaphore *sem)
 {
     (void)sem;

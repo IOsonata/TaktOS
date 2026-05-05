@@ -18,16 +18,22 @@
 #ifndef KVB_CONFIG_ZEPHYR_H
 #define KVB_CONFIG_ZEPHYR_H
 
-/* ----- Tick rate ----------------------------------------------------- *
+/* ----- Tick rate / CPU clock metadata ------------------------------- *
  *
- * KVB_CORE_CLOCK_HZ is intentionally LEFT AT THE FRAMEWORK DEFAULT
- * (see KVB/include/kvb_config.h).  The Zephyr platform layer overrides
- * kvb_platform_cycle_frequency_hz() to return
- * sys_clock_hw_cycles_per_sec() at runtime, so the compile-time value
- * is only a fallback that should never actually be observed.
+ * KVB_CORE_CLOCK_HZ is the CPU clock printed in the run metadata.  It is
+ * not necessarily the same as kvb_platform_cycle_frequency_hz(): Zephyr can
+ * expose a platform timer as its cycle source while the CPU runs faster.
  *
  * KVB_TICK_HZ matches CONFIG_SYS_CLOCK_TICKS_PER_SEC in prj.conf.
  * Both must agree — keep them at 1000 unless you change both. */
+#if defined(CONFIG_SOC_NRF54L15_CPUAPP) || defined(CONFIG_SOC_NRF54L15) || \
+    defined(CONFIG_SOC_SERIES_NRF54LX) || defined(CONFIG_SOC_SERIES_NRF54L)
+#define KVB_CORE_CLOCK_HZ       128000000u
+#elif defined(CONFIG_SOC_NRF52832) || defined(CONFIG_SOC_NRF52833) || \
+      defined(CONFIG_SOC_NRF52840) || defined(CONFIG_SOC_SERIES_NRF52X)
+#define KVB_CORE_CLOCK_HZ       64000000u
+#endif
+
 #define KVB_TICK_HZ             1000u
 
 /* ----- Measurement windows ------------------------------------------ */
@@ -49,6 +55,10 @@
 
 #define KVB_RUNNER_STACK_SIZE   2048u   /* matches CONFIG_MAIN_STACK_SIZE */
 #define KVB_DEFAULT_STACK_SIZE  1024u   /* per-worker usable stack */
+#define KVB_TEST_THREAD_STACK_SIZE   KVB_DEFAULT_STACK_SIZE
+#define KVB_SCHED_WORKER_STACK_SIZE  KVB_TEST_THREAD_STACK_SIZE
+#define KVB_RT_THREAD_STACK_SIZE     KVB_TEST_THREAD_STACK_SIZE
+#define KVB_SYNC_THREAD_STACK_SIZE   KVB_TEST_THREAD_STACK_SIZE
 
 /* ----- Worker count ------------------------------------------------- */
 
@@ -64,6 +74,8 @@
 
 #define KVB_MAX_REGISTERED_TESTS 16u
 #define KVB_THROUGHPUT_BATCH    256u
+
+#define KVB_ENABLE_RT_TESTS          1u
 
 /* ----- Test selection ----------------------------------------------- */
 

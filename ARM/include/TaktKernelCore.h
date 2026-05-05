@@ -140,7 +140,7 @@ TAKT_ALWAYS_INLINE void TaktOSCtxSwitch(void)
  * Issues SVC #0, which triggers SVC_Handler.  SVC_Handler loads the first
  * task's fake context frame, switches the active stack from MSP (used during
  * init) to PSP (used by all tasks), and performs an exception return into
- * Thread mode.  This is the only safe way to make the MSPPSP transition on
+ * Thread mode.  This is the only safe way to make the MSP→PSP transition on
  * Cortex-M  a plain branch would leave the processor in Handler mode.
  *
  * Implemented in ARM/cm{0,4,7,33,55}/PendSV_M*.S (one per Cortex-M variant).

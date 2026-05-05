@@ -32,19 +32,23 @@
  *  Phase                                              Cycles (TRM)
  *  HW exception entry (auto-stack)                       12
  *  MRS r0, PSP                                            1
- *  STMDB r0!, {r4–r11}         TRM: 1+8 regs             9
+ *  TST lr, #EXC_RETURN_FPU_BIT  +  IT EQ  (FPU gate)      2
+ *  STMDB r0!, {r4–r11, lr}     TRM: 1+9 regs            10
  *  LDR r1 + dual-load r2/r3 + STR/LDR/STR           ~7   (stalls hidden)
- *  LDMIA r0!, {r4–r11}         TRM: 1+8 regs             9
- *  MSR PSP + BX lr (HW unstack begins)                   2
+ *  LDMIA r0!, {r4–r11, lr}     TRM: 1+9 regs            10
+ *  TST lr, #EXC_RETURN_FPU_BIT  +  IT EQ  (FPU gate)      2
+ *  MSR PSP + BX lr (HW unstack begins)                    2
  *  HW exception return                                   10
  *                                                     ────
- *  SW body                                           ~29cy  (M7 pipeline hides
- *  Total                                             ~51cy   some stalls via OOO window)
+ *  SW body                                           ~34cy  (M7 pipeline hides
+ *  Total                                             ~56cy   some stalls via OOO window)
  *
  *  Note: M7 has a 6-stage pipeline with limited out-of-order capability and
  *  branch prediction. STM/LDM timing is 1+N cycles on the pipeline (same as
  *  M4) but the wider fetch bus and OOO window can reduce effective stall cost.
- *  DWT on-target validation pending (STM32H7 class target).
+ *
+ *  LR is saved/restored with r4-r11 so the incoming task's EXC_RETURN drives
+ *  unstack — required for correct FPU bit handling on a per-task basis.
  *
  *  +FPU  (__VFP_FP__ && !__SOFTFP__, FPU active):  +~18cy
  *  +PendSV_Handler_MPU block:                 +~6cy
@@ -105,7 +109,7 @@
 
 
         /* TaktOSCtxSwitch removed from assembly.
-         * Now always_inline in ARM/include/TaktCriticalSection.h:
+         * Now always_inline in ARM/include/TaktOSCriticalSection.h:
          *   *((volatile unsigned int*)0xE000ED04u) = (1u << 28);
          * Saves ~5cy BL/BX overhead at every call site.            */
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>FreeRTOS_nRF52832_KvbSuite</name>
-	<comment>KVB benchmark suite on FreeRTOS for nRF52-DK (PCA10040) board.  Sibling of TaktOS_nRF52832_KvbSuite — same shared platform/test set, FreeRTOS swapped for TaktOS as the kernel under test.</comment>
+	<name>FreeRTOS_nRF54L15_KvbSuite</name>
+	<comment>KVB benchmark suite on FreeRTOS for nRF54L15-DK board.  Sibling of TaktOS_nRF54L15_KvbSuite and ThreadX_nRF54L15_KvbSuite — same shared platform/test set, FreeRTOS swapped for the kernel under test.</comment>
 	<projects>
 	</projects>
 	<buildSpec>

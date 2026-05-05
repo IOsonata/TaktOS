@@ -40,6 +40,10 @@
  * caller / runner-only) and no longer contributes to runner stack peak. */
 #define KVB_RUNNER_STACK_SIZE   1024u
 #define KVB_DEFAULT_STACK_SIZE  512u
+#define KVB_TEST_THREAD_STACK_SIZE   KVB_DEFAULT_STACK_SIZE
+#define KVB_SCHED_WORKER_STACK_SIZE  KVB_TEST_THREAD_STACK_SIZE
+#define KVB_RT_THREAD_STACK_SIZE     KVB_TEST_THREAD_STACK_SIZE
+#define KVB_SYNC_THREAD_STACK_SIZE   KVB_TEST_THREAD_STACK_SIZE
 
 #define KVB_WORKER_THREAD_COUNT 3u
 
@@ -68,5 +72,7 @@
  * each batch takes well under a millisecond, so the 10 s measurement
  * window covers thousands of batches per test. */
 #define KVB_THROUGHPUT_BATCH    256u
+
+#define KVB_ENABLE_RT_TESTS          1u
 
 #endif /* KVB_CONFIG_NRF54L15_H */

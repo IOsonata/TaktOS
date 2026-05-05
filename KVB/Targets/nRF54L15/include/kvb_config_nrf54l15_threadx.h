@@ -64,6 +64,10 @@
 /* Worker stack - 1024 B (vs 512 B on TaktOS/FreeRTOS).  Documented
  * asymmetry, kernel-structural - see header docstring. */
 #define KVB_DEFAULT_STACK_SIZE  1024u
+#define KVB_TEST_THREAD_STACK_SIZE   KVB_DEFAULT_STACK_SIZE
+#define KVB_SCHED_WORKER_STACK_SIZE  KVB_TEST_THREAD_STACK_SIZE
+#define KVB_RT_THREAD_STACK_SIZE     KVB_TEST_THREAD_STACK_SIZE
+#define KVB_SYNC_THREAD_STACK_SIZE   KVB_TEST_THREAD_STACK_SIZE
 
 #define KVB_WORKER_THREAD_COUNT 3u
 
@@ -78,6 +82,8 @@
 
 #define KVB_MAX_REGISTERED_TESTS 16u
 #define KVB_THROUGHPUT_BATCH    256u
+
+#define KVB_ENABLE_RT_TESTS          1u
 
 /* Port-private pool sizes — sized to cumulative peak across the suite
  * because no test calls kvb_sem_delete / kvb_mutex_delete (slots

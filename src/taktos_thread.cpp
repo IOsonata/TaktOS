@@ -49,6 +49,9 @@ SOFTWARE.
 #include <stddef.h>
 #include "TaktOS.h"
 #include "TaktOSThread.h"
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+#include "TaktOSWakeTrace.h"
+#endif
 
 // TAKTOS_STACK_GUARD_ALIGN defined in TaktOSThread.h
 
@@ -62,8 +65,8 @@ static_assert(offsetof(TaktOSThread_t, pStackBottom) == 16u,
               "TCB_STACK_BOTTOM mismatch -- update PendSV_M*.S defines");
 #endif
 
-#define TAKTOS_GUARD_WORD     0xDEADBEEFu
-#define TAKTOS_GUARD_OFFSET   sizeof(TaktOSThread_t)
+// TAKTOS_GUARD_WORD and TAKTOS_GUARD_OFFSET moved to TaktOSThread.h so the
+// inline TaktOSThreadGuardCheck() can reference them at every call site.
 
 //--- Wraparound-safe tick comparison ------------------------------------
 // Returns true if tick 'a' fires strictly before tick 'b'.
@@ -376,7 +379,7 @@ TaktOSErr_t TaktOSThreadResumeSlowPath(TaktOSThread_t *t, uint32_t primask)
     // Must remove from sleep list before TaktReadyTask 
     // pNext is shared between the run queue and the sleep list.
     TaktSleepListRemove(t);
-    t->WakeTick = 0u;  // Bug fix: clear stale WakeTick
+    t->WakeTick = 0u;  // node unlinked from sleep list  clear stale deadline
     if (t->pWaitList != nullptr)
     {
         TaktWaitListRemove(t->pWaitList, t);
@@ -397,9 +400,10 @@ TaktOSErr_t TaktOSThreadResumeSlowPath(TaktOSThread_t *t, uint32_t primask)
 }
 
 //--- Sleep --------------------------------------------------------------
-// Bug fix: TaktOSCtxSwitch() is only called when t == current.
-// Previously it was called unconditionally, causing the calling thread
-// to lose the CPU even when sleeping a different (foreign) thread.
+// Sleeping a foreign thread (t != current) marks it SLEEPING and removes it
+// from the run queue without yielding the caller; only Sleep on the current
+// thread invokes a context switch (see isCurrent guard around TaktOSCtxSwitch
+// at the end of TaktOSThreadSleepTicks).
 
 /**
  * @brief	Sleep a thread for N ticks  implementation.  @see TaktOSThread.h.
@@ -437,14 +441,11 @@ TaktOSErr_t TaktOSThreadSleepTicks(hTaktOSThread_t hThread, uint32_t ticks)
         TaktOSExitCritical(primask);
         return TAKTOS_ERR_INVALID;
     }
-    // WakeTick uses (now + ticks + 1) so the wake fires on the (N+1)th
-    // SysTick after entry, guaranteeing AT LEAST `ticks` full tick-periods
-    // have elapsed regardless of where in the current tick window this
-    // call landed.  Without the +1, a sleep entered partway through a
-    // tick wakes after only (ticks - phase) of real time — strictly less
-    // than the user requested.  Same correction applies to all timed
-    // waits in sem/mutex/queue.
-    hThread->WakeTick   = TaktOSTickCount() + ticks + 1u;
+    // Tick-based sleep uses the kernel tick counter directly: sleep(N)
+    // becomes ready when the global tick reaches now + N.  This matches
+    // the public tick API and avoids an extra tick of latency in periodic
+    // control loops and timeout tests.
+    hThread->WakeTick   = TaktOSTickCount() + ticks;
     hThread->State      = TAKTOS_SLEEPING;
     hThread->pWaitList = nullptr;   // plain sleep  not a timed kernel-object wait
     if (!TaktBlockTask(hThread))
@@ -686,15 +687,10 @@ TaktOSErr_t TaktOSThreadHandOff(hTaktOSThread_t hNext)
 }
 
 //--- Guard check --------------------------------------------------------
-
-/**
- * @brief	Check the stack guard word  implementation.  @see TaktOSThread.h.
- */
-bool TaktOSThreadGuardCheck(TaktOSThread_t *pThread)
-{
-    const uint32_t *guard = (const uint32_t*)((const uint8_t*)pThread + TAKTOS_GUARD_OFFSET);
-    return (*guard == TAKTOS_GUARD_WORD);
-}
+// TaktOSThreadGuardCheck() is now defined inline in TaktOSThread.h:
+// the body is a single load + compare and it runs every tick on
+// M4/M7-without-MPU; inlining eliminates the BL/BX overhead and a
+// cold-fetch risk that was visible in RT_TICK_JITTER on cold ICACHE.
 
 //--- Stack overflow hook (weak default) ---------------------------------
 
@@ -733,38 +729,70 @@ TAKT_WEAK void TaktOSStackOverflowHandler(hTaktOSThread_t)
 // (IOsonata).  See TaktKernel.h for the full ownership boundary.
 
 /**
+ * @brief	Clean up a timed kernel-object wait that expired.
+ *
+ * This is split out of TaktThreadWakeTick() so the common plain-sleep
+ * wake path stays straight-line.  Timed semaphore, mutex, and queue waits
+ * still need removal from their object wait list before the thread becomes
+ * ready.
+ *
+ * @param	t : Expired thread whose pWaitList is non-null.
+ */
+static TAKT_COLD void TaktThreadTimeoutCleanup(TaktOSThread_t *t)
+{
+    TaktWaitListRemove(t->pWaitList, t);
+    t->pWaitList = nullptr;
+    t->WakeReason = TAKT_WOKEN_BY_TIMEOUT;
+    t->State = TAKTOS_READY;
+}
+
+/**
  * @brief	Wake threads whose sleep deadline has expired  implementation.
  *
  * Called by TaktKernelTickHandler() on every tick.  Walks the sorted sleep
  * list from the head and wakes all threads whose WakeTick  tickCount.
- * Stamps TAKT_WOKEN_BY_TIMEOUT so TaktOSSemTake / TaktOSMutexLock can
- * distinguish a timeout from a normal wakeup.
+ * Plain SleepTicks() wakeup is kept as the hot path; timed kernel-object
+ * wait cleanup is placed in a cold helper.
  *
  * @param	tickCount : Current global tick count.
  */
 void TaktThreadWakeTick(uint32_t tickCount)
 {
-    while (g_sleepList != nullptr
-           && (int32_t)(g_sleepList->WakeTick - tickCount) <= 0)
+    TaktOSThread_t *t = g_sleepList;
+
+    if (t == nullptr || (int32_t)(t->WakeTick - tickCount) > 0)
     {
-        TaktOSThread_t *t = g_sleepList;
-        g_sleepList = t->pNext;
-        t->pNext    = nullptr;
-        t->WakeTick = 0u;
-        t->State    = TAKTOS_READY;
-
-        if (t->pWaitList != nullptr)
-        {
-            // Timed kernel-object wait expired.
-            TaktWaitListRemove(t->pWaitList, t);
-            t->pWaitList = nullptr;
-            t->WakeReason = TAKT_WOKEN_BY_TIMEOUT;
-        }
-        // else: plain sleep  wakeReason stays TAKT_WOKEN_BY_EVENT (0)
-
-        TaktReadyTask(t);
+        return;
     }
 
+    do
+    {
+        TaktOSThread_t *next = t->pNext;
+        g_sleepList = next;
+        t->pNext    = nullptr;
+        t->WakeTick = 0u;
+
+        if (TAKT_LIKELY(t->pWaitList == nullptr))
+        {
+            t->State = TAKTOS_READY;
+        }
+        else
+        {
+            TaktThreadTimeoutCleanup(t);
+        }
+
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+        if (g_TaktWakeTrace.Enabled != 0u)
+        {
+            g_TaktWakeTrace.ExpiredCount = g_TaktWakeTrace.ExpiredCount + 1u;
+        }
+#endif
+
+        TaktReadyTask(t);
+
+        t = next;
+    }
+    while (t != nullptr && (int32_t)(t->WakeTick - tickCount) <= 0);
 }
 
 /**

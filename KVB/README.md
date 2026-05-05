@@ -78,6 +78,7 @@ SYNC    Semaphores, mutexes, ownership, priority inheritance
 IPC     Queues, mailboxes, message passing, FIFO correctness
 IRQ     Interrupt-to-thread behavior and ISR API legality
 TIME    Sleep, timeout, tick, timer accuracy, jitter
+RT      Wake-to-run latency and real-time control-loop jitter
 MEM     Pools, allocators, stack behavior, memory safety hooks
 ERR     Invalid API usage, null arguments, invalid objects
 DET     Determinism and latency distribution
@@ -144,6 +145,19 @@ Validation:
   - unlock by thread B must fail
 Metric:
   - optional error-path latency
+```
+
+Example:
+
+```text
+Test: RT_SEM_WAKE_001
+Purpose: Measure wake-to-run latency from a lower-priority thread to a blocked higher-priority thread.
+Validation:
+  - higher-priority thread must be blocked before each wake
+  - every wake must produce one acknowledgement
+  - sample count must match the configured iteration count
+Metric:
+  - min / average / max wake latency in cycles and nanoseconds
 ```
 
 This prevents meaningless results such as a high mutex throughput number from a kernel configuration that does not enforce mutex ownership.
@@ -291,10 +305,22 @@ Initial test coverage:
 SCHED_COOP_001
 SYNC_SEM_FAST_001
 SYNC_MUTEX_FAST_001
+SYNC_MUTEX_PCP_FAST_001
 SYNC_MUTEX_OWNERSHIP_001
 IPC_QUEUE_FAST_001
 TIME_SLEEP_001
+RT_SEM_WAKE_001
+RT_QUEUE_WAKE_001
+RT_MUTEX_WAKE_001
+RT_TICK_JITTER_001
+RT_IRQ_MASK_001
 ```
+
+Timing notes:
+
+- `TIME_SLEEP_001` measures sleep accuracy across several requested durations instead of relying on a single short sleep. The default set is 1, 2, 3, 5, 7, 11, 19, 37, `KVB_SLEEP_TEST_TICKS`, and `KVB_SLEEP_TEST_LONG_TICKS`, repeated `KVB_SLEEP_TEST_REPEAT_COUNT` times. The odd durations are intentional: they catch off-by-one and rounding behavior that can be hidden by even-only cases. The test reports average requested time, average elapsed time, average absolute error, maximum absolute error, early count, late count, and the odd/even case count.
+- `RT_TICK_JITTER_001` measures sleep wake error against the requested target wake time, not against the average observed wake time. The default requested durations are 1, 5, 10, 17, 23, 31, and 47 ticks. The test reports signed target error (`min_error_cycles`, `avg_error_cycles`, `max_error_cycles`), absolute jitter (`max_abs_jitter_cycles`), early/late sample counts, and maximum early/late error. A stable but one-tick-late implementation is therefore reported as late by one tick, not as low jitter.
+- `RT_TAKT_WAKE_TRACE_001` is a TaktOS-only diagnostic test and is disabled by default in clean benchmark builds. Enable it only for wake-path diagnostic builds by defining `KVB_ENABLE_TAKT_WAKE_TRACE_TEST=1` for KVB and `TAKTOS_WAKE_TRACE_ENABLE` for the TaktOS library/assembly build. It instruments the kernel tick/PendSV path and should not be used in cross-kernel score tables.
 
 Near-term tests:
 
@@ -514,7 +540,7 @@ Each published result must identify the profile.
 - producer/consumer queue test
 - latency histogram
 - deterministic start barrier
-- ISR-to-thread wake latency test
+- hardware IRQ probe for maximum interrupt masking window
 
 ### Phase 3 — Priority Inversion and Error Behavior
 

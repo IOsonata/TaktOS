@@ -251,6 +251,16 @@ KvbStatus kvb_sem_post(KvbSemaphore *sem)
     return KVB_OK;
 }
 
+KvbStatus kvb_sem_post_from_isr(KvbSemaphore *sem)
+{
+    if (sem == 0) {
+        return KVB_ERR_INVALID_ARG;
+    }
+
+    k_sem_give(&sem->sem);
+    return KVB_OK;
+}
+
 KvbStatus kvb_sem_delete(KvbSemaphore *sem)
 {
     (void)sem;

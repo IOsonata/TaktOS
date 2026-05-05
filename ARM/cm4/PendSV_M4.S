@@ -35,24 +35,32 @@
  *  Phase                                              Cycles (TRM)
  *  HW exception entry (auto-stack r0–r3,r12,lr,pc,xpsr)  12
  *  MRS r0, PSP                                             1
- *  STMDB r0!, {r4–r11}          TRM: 1+8 regs             9
+ *  TST lr, #EXC_RETURN_FPU_BIT  +  IT EQ  (FPU gate)       2
+ *  STMDB r0!, {r4–r11, lr}      TRM: 1+9 regs            10
  *  LDR r1, =g_TaktosCtx         literal pool load          2
  *  LDR r2, [r1, #0]             current TCB (load-use)     2
  *  LDR r3, [r1, #4]             next TCB (hides r2 stall)  1
  *  STR r0, [r2, #0]             save SP (r2 ready)         1
  *  LDR r0, [r3, #0]             new SP  (load-use)         2
  *  STR r3, [r1, #0]             current=next (hides r0 stall) 1
- *  LDMIA r0!, {r4–r11}          TRM: 1+8 regs             9
+ *  LDMIA r0!, {r4–r11, lr}      TRM: 1+9 regs            10
+ *  TST lr, #EXC_RETURN_FPU_BIT  +  IT EQ  (FPU gate)       2
  *  MSR PSP, r0                                             1
  *  BX lr  (HW unstack begins)                              1
  *  HW exception return (unstack r0–r3,r12,lr,pc,xpsr)    10
  *                                                       ────
- *  SW body                                             ~31cy  (llvm-mca: 13cy optimistic)
- *  Total                                               ~53cy
+ *  SW body                                             ~35cy
+ *  Total                                               ~57cy
  *
  *  Load-use stall elimination: LDR r2 and LDR r3 are issued back-to-back;
  *  each hides the other's 1-cycle latency. STR r3 slides into the stall
  *  slot before LDMIA. Net saving: 3 stalls eliminated vs naive sequence.
+ *
+ *  LR is saved/restored with r4-r11 so the incoming task's EXC_RETURN
+ *  drives unstack — a task switched in with FPU context returns with the
+ *  FPU bit set in lr, and a task without FPU context returns with it
+ *  clear. Without this, the incoming task would inherit the outgoing
+ *  task's lr and corrupt the exception return frame.
  *
  *  +FPU  (__VFP_FP__ && !__SOFTFP__, FPU active):  +~18cy (VSTMDB/VLDMIA S16-S31)
  *  +PendSV_Handler_MPU block:                 +~6cy  (LDR+ORR+LDR+STR+LDR+STR)
@@ -102,6 +110,9 @@
 #endif
 
         .extern g_TaktosCtx
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+        .extern g_TaktWakeTrace
+#endif
 
 #define EXC_RETURN_THREAD_PSP   0xFFFFFFFD
 #define EXC_RETURN_FPU_BIT      0x10
@@ -112,9 +123,14 @@
  * Update here if the TCB layout changes. */
 #define TCB_STACK_BOTTOM        16
 
+#define TRACE_ENABLED           0
+#define TRACE_PENDSV_ENTRY      40
+#define TRACE_PENDSV_RETURN     44
+#define DWT_CYCCNT              0xE0001004
+
 
         /* TaktOSCtxSwitch removed from assembly.
-         * Now always_inline in ARM/include/TaktCriticalSection.h:
+         * Now always_inline in ARM/include/TaktOSCriticalSection.h:
          *   *((volatile unsigned int*)0xE000ED04u) = (1u << 28);
          * Saves ~5cy BL/BX overhead at every call site.            */
 
@@ -128,16 +144,36 @@
         .global  PendSV_Handler
         .type    PendSV_Handler, %function
         .thumb_func
-        .align   2                      /* Thumb-2 minimum (4-byte) alignment.
-                                         * Do not add .balign here -- alignment
-                                         * padding shifts surrounding hot functions
-                                         * (TaktReadyTask, TaktBlockTask, inlined
-                                         * semaphore code) to worse 128-byte
-                                         * prefetch positions in TM3/TM7 binaries.
-                                         * Align those functions individually once
-                                         * their .map addresses are known.       */
+        .balign  16                     /* ICACHE line on nRF52 NVMC = 16 B.
+                                         * Aligning the handler entry to a
+                                         * cache-line boundary guarantees its
+                                         * first line is not shared with any
+                                         * other function — the handler hits
+                                         * a fresh cache line on every entry
+                                         * regardless of which task code ran
+                                         * just before SysTick fired.  The
+                                         * older .balign 64 is still wrong
+                                         * (TM3/TM7 surrounding-function
+                                         * shift); 16 is the minimum that
+                                         * still hits this property and is
+                                         * compatible with the 16 B ICACHE
+                                         * line on nRF52 / 32 B on Cortex-M7
+                                         * (M7 cache lines are 32 B but
+                                         * accept 16 B alignment fine — line
+                                         * fill always starts at the line
+                                         * boundary regardless).         */
 
 PendSV_Handler:
+
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+        LDR     r0, = g_TaktWakeTrace
+        LDR     r1, [r0, #TRACE_ENABLED]
+        CBZ     r1, 1f
+        LDR     r1, = DWT_CYCCNT
+        LDR     r1, [r1]
+        STR     r1, [r0, #TRACE_PENDSV_ENTRY]
+1:
+#endif
 
         /* -- 1. Save current thread ---------------------------------------- */
         MRS     r0, PSP
@@ -168,7 +204,15 @@ PendSV_Handler:
 
         MSR     PSP, r0
 
-
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+        LDR     r0, = g_TaktWakeTrace
+        LDR     r1, [r0, #TRACE_ENABLED]
+        CBZ     r1, 2f
+        LDR     r1, = DWT_CYCCNT
+        LDR     r1, [r1]
+        STR     r1, [r0, #TRACE_PENDSV_RETURN]
+2:
+#endif
 
         BX      lr
 
@@ -183,9 +227,20 @@ PendSV_Handler:
         .global  PendSV_Handler_MPU
         .type    PendSV_Handler_MPU, %function
         .thumb_func
-        .align   2
+        .balign  16                     /* ICACHE-line aligned (see notes on
+                                         * PendSV_Handler above).             */
 
 PendSV_Handler_MPU:
+
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+        LDR     r0, = g_TaktWakeTrace
+        LDR     r1, [r0, #TRACE_ENABLED]
+        CBZ     r1, 1f
+        LDR     r1, = DWT_CYCCNT
+        LDR     r1, [r1]
+        STR     r1, [r0, #TRACE_PENDSV_ENTRY]
+1:
+#endif
 
         /* -- 1. Save current thread ---------------------------------------- */
         MRS     r0, PSP
@@ -226,6 +281,16 @@ PendSV_Handler_MPU:
         STR     r0, [r2]                         /* write RBAR (selects region) */
         LDR     r0, =0x10000009                 /* RASR constant               */
         STR     r0, [r2, #4]                    /* write RASR                  */
+
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+        LDR     r0, = g_TaktWakeTrace
+        LDR     r1, [r0, #TRACE_ENABLED]
+        CBZ     r1, 2f
+        LDR     r1, = DWT_CYCCNT
+        LDR     r1, [r1]
+        STR     r1, [r0, #TRACE_PENDSV_RETURN]
+2:
+#endif
 
         BX      lr
 

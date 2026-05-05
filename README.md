@@ -40,7 +40,7 @@ So the operational rule is: **immediate yield in normal Thread mode; deferred yi
 | **Certification target** | IEC 61508 SIL 2 → ASIL D (SEooC) |
 | **Platform integration** | IOsonata Land-layer primitives |
 
-¹ Design target from llvm-mca cycle budget. Measured performance via KVB (validation-gated, primary) and Thread-Metric on real hardware — nRF52832 (Cortex-M4F @ 64 MHz) and nRF54L15 (Cortex-M33 @ 128 MHz). Both benchmark suites use GCC 12.2.x across all four kernels (TaktOS / FreeRTOS / ThreadX / Zephyr) so Zephyr is compared on equal terms.
+¹ Design target from llvm-mca cycle budget. Measured performance via Thread-Metric on real hardware (nRF52832 M4, nRF54L15 M33).
 
 **RISC-V RV32 port:** placeholder, not in v1.x scope. The `RISCV/`
 directory and the `Benchmark/ThreadMetric/ESP32C*/` projects in this
@@ -53,96 +53,62 @@ silicon validation campaign and the IOsonata build path. See
 
 ---
 
-## On-target benchmark results
+## On-target benchmark results — Thread-Metric
 
-Two benchmark suites are run on the same hardware with the same toolchain pinning:
+**Suite:** eclipse-threadx/threadx Thread-Metric (MIT) — steady-state iteration counts, higher = better.  
+**Build:** All RTOSes compiled with identical flags on the same MCU. ThreadX tested with source code.
 
-- **KVB (Kernel Validation Benchmark)** — primary, validation-gated. Every reported throughput number ships with an accompanying behavioural PASS (mutex ownership rejection, sleep-duration lower bound, parameter validation), so the comparison reflects correct behaviour, not just speed. 10-second measurement window, 1 kHz tick.
-- **Thread-Metric** (eclipse-threadx/threadx, MIT) — industry-standard cross-RTOS throughput benchmark, kept as the cross-check against the de-facto baseline. 30-second steady-state windows, 1 kHz tick.
+### nRF54L15 · Cortex-M33 · 128 MHz · GCC 15.2.1 · `-Os` · 1 kHz tick
 
-**Toolchain pinning.** All four kernels are built with **GCC 12.2.x** — same major.minor that the Zephyr SDK ships (NCS v3.3.0 → GCC 12.2.0; xPack arm-none-eabi-gcc 12.2.1 for the others). Zephyr cannot substitute its SDK toolchain without breaking SDK guarantees, so the others align down to it. This removes the toolchain as a confounder; remaining differences in the headline tables reflect the kernels themselves.
+| Test | TaktOS | ThreadX | FreeRTOS | T / TX | T / FR |
+|---|---|---|---|---|---|
+| TM1  Basic Processing      |    374,404 |    374,403 |    374,303 | 1.00× | 1.00× |
+| TM2  Cooperative Scheduling | 39,161,183 | 26,466,010 | 26,474,445 | **1.48×** | **1.48×** |
+| TM3  Preemptive Scheduling  | 13,287,261 | 11,757,316 |  6,721,773 | **1.13×** | **1.98×** |
+| TM6  Message Processing     | 27,608,741 | 19,092,528 |  6,947,836 | **1.45×** | **3.97×** |
+| TM7  Synchronization        | 59,961,406 | 38,375,092 | 11,555,762 | **1.56×** | **5.19×** |
+| TM8  Mutex Processing       | 19,679,521 | 10,105,427 |  7,259,902 | **1.95×** | **2.71×** |
+| **Geometric mean (TM2–TM8)** | | | | **1.49×** | **2.77×** |
 
----
+**TM1 note:** All three RTOSes score within 0.03 % of each other on single-thread compute — no context switches occur during the TM1 window.
 
-### KVB — nRF54L15 · Cortex-M33 · 128 MHz · GCC 12.2.x · `-Os` · 1 kHz tick
+**Binary size — TM7 Synchronization `.text`** *(via `arm-none-eabi-size --format=berkeley` on the linked ELF; all three built with GCC 15.2.1, `-Os`, `--gc-sections`, same Thread-Metric harness)*:
 
-| KVB Test | TaktOS | FreeRTOS V11.3 | ThreadX V6.4.2 | Zephyr 4.3.99 | T/FR | T/TX | T/Z |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| `SCHED_COOP_001` (yields/10 s)         | 10,658,299 | 6,730,284  | 4,034,399  | 4,608,098  | **1.58×** | **2.64×** | **2.31×** |
-| `SYNC_SEM_FAST_001` (pairs/s)          |  1,468,992 |   390,280  | 1,085,516  |   526,438  | **3.76×** | **1.35×** | **2.79×** |
-| `SYNC_MUTEX_FAST_001` (pairs/s)        |  1,323,191 |   269,394  |   460,008  |   424,115  | **4.91×** | **2.88×** | **3.12×** |
-| `SYNC_MUTEX_PCP_FAST_001` (pairs/s) ¹  |    559,345 |   265,790  |   459,687  |   424,115  | **2.10×** | **1.22×** | **1.32×** |
-| `IPC_QUEUE_FAST_001` (pairs/s)         |    342,282 |   171,693  |   303,617  |   153,958  | **1.99×** | **1.13×** | **2.22×** |
-| `SYNC_MUTEX_OWNERSHIP_001`             | PASS       | PASS       | PASS       | PASS       | parity | parity | parity |
-| `TIME_SLEEP_001` ²                     | PASS @10399 µs | PASS @9479 µs | PASS @9467 µs | PASS @11000 µs | — | — | — |
+| RTOS | .text bytes | vs TaktOS |
+|---|---|---|
+| TaktOS   |  6,494 | — |
+| ThreadX  |  7,239 | +11.5% |
+| FreeRTOS |  8,824 | +35.9% |
 
-¹ TaktOS uses **Priority Ceiling Protocol (PCP)**; FreeRTOS / ThreadX / Zephyr use **Priority Inheritance (PI)**. The protocols differ — both boost holder priority, but PCP is a single ceiling assignment while PI walks the wait chain on contention. Numbers are still meaningful as "what does the kernel do when you ask for a priority-boosted mutex," but they do not measure the same algorithm.
-
-² `TIME_SLEEP_001` calls `Sleep(10 ticks)` at 1 kHz tick. KVB has two acceptance bars: 90 % floor (≥ 9000 µs — all four kernels PASS) and **strict at-least-N-ticks** (≥ 10000 µs — only **TaktOS and Zephyr** satisfy this). TaktOS satisfies it by design (the kernel adds `+1u` at every timed-wait site since the May 2026 sleep-API split). Zephyr satisfies it because `k_sleep` rounds up similarly. FreeRTOS and ThreadX clear the 90 % floor but undershoot the nominal by ~520 µs and ~530 µs respectively.
-
-### KVB — nRF52832 · Cortex-M4F · 64 MHz · GCC 12.2.x · `-Os` · 1 kHz tick
-
-| KVB Test | TaktOS | FreeRTOS V11.3 | ThreadX V6.4.2 | Zephyr 4.3.99 | T/FR | T/TX | T/Z |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| `SCHED_COOP_001` (yields/10 s)         | 4,093,473 | 2,673,007 | 1,929,845 | 1,679,433 | **1.53×** | **2.12×** | **2.44×** |
-| `SYNC_SEM_FAST_001` (pairs/s)          |   443,662 |   139,804 |   359,094 |   204,934 | **3.17×** | **1.24×** | **2.16×** |
-| `SYNC_MUTEX_FAST_001` (pairs/s)        |   375,768 |    97,238 |   157,013 |   170,778 | **3.86×** | **2.39×** | **2.20×** |
-| `SYNC_MUTEX_PCP_FAST_001` (pairs/s) ¹  |   175,466 |    97,239 |   157,404 |   168,060 | **1.80×** | **1.11×** | **1.04×** |
-| `IPC_QUEUE_FAST_001` (pairs/s)         |   110,874 |    53,586 |   100,786 |    70,166 | **2.07×** | **1.10×** | **1.58×** |
-| `SYNC_MUTEX_OWNERSHIP_001`             | PASS      | PASS      | PASS      | PASS      | parity | parity | parity |
-| `TIME_SLEEP_001` ²                     | PASS @10153 µs | PASS @9696 µs | PASS @9429 µs | PASS @11297 µs | — | — | — |
-
-**KVB suite outcome on both boards: 7 PASS / 0 FAIL / 7 total — every kernel, every run.**
-
-KVB sources and per-kernel ports live under `KVB/`. Per-board run logs:
-
-- `KVB/Targets/nRF52832/KVB_Results_nRF52832.txt`
-- `KVB/Targets/nRF52832/nRF52832_KVB_Comparison.md` *(canonical 5-run-aggregate, strict-parity)*
-- `KVB/Targets/nRF54L15/KVB_Results_nRF54L15.txt`
-- `KVB/Targets/STM32F0308/KVB_Results_STM32F0308.txt`
-- `KVB/Targets/STM32F0308/STM32F0308_KVB_Comparison.md`
+`.data` and `.bss` are not shown: both are dominated by test-harness static allocations (thread stacks, message-queue buffers, and for FreeRTOS the `configTOTAL_HEAP_SIZE` pool in `heap_4.c`). Those are per-port harness choices, not kernel properties.
 
 ---
 
-### Thread-Metric — nRF54L15 · Cortex-M33 · 128 MHz · GCC 12.2.x · `-Os` · 1 kHz tick
+### nRF52832 · Cortex-M4 · 64 MHz · GCC 15.2.1 · `-Os` · 1 kHz tick
 
-Steady-state iteration count, higher = better. Source logs: `Benchmark/ThreadMetric/nRF54L15/TestResults_nRF54L15_gcc_12_2.txt`.
+FreeRTOS TM2 ⚠ — determinism error every window, value is informational only.
 
-| Test | TaktOS | FreeRTOS V11.3 | ThreadX V6.4.2 | Zephyr 4.3.99 | T / FR | T / TX | T / Z |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| TM1  Basic Processing       |    374,397 |    374,335 |    374,394 |    373,427 | 1.00× | 1.00× | 1.00× |
-| TM2  Cooperative Scheduling | 35,209,422 | 21,557,088 ⚠ | 16,541,318 | 13,996,145 | **1.63×** | **2.13×** | **2.52×** |
-| TM3  Preemptive Scheduling  | 13,944,360 |  6,311,100 |  7,912,474 |  8,735,995 | **2.21×** | **1.76×** | **1.60×** |
-| TM6  Message Processing     | 22,979,552 |  7,251,900 | 19,092,261 |  7,308,438 | **3.17×** | **1.20×** | **3.14×** |
-| TM7  Synchronization        | 49,838,602 | 12,142,194 | 34,263,828 | 17,619,784 | **4.10×** | **1.45×** | **2.83×** |
-| TM8  Mutex Processing       | 19,406,089 |  7,075,918 |  7,539,185 |  6,701,746 | **2.74×** | **2.57×** | **2.90×** |
-| TM9  Mutex Barging (Total)  | 19,284,580 |  6,866,504 |  7,373,447 |  6,982,184 | **2.81×** | **2.62×** | **2.76×** |
-| TM9  Barge fraction ³       |      0.003 |      0.017 |      0.016 |      0.008 |   —    |   —    |   —    |
-| **Geomean (TM2–TM8)**       |            |            |            |            | **2.64×** | **1.76×** | **2.51×** |
+| Test | TaktOS | ThreadX | FreeRTOS | T / TX | T / FR |
+|---|---|---|---|---|---|
+| TM1  Basic Processing       |    143,765 |    124,641 |    124,608 | 1.15× | 1.15× |
+| TM2  Cooperative Scheduling | 13,823,020 | 10,497,840 |  8,369,345⚠ | 1.32× | 1.65× |
+| TM3  Preemptive Scheduling  |  4,793,897 |  4,354,376 |  2,380,390 | **1.10×** | **2.01×** |
+| TM6  Message Processing     |  8,952,189 |  6,564,371 |  2,158,116 | **1.36×** | **4.15×** |
+| TM7  Synchronization        | 20,381,897 | 14,632,422 |  3,910,892 | **1.39×** | **5.21×** |
+| TM8  Mutex Processing       |  6,916,236 |  3,693,281 |  2,421,976 | **1.87×** | **2.86×** |
+| **Geometric mean (TM2–TM8)** | | | | **1.39×** | **2.90×** |
 
-**TM1 note:** all four kernels score essentially the same — TM1 measures only the loop-body code generation, no scheduling occurs.
+**Binary size — TM7 Synchronization `.text`:**
 
-### Thread-Metric — nRF52832 · Cortex-M4F · 64 MHz · GCC 12.2.x · `-Os` · 1 kHz tick
+| RTOS | .text bytes | vs TaktOS |
+|---|---|---|
+| TaktOS   |  6,102 | — |
+| ThreadX  |  6,625 | +8.6% |
+| FreeRTOS | 10,164 | +66.6% |
 
-FreeRTOS TM2 ⚠ — produces "counters more than 1 different from average" determinism warnings on every 30-second window; counts are reported as captured. Source logs: `Benchmark/ThreadMetric/nRF52832/TestResults_nRF52832_gcc_12_2.txt`.
+**PX5 on nRF52832:** Eclipse projects for PX5 exist under `Benchmark/ThreadMetric/nRF52832/` but no PX5 number is published in this repo. The PX5 demo package cannot be configured the same way TaktOS, FreeRTOS, and ThreadX are tuned for this benchmark (optimization level, inlining, kernel options), so running it against them would violate the like-for-like methodology used throughout this work. Published PX5 numbers (Beningo, 2024) are cited separately in the engineering benchmark report where relevant, but are not re-run or presented as our measurement.
 
-| Test | TaktOS | FreeRTOS V11.3 | ThreadX V6.4.2 | Zephyr 4.3.99 | T / FR | T / TX | T / Z |
-|---|---:|---:|---:|---:|---:|---:|---:|
-| TM1  Basic Processing       |    124,626 |    133,534 |    124,634 |    163,500 | 0.93× | 1.00× | 0.76× |
-| TM2  Cooperative Scheduling | 14,172,449 |  8,114,857 ⚠ |  6,008,402 |  4,980,000 | **1.75×** | **2.36×** | **2.85×** |
-| TM3  Preemptive Scheduling  |  5,133,419 |  2,255,396 |  2,807,117 |  3,154,000 | **2.28×** | **1.83×** | **1.63×** |
-| TM6  Message Processing     |  7,481,555 |  2,351,340 |  6,027,274 |  2,747,000 | **3.18×** | **1.24×** | **2.72×** |
-| TM7  Synchronization        | 16,100,253 |  4,355,732 | 11,341,405 |  6,263,000 | **3.70×** | **1.42×** | **2.57×** |
-| TM8  Mutex Processing       |  6,891,808 |  2,603,737 |  2,691,913 |  2,432,000 | **2.65×** | **2.56×** | **2.83×** |
-| TM9  Mutex Barging (Total)  |  6,800,973 |  2,318,856 |  2,522,960 |  2,405,000 | **2.93×** | **2.70×** | **2.83×** |
-| TM9  Barge fraction ³       |      0.008 |      0.051 |      0.047 |      0.024 |   —    |   —    |   —    |
-| **Geomean (TM2–TM8)**       |            |            |            |            | **2.62×** | **1.81×** | **2.47×** |
-
-**TM1 note (nRF52832):** the loop-body code generation favours FreeRTOS and Zephyr slightly on this M4 build; TM1 does not exercise the scheduler so the ranking has no bearing on actual scheduling/IPC workloads.
-
-³ **TM9 Mutex Barging** — TaktOS-added test (not in upstream Thread-Metric). Four worker threads at priority 10 contend with four high-priority interlopers at priority 3 on a priority-protected mutex. The `barge fraction` = interloper ops / total ops; lower is closer to the ideal of high-priority threads always winning. TaktOS PCP holds barging ≤ 0.008 on both boards; Zephyr / ThreadX / FreeRTOS use PI and run higher (0.016–0.051). Different protocol shapes, not implementation defects.
-
-**TM4 and TM5 are not run.** TM4 requires kernel-owned hardware-timer IRQs — TaktOS does not own application IRQs by design. TM5 measures dynamic memory allocation — TaktOS has no heap by design.
+**TM4 and TM5 are not run.** TM4 requires a hardware timer IRQ owned by the test harness — TaktOS does not own application IRQs by design. TM5 measures dynamic memory allocation — TaktOS has no heap by design.
 
 ---
 
@@ -150,14 +116,12 @@ FreeRTOS TM2 ⚠ — produces "counters more than 1 different from average" dete
 
 `TAKT_INLINE_OPTIMIZATION` forces `TAKT_ALWAYS_INLINE` on the semaphore, mutex, and queue fast paths. Removing the define reverts those to regular function calls.
 
-The A/B below is the **GCC 15.2.1** capture from the previous benchmark cycle. Re-running at the new GCC 12.2.x toolchain pinning is open work; the optimisation mechanism is structural (call-site inlining of the fast paths into the caller's loop body) and the qualitative impact carries to GCC 12.2.x.
-
 | Test | nRF52832 M4  with | without | M4 Δ | nRF54L15 M33  with | without | M33 Δ |
-|---|---:|---:|---:|---:|---:|---:|
-| TM6 Message         |  8,952,189 |  7,663,774 | −14.4 % | 27,608,741 | 22,310,845 | −19.2 % |
-| TM7 Synchronization | 20,381,897 | 15,203,494 | −25.4 % | 59,961,406 | 43,116,795 | −28.1 % |
+|---|---|---|---|---|---|---|
+| TM6 Message         |  8,952,189 |  7,663,774 | −14.4% | 27,608,741 | 22,310,845 | −19.2% |
+| TM7 Synchronization | 20,381,897 | 15,203,494 | −25.4% | 59,961,406 | 43,116,795 | −28.1% |
 
-TM7 is affected more than TM6 on both boards — the entire workload is semaphore give/take. The M33 takes a larger penalty than the M4: its instruction cache eliminates flash wait states, making `BL`/`BX` call overhead proportionally more expensive. For certification builds where `TAKT_ALWAYS_INLINE` is disabled, the *without* column is the expected performance baseline.
+TM7 is affected more than TM6 on both boards — the entire workload is semaphore give/take. The M33 takes a larger penalty than the M4: its instruction cache eliminates flash wait states, making BL/BX call overhead proportionally more expensive. For certification builds where `TAKT_ALWAYS_INLINE` is disabled, the *without* column is the expected performance baseline.
 
 ---
 
@@ -193,18 +157,10 @@ TaktOS/
 │   ├── taktos_queue.cpp      # queue slow paths
 │   ├── taktos_thread.cpp     # thread lifecycle
 │   └── posix/                # PSE51 implementation
-├── Benchmark/ThreadMetric/  # Thread-Metric Eclipse projects + per-board run logs
-│   ├── nRF52832/            #   four-way runs at GCC 12.2.x
-│   └── nRF54L15/            #   four-way runs at GCC 12.2.x
-├── KVB/                     # Kernel Validation Benchmark — primary on-target test harness
-│   ├── docs/                #   design.md, porting-guide.md
-│   ├── ports/               #   per-platform timing/console + per-kernel adapter
-│   └── Targets/             #   per-board KVB suites (TaktOS / FreeRTOS / ThreadX / Zephyr)
-│       ├── nRF52832/        #     5-run-aggregate canonical comparison MD
-│       ├── nRF54L15/        #     run logs (Zephyr 4.3.99 / NCS v3.3.0)
-│       └── STM32F0308/      #     Cortex-M0 reference target
-├── examples/                # basic, mutex, posix, queue
-└── test/                    # MPU vector reloc tests (on-target)
+├── Benchmark/Thread-Metric/  # Thread-Metric Eclipse projects (nRF52832, nRF54L15)
+├── KVB/                      # Kernel Validation Benchmark — primary on-target test harness
+├── examples/                 # basic, mutex, posix, queue
+└── test/                     # MPU vector reloc tests (on-target)
 ```
 
 ### Arch port
@@ -304,7 +260,7 @@ In your firmware's `.cproject` (or Makefile), link as:
     -L .../ARM/cm4/Eclipse/ReleaseFPU
     -lTaktOS_M4
     -I .../include          # public API: TaktOS.h, TaktOSThread.h, ...
-    -I .../ARM/include      # arch headers: TaktKernelCore.h, TaktOSCriticalSection.h
+    -I .../ARM/include      # arch types: TAKTOS_THREAD_STACK_LAYOUT_OVERHEAD
 
 The Thread-Metric projects under `Benchmark/ThreadMetric/` are worked
 examples of this model on five different MCUs.
@@ -333,19 +289,11 @@ All targets: `-std=gnu++23 -fno-exceptions -fno-rtti -Os`
 There is no user config header. All kernel parameters are passed at runtime:
 
 ```c
-TaktOSInit(64000000u, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR, 0u);
-//         tick input Hz, tick rate Hz, tick clock source, handler base
-```
-
-Thread memory is statically declared by the application using one helper:
-
-```c
-static uint8_t g_MyThreadMem[TAKTOS_THREAD_MEM_SIZE(512)] TAKT_ALIGNED(4);
-//                           ^^^ usable stack in bytes; macro adds the per-arch TCB + guard overhead
+TaktOSInit(64000000u, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR, 0u);   // tick input Hz, tick rate Hz, tick clock source, handler base
 ```
 
 Stack overflow detection (paint+check guard word) is always active.
-MPU guard regions are library build options, not application defines.
+MPU/PMP guard regions are library build options, not application defines.
 
 ---
 
@@ -364,20 +312,16 @@ IOsonata architecture (the Land/Roots/Trees/Fruit orchard metaphor and `DevIntrf
 
 ## Status
 
-- [x] ARM Cortex-M0/M0+ port — KVB validated on STM32F0308
-- [x] ARM Cortex-M4/M4F port — KVB and Thread-Metric validated on nRF52832
-- [x] ARM Cortex-M7 port — functional, no benchmark run yet
-- [x] ARM Cortex-M33 port — KVB and Thread-Metric validated on nRF54L15
-- [x] ARM Cortex-M55 port — functional, no benchmark run yet
-- [x] POSIX PSE51 layer (pthread, sem, mqueue, timer) — replaces the earlier FreeRTOS-shim concept
-- [x] IPCP mutex — `TaktOSMutexInitProtect(Ceiling)` / `pthread_mutexattr_setprotocol(PTHREAD_PRIO_PROTECT)`. Plain mutex + IPCP variant exposed through both native and POSIX APIs.
-- [x] Sleep API split — `TaktOSThreadSleep(ms)` / `TaktOSThreadSleepTicks(ticks)` / `TaktOSGetTickHz()`; strict at-least-N-ticks bound on every timed wait
-- [x] KVB suite — TaktOS, FreeRTOS V11.3, Eclipse ThreadX V6.4.2, Zephyr 4.3.99 — 7/7 PASS on every run, every board (nRF52832, nRF54L15, STM32F0308)
-- [x] Thread-Metric TM1/TM2/TM3/TM6/TM7/TM8/TM9 — same four kernels, GCC 12.2.x, on nRF52832 and nRF54L15
+- [x] ARM Cortex-M0/M0+ port
+- [x] ARM Cortex-M4/M4F port — Thread-Metric validated on nRF52832
+- [x] ARM Cortex-M7 port — functional, no Thread-Metric run yet
+- [x] ARM Cortex-M33 port — Thread-Metric validated on nRF54L15
+- [x] ARM Cortex-M55 port — functional, no Thread-Metric run yet
+- [x] POSIX PSE51 layer (pthread, sem, mqueue, timer)
+- [x] Thread-Metric TM1/TM2/TM3/TM6/TM7/TM8 — TaktOS, FreeRTOS, ThreadX on nRF52832 and nRF54L15
 - [ ] RISC-V RV32IMAC port — **placeholder, not in v1.x scope.** `RISCV/` and `Benchmark/ThreadMetric/ESP32C*/` contain placeholder code only; not on the v1.x roadmap.
 - [ ] MC/DC coverage run — pending KVB host platform port (gcov-instrumented x86 build of cert-boundary modules running KVB test bodies)
-- [ ] Contended SYNC and IPC tests in KVB (`SYNC_SEM_CONTEND_001`, `IPC_QUEUE_CONTEND_001`, etc.) — Phase 2 roadmap
-- [ ] `TAKT_INLINE_OPTIMIZATION` A/B re-run at GCC 12.2.x — qualitative effect carries from the GCC 15.2.1 capture; quantitative re-run pending
+- [ ] POSIX PSE51 functional test suite — pending KVB POSIX test group
 - [ ] IEC 61508 SIL 2 certification campaign
 
 TM4 and TM5 are not planned: TM4 requires kernel-owned IRQs (TaktOS does not have them by design), TM5 requires dynamic allocation (TaktOS does not have it by design).

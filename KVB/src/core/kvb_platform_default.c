@@ -19,6 +19,11 @@ KVB_WEAK uint64_t kvb_platform_cycle_count(void)
     return 0u;
 }
 
+KVB_WEAK uint32_t kvb_platform_cycle_count32(void)
+{
+    return (uint32_t)kvb_platform_cycle_count();
+}
+
 KVB_WEAK uint32_t kvb_platform_cycle_frequency_hz(void)
 {
     return KVB_CORE_CLOCK_HZ;
@@ -101,7 +106,7 @@ KVB_WEAK const char *kvb_platform_build_optimization(void)
 
 KVB_WEAK const char *kvb_platform_build_fpu(void)
 {
-#if defined(__ARM_FP) || defined(__VFP_FP__) || defined(__riscv_flen)
+#if (defined(__ARM_FP) && (__ARM_FP != 0)) || defined(__riscv_flen)
     return "on";
 #else
     return "off";
@@ -110,10 +115,12 @@ KVB_WEAK const char *kvb_platform_build_fpu(void)
 
 KVB_WEAK const char *kvb_platform_build_float_abi(void)
 {
-#if defined(__ARM_FP) && !defined(__SOFTFP__)
-    return "hard";
-#elif defined(__ARM_FP) && defined(__SOFTFP__)
+#if defined(__ARM_FP) && (__ARM_FP != 0)
+#  if defined(__SOFTFP__)
     return "softfp";
+#  else
+    return "hard";
+#  endif
 #else
     return "soft";
 #endif
@@ -132,4 +139,27 @@ KVB_WEAK const char *kvb_platform_safety_profile(void)
 KVB_WEAK const char *kvb_platform_heap_profile(void)
 {
     return "port-defined";
+}
+
+
+KVB_WEAK KvbStatus kvb_platform_irq_probe_init(KvbPlatformIrqHandler handler, void *arg)
+{
+    (void)handler;
+    (void)arg;
+    return KVB_ERR_UNSUPPORTED;
+}
+
+KVB_WEAK KvbStatus kvb_platform_irq_probe_trigger(void)
+{
+    return KVB_ERR_UNSUPPORTED;
+}
+
+KVB_WEAK KvbStatus kvb_platform_irq_probe_disable(void)
+{
+    return KVB_ERR_UNSUPPORTED;
+}
+
+KVB_WEAK const char *kvb_platform_irq_probe_name(void)
+{
+    return "none";
 }

@@ -544,6 +544,20 @@ KvbStatus kvb_sem_post(KvbSemaphore *sem)
     return (rc == TX_SUCCESS) ? KVB_OK : kvb_threadx_status(rc, 0u);
 }
 
+KvbStatus kvb_sem_post_from_isr(KvbSemaphore *sem)
+{
+    UINT rc;
+    kvb_threadx_sem_slot_t *slot;
+
+    if (sem == NULL || sem->internal == NULL) {
+        return KVB_ERR_INVALID_ARG;
+    }
+
+    slot = (kvb_threadx_sem_slot_t *)sem->internal;
+    rc = tx_semaphore_put(&slot->sem);
+    return (rc == TX_SUCCESS) ? KVB_OK : kvb_threadx_status(rc, 0u);
+}
+
 KvbStatus kvb_sem_delete(KvbSemaphore *sem)
 {
     UINT rc;

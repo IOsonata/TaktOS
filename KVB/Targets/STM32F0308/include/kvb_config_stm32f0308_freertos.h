@@ -75,6 +75,10 @@
  * pressure.  Either way the same 1024 B figure applies. */
 #define KVB_RUNNER_STACK_SIZE   1024u
 #define KVB_DEFAULT_STACK_SIZE  256u
+#define KVB_TEST_THREAD_STACK_SIZE   256u
+#define KVB_SCHED_WORKER_STACK_SIZE  256u
+#define KVB_RT_THREAD_STACK_SIZE     256u
+#define KVB_SYNC_THREAD_STACK_SIZE   256u
 
 #define KVB_WORKER_THREAD_COUNT 3u
 
@@ -99,5 +103,15 @@
 /* Same throughput batch as the TaktOS counterpart so per-batch wall-clock
  * measurement windows are identical for direct comparison. */
 #define KVB_THROUGHPUT_BATCH    256u
+
+#define KVB_ENABLE_RT_TESTS          1u
+#define KVB_RT_LATENCY_ITERATIONS    64u
+#define KVB_RT_JITTER_ITERATIONS     32u
+
+/* STM32F0308 is Cortex-M0, so there is no DWT cycle counter.
+ * The STM32F0308 platform port provides a SysTick-derived microsecond
+ * timebase, and the RT tests use that fallback with reduced iteration
+ * counts and shared helper stacks. This keeps the canonical KVB test set
+ * active on the 8 KB SRAM target. */
 
 #endif /* KVB_CONFIG_STM32F0308_FREERTOS_H */

@@ -39,15 +39,22 @@ static void kvb_log_metadata(void)
              kvb_platform_compiler_name(),
              kvb_platform_compiler_version());
 
-    kvb_logf("[KVB] CONFIG measurement_ms=%u warmup_ms=%u throughput_batch=%u workers=%u queue_depth=%u queue_msg_size=%u stack_size=%u runner_stack_size=%u",
+    kvb_logf("[KVB] CONFIG measurement_ms=%u warmup_ms=%u throughput_batch=%u workers=%u queue_depth=%u queue_msg_size=%u",
              (unsigned)KVB_MEASUREMENT_MS,
              (unsigned)KVB_WARMUP_MS,
              (unsigned)KVB_THROUGHPUT_BATCH,
              (unsigned)KVB_WORKER_THREAD_COUNT,
              (unsigned)KVB_QUEUE_DEPTH,
-             (unsigned)KVB_QUEUE_MESSAGE_SIZE,
+             (unsigned)KVB_QUEUE_MESSAGE_SIZE);
+
+    kvb_logf("[KVB] CONFIG_STACK default=%u test=%u sched=%u rt=%u sync=%u runner=%u rt_tests=%u",
              (unsigned)KVB_DEFAULT_STACK_SIZE,
-             (unsigned)KVB_RUNNER_STACK_SIZE);
+             (unsigned)KVB_TEST_THREAD_STACK_SIZE,
+             (unsigned)KVB_SCHED_WORKER_STACK_SIZE,
+             (unsigned)KVB_RT_THREAD_STACK_SIZE,
+             (unsigned)KVB_SYNC_THREAD_STACK_SIZE,
+             (unsigned)KVB_RUNNER_STACK_SIZE,
+             (unsigned)KVB_ENABLE_RT_TESTS);
 
     kvb_logf("[KVB] BUILD opt=%s fpu=%s float_abi=%s timing=%s safety=\"%s\" heap=%s",
              kvb_platform_build_optimization(),

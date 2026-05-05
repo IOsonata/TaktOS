@@ -98,7 +98,7 @@ struct __TaktOSThread_s {
 	void *pSp;							//!< offset  0  loaded by context switch handler
 	uint8_t Priority;					//!< offset  4  current EFFECTIVE priority (may be boosted by IPCP)
 	uint8_t	State;						//!< offset  5  uint8_t enum; no padding before WakeTick
-	uint8_t WakeReason;					//!< offset  6 - TAKT_WOKEN_BY_EVENT / _TIMEOUT
+	uint8_t WakeReason;					//!< offset  6 - TAKT_WOKEN_BY_EVENT / _TIMEOUT / _RESUME
 	uint8_t BasePriority;				//!< offset  7  original priority (set in Create); IPCP unboost target
 	uint32_t WakeTick;					//!< offset  8
 	struct __TaktOSThread_s *pNext;		//!< offset 12  run queue and sleep list
@@ -362,7 +362,7 @@ void TaktSleepListRemove(hTaktOSThread_t hThread);
 //                     Declared in the arch-specific TaktKernelCore.h /
 //                     TaktOSCriticalSection.h header included above.
 //  TaktOSStartFirst  launch the first task.  Mechanism is ISA-specific:
-//                     ARM raises SVC #0  SVC_Handler switches MSPPSP;
+//                     ARM raises SVC #0  SVC_Handler switches MSP→PSP;
 //                     RISC-V loads the first frame and executes mret.
 //                     Declared in the arch-specific header (not here) so
 //                     the call site in taktos.cpp resolves it at link time

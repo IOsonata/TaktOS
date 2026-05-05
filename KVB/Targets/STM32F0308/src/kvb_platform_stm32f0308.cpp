@@ -29,6 +29,14 @@
 #include "kvb_platform_port.h"
 #include "kvb_config.h"
 
+static inline uint32_t kvb_stm32f0308_in_exception(void)
+{
+    uint32_t ipsr;
+
+    __asm volatile ("mrs %0, ipsr" : "=r" (ipsr));
+    return ipsr != 0u;
+}
+
 /* ----- Kernel-agnostic tick getter ------------------------------------ */
 
 #if defined(KVB_PORT_TAKTOS) && (KVB_PORT_TAKTOS != 0)
@@ -42,6 +50,10 @@
 #  include "task.h"
    static inline uint32_t kvb_stm32f0308_tick_count(void)
    {
+       if (kvb_stm32f0308_in_exception() != 0u) {
+           return (uint32_t)xTaskGetTickCountFromISR();
+       }
+
        return (uint32_t)xTaskGetTickCount();
    }
 #elif defined(KVB_PORT_THREADX) && (KVB_PORT_THREADX != 0)
@@ -113,4 +125,45 @@ extern "C" const char *kvb_platform_board_name(void)
 extern "C" const char *kvb_platform_cpu_name(void)
 {
     return "Cortex-M0 @ 48 MHz (STM32F030R8)";
+}
+
+
+/* ----- IRQ probe ------------------------------------------------------- */
+
+extern "C" KvbStatus kvb_platform_cortex_m_irq_probe_init(uint32_t irq_n,
+                                                           uint32_t priority,
+                                                           KvbPlatformIrqHandler handler,
+                                                           void *arg);
+extern "C" KvbStatus kvb_platform_cortex_m_irq_probe_trigger(void);
+extern "C" KvbStatus kvb_platform_cortex_m_irq_probe_disable(void);
+extern "C" void kvb_platform_cortex_m_irq_probe_handler(void);
+
+#define KVB_STM32F0308_IRQ_PROBE_N 22u     /* TIM17_IRQn */
+
+extern "C" KvbStatus kvb_platform_irq_probe_init(KvbPlatformIrqHandler handler, void *arg)
+{
+    return kvb_platform_cortex_m_irq_probe_init(KVB_STM32F0308_IRQ_PROBE_N,
+                                                KVB_IRQ_PROBE_PRIORITY,
+                                                handler,
+                                                arg);
+}
+
+extern "C" KvbStatus kvb_platform_irq_probe_trigger(void)
+{
+    return kvb_platform_cortex_m_irq_probe_trigger();
+}
+
+extern "C" KvbStatus kvb_platform_irq_probe_disable(void)
+{
+    return kvb_platform_cortex_m_irq_probe_disable();
+}
+
+extern "C" const char *kvb_platform_irq_probe_name(void)
+{
+    return "NVIC TIM17";
+}
+
+extern "C" void TIM17_IRQHandler(void)
+{
+    kvb_platform_cortex_m_irq_probe_handler();
 }

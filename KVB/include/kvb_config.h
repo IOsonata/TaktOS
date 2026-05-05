@@ -23,17 +23,37 @@
 #define KVB_WARMUP_MS 100u
 #endif
 
-/* KVB_DEFAULT_STACK_SIZE is the USABLE stack size requested by tests for
-   each test thread, in bytes.  Tests must allocate
-   KVB_THREAD_BUF_SIZE(KVB_DEFAULT_STACK_SIZE) bytes of backing buffer so
-   that every kernel — including kernels that store the TCB inside the
-   caller-provided block — delivers the same usable stack. */
+/* KVB_DEFAULT_STACK_SIZE is the baseline usable stack size, in bytes.
+ * Individual test roles can override it with the role-specific stack
+ * macros below.  Tests must allocate buffers through KVB_THREAD_STACK_*
+ * macros so each kernel port can add its native TCB, frame, guard, and
+ * alignment overhead while preserving the requested usable stack. */
 #ifndef KVB_DEFAULT_STACK_SIZE
 #define KVB_DEFAULT_STACK_SIZE 1024u
 #endif
 
 #ifndef KVB_RUNNER_STACK_SIZE
 #define KVB_RUNNER_STACK_SIZE 2048u
+#endif
+
+/* Test-thread stack sizes are split by role so small-SRAM targets can tune
+ * only the helper threads that need less call depth while keeping the runner
+ * stack large enough for logging.  Values are usable stack bytes; kernel
+ * ports still apply their native TCB, frame, guard, and alignment overhead. */
+#ifndef KVB_TEST_THREAD_STACK_SIZE
+#define KVB_TEST_THREAD_STACK_SIZE KVB_DEFAULT_STACK_SIZE
+#endif
+
+#ifndef KVB_SCHED_WORKER_STACK_SIZE
+#define KVB_SCHED_WORKER_STACK_SIZE KVB_TEST_THREAD_STACK_SIZE
+#endif
+
+#ifndef KVB_RT_THREAD_STACK_SIZE
+#define KVB_RT_THREAD_STACK_SIZE KVB_TEST_THREAD_STACK_SIZE
+#endif
+
+#ifndef KVB_SYNC_THREAD_STACK_SIZE
+#define KVB_SYNC_THREAD_STACK_SIZE KVB_TEST_THREAD_STACK_SIZE
 #endif
 
 #ifndef KVB_WORKER_THREAD_COUNT
@@ -56,6 +76,10 @@
 #define KVB_SLEEP_TEST_TICKS 10u
 #endif
 
+/* TIME_SLEEP_001 also includes fixed odd durations: 1, 3, 5, 7,
+   11, 19, and 37 ticks.  Keep this configurable case available for
+   target-specific smoke checks without removing the odd-duration spread. */
+
 /* Tick-based sleep APIs normally wake after N tick boundaries, not necessarily
    after N complete wall-clock tick periods from the call site.  If a test calls
    sleep just before the next tick, a request for N ticks may measure close to
@@ -63,6 +87,14 @@
    aligns to a tick boundary before measuring. */
 #ifndef KVB_SLEEP_TEST_STRICT_MINIMUM
 #define KVB_SLEEP_TEST_STRICT_MINIMUM 0
+#endif
+
+#ifndef KVB_SLEEP_TEST_LONG_TICKS
+#define KVB_SLEEP_TEST_LONG_TICKS 100u
+#endif
+
+#ifndef KVB_SLEEP_TEST_REPEAT_COUNT
+#define KVB_SLEEP_TEST_REPEAT_COUNT 8u
 #endif
 
 /* Maximum number of extra scheduler ticks accepted by TIME_SLEEP_001.
@@ -79,12 +111,42 @@
 #define KVB_THROUGHPUT_BATCH 1024u
 #endif
 
+
+/* Real-time responsiveness implementation selector.  The KVB manifest stays
+ * canonical: every target registers the same RT test IDs.  Mainline
+ * Cortex-M targets normally use DWT/CYCCNT.  Small/no-DWT targets should
+ * provide kvb_platform_time_us() and tune KVB_RT_* stack/iteration values
+ * before disabling this group.  Set KVB_ENABLE_RT_TESTS to 0 only when the
+ * target truly has no usable high-resolution timebase or cannot reserve even
+ * the shared RT helper stacks. */
+#ifndef KVB_ENABLE_RT_TESTS
+#define KVB_ENABLE_RT_TESTS 1u
+#endif
+
+#ifndef KVB_RT_LATENCY_ITERATIONS
+#define KVB_RT_LATENCY_ITERATIONS 256u
+#endif
+
+#ifndef KVB_RT_JITTER_ITERATIONS
+#define KVB_RT_JITTER_ITERATIONS 128u
+#endif
+
+#ifndef KVB_IRQ_PROBE_PRIORITY
+#define KVB_IRQ_PROBE_PRIORITY 0xC0u
+#endif
+
+/* TaktOS-only wake-path trace diagnostic. Keep disabled for clean benchmark
+   runs because it instruments the kernel tick/PendSV path. */
+#ifndef KVB_ENABLE_TAKT_WAKE_TRACE_TEST
+#define KVB_ENABLE_TAKT_WAKE_TRACE_TEST 0u
+#endif
+
 #ifndef KVB_LOG_BUFFER_SIZE
 #define KVB_LOG_BUFFER_SIZE 192u
 #endif
 
 #ifndef KVB_MAX_METRICS_PER_TEST
-#define KVB_MAX_METRICS_PER_TEST 8u
+#define KVB_MAX_METRICS_PER_TEST 16u
 #endif
 
 /* UART reset settling. Some debug probes / USB-UART bridges can deliver stale

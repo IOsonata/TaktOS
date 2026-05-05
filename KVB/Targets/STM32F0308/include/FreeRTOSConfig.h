@@ -4,17 +4,12 @@
 /* -------------------------------------------------------------------------- *
  *  FreeRTOS kernel configuration for STM32F0308-DISCO / STM32F030R8 @ 48 MHz.
  *
- *  ** DIAGNOSTIC BUILD — DYNAMIC ALLOCATION **
- *
- *  This variant uses heap_4 with a 4 KB heap to test whether the static-only
- *  build's PendSV hardfault is specific to the static buffer initialisation
- *  path or a more fundamental issue with the V11+ ARM_CM0 port on this
- *  IOsonata-startup environment.
- *
- *  If THIS variant runs successfully, the bug is localized to
- *  pxPortInitialiseStack's static-buffer setup.  If THIS variant also
- *  hardfaults in PendSV, the bug is unrelated to allocation strategy
- *  (likely vector table, scheduler init sequence, or CCR.STKALIGN).
+ *  Dynamic allocation build.  STM32F030R8 has only 8 KB of SRAM, so the
+ *  FreeRTOS port keeps the 4 KB heap_4 arena but does not also reserve the
+ *  caller-provided static KVB stack buffers.  The shared KVB tests still
+ *  pass their requested stack sizes through the port macros; xTaskCreate()
+ *  receives those sizes directly and allocates the actual stacks from the
+ *  FreeRTOS heap.
  *
  *  Cortex-M0 (ARMv6-M).  No NVIC priority bits worth subdividing for the
  *  syscall mask — FreeRTOS uses the standard PendSV/SVC/SysTick priority
@@ -65,7 +60,7 @@
 
 #define configSUPPORT_DYNAMIC_ALLOCATION        1
 #define configSUPPORT_STATIC_ALLOCATION         0
-#define configTOTAL_HEAP_SIZE                   ( ( size_t ) 4096 )   /* 4 KB heap_4, diagnostic build */
+#define configTOTAL_HEAP_SIZE                   ( ( size_t ) 4096 )   /* 4 KB heap_4 arena */
 
 #define configCHECK_FOR_STACK_OVERFLOW          2
 #define configUSE_MALLOC_FAILED_HOOK            0

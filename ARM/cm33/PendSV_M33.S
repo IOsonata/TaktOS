@@ -40,8 +40,8 @@
  * PSPLIM — always active (no gate):
  *   Every Cortex-M33 part has PSPLIM. Writing it on every context switch gives
  *   hardware stack-overflow detection (UsageFault) at zero configuration cost.
- *   r3 = next TCB is preserved through LDMIA (restores r4-r11 only), so
- *   LDR r0, [r3, #TCB_STACK_BOTTOM] + MSR PSPLIM, r0 costs ~3cy and requires
+ *   r3 = next TCB is preserved through LDMIA (which restores r4-r11 and lr),
+ *   so LDR r0, [r3, #TCB_STACK_BOTTOM] + MSR PSPLIM, r0 costs ~3cy and requires
  *   no extra register saves.  SVC_Handler also sets PSPLIM for the first task.
  *
  * Cycle budget — no FPU, no MPU (Cortex-M33, PSPLIM always on):
@@ -49,17 +49,22 @@
  *  Phase                                              Cycles (TRM)
  *  HW exception entry (auto-stack)                       12
  *  MRS r0, PSP                                            1
- *  STMDB r0!, {r4–r11}         TRM: 1+8 regs             9
+ *  TST lr, #EXC_RETURN_FPU_BIT  +  IT EQ  (FPU gate)      2
+ *  STMDB r0!, {r4–r11, lr}     TRM: 1+9 regs            10
  *  LDR r1 + dual-load r2/r3 + STR/LDR/STR            ~8  (stalls hidden)
- *  LDMIA r0!, {r4–r11}         TRM: 1+8 regs             9
+ *  LDMIA r0!, {r4–r11, lr}     TRM: 1+9 regs            10
+ *  TST lr, #EXC_RETURN_FPU_BIT  +  IT EQ  (FPU gate)      2
  *  MSR PSP, r0                                            1
  *  LDR r0, [r3, #TCB_STACK_BOTTOM]                        2
  *  MSR PSPLIM, r0                                         2
  *  BX lr  (HW unstack begins)                             1
  *  HW exception return                                   10
  *                                                     ────
- *  SW body                                            ~34cy
- *  Total                                              ~56cy
+ *  SW body                                            ~39cy
+ *  Total                                              ~61cy
+ *
+ *  LR is saved/restored with r4-r11 so the incoming task's EXC_RETURN drives
+ *  the FPU bit on unstack on a per-task basis.
  *
  *  +FPU  (__VFP_FP__ && !__SOFTFP__, FPU active):  +~18cy
  *  +PendSV_Handler_MPU block (MPU region 7 write): +~6cy  (STR RNR + ORR + STR RBAR + ORR + STR RLAR)
@@ -109,6 +114,9 @@
 #endif
 
         .extern g_TaktosCtx
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+        .extern g_TaktWakeTrace
+#endif
 
 /* EXC_RETURN for first-task launch via SVC_Handler.
  * ARMv8-M Secure single mode (no NS world):
@@ -125,6 +133,11 @@
  * Update here if the TCB layout changes. */
 #define TCB_STACK_BOTTOM        16
 
+#define TRACE_ENABLED           0
+#define TRACE_PENDSV_ENTRY      40
+#define TRACE_PENDSV_RETURN     44
+#define DWT_CYCCNT              0xE0001004
+
 /* MPU region reserved for the per-task stack guard.  Must match
  * MPU_GUARD_REGION in takt_mpu_v8m.h (C header cannot be included in .S). */
 #define TAKT_MPU_GUARD_REGION   7
@@ -135,7 +148,7 @@
 
 
         /* TaktOSCtxSwitch removed from assembly.
-         * Now always_inline in ARM/include/TaktCriticalSection.h:
+         * Now always_inline in ARM/include/TaktOSCriticalSection.h:
          *   *((volatile unsigned int*)0xE000ED04u) = (1u << 28);
          * Saves ~5cy BL/BX overhead at every call site.            */
 
@@ -152,6 +165,16 @@
         .align   3
 
 PendSV_Handler:
+
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+        LDR     r0, = g_TaktWakeTrace
+        LDR     r1, [r0, #TRACE_ENABLED]
+        CBZ     r1, 1f
+        LDR     r1, = DWT_CYCCNT
+        LDR     r1, [r1]
+        STR     r1, [r0, #TRACE_PENDSV_ENTRY]
+1:
+#endif
 
         /* ── 1. Save current thread ──────────────────────────────────── */
         MRS     r0, PSP
@@ -187,7 +210,15 @@ PendSV_Handler:
         LDR     r0, [r3, #TCB_STACK_BOTTOM]   /* 32-byte-aligned guard base   */
         MSR     PSPLIM, r0
 
-
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+        LDR     r0, = g_TaktWakeTrace
+        LDR     r1, [r0, #TRACE_ENABLED]
+        CBZ     r1, 2f
+        LDR     r1, = DWT_CYCCNT
+        LDR     r1, [r1]
+        STR     r1, [r0, #TRACE_PENDSV_RETURN]
+2:
+#endif
 
         BX      lr
 
@@ -199,7 +230,7 @@ PendSV_Handler:
  *
  * BUG FIX: use r2 = next TCB throughout so PSPLIM can read pStackBottom
  * from r2 after the stack is restored. The previous version used r0 for
- * the next_thread load, lost the TCB pointer, then read r2 undefined.
+ * the pNextThread load, lost the TCB pointer, then read r2 undefined.
  * ═══════════════════════════════════════════════════════════════════════════ */
 
         .section .text.SVC_Handler, "ax", %progbits
@@ -265,6 +296,16 @@ SVC_Handler:
 
 PendSV_Handler_MPU:
 
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+        LDR     r0, = g_TaktWakeTrace
+        LDR     r1, [r0, #TRACE_ENABLED]
+        CBZ     r1, 1f
+        LDR     r1, = DWT_CYCCNT
+        LDR     r1, [r1]
+        STR     r1, [r0, #TRACE_PENDSV_ENTRY]
+1:
+#endif
+
         /* ── 1. Save current thread ──────────────────────────────────── */
         MRS     r0, PSP
 
@@ -306,6 +347,16 @@ PendSV_Handler_MPU:
         STR     r1, [r2, #4]                   /* RBAR @ RNR+4                  */
         ORR     r1, r0, #0x01                  /* RLAR: base | AttrIndx=0 | EN=1     */
         STR     r1, [r2, #8]                   /* RLAR @ RNR+8                  */
+
+#if defined(TAKTOS_WAKE_TRACE_ENABLE)
+        LDR     r0, = g_TaktWakeTrace
+        LDR     r1, [r0, #TRACE_ENABLED]
+        CBZ     r1, 2f
+        LDR     r1, = DWT_CYCCNT
+        LDR     r1, [r1]
+        STR     r1, [r0, #TRACE_PENDSV_RETURN]
+2:
+#endif
 
         BX      lr
 

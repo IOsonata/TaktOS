@@ -91,8 +91,15 @@ typedef struct KvbTimer {
  * stack interior. */
 #define KVB_FREERTOS_STACK_BYTES_ALIGNED(usable_bytes) \
     (((usable_bytes) + (size_t)portBYTE_ALIGNMENT - 1u) & ~((size_t)portBYTE_ALIGNMENT - 1u))
-#define KVB_FREERTOS_STACK_WORDS(usable_bytes) \
+#define KVB_FREERTOS_STACK_WORDS_RAW(usable_bytes) \
     (KVB_FREERTOS_STACK_BYTES_ALIGNED(usable_bytes) / sizeof(StackType_t))
+#define KVB_FREERTOS_STACK_WORDS(usable_bytes) \
+    ((KVB_FREERTOS_STACK_WORDS_RAW(usable_bytes) < (size_t)configMINIMAL_STACK_SIZE) ? \
+        (size_t)configMINIMAL_STACK_SIZE : KVB_FREERTOS_STACK_WORDS_RAW(usable_bytes))
+#define KVB_FREERTOS_STACK_BYTES(usable_bytes) \
+    (KVB_FREERTOS_STACK_WORDS(usable_bytes) * sizeof(StackType_t))
+
+#if (configSUPPORT_STATIC_ALLOCATION == 1)
 
 #define KVB_THREAD_STACK_DEFINE(name, usable_bytes) \
     StackType_t name[KVB_FREERTOS_STACK_WORDS(usable_bytes)] \
@@ -110,6 +117,31 @@ typedef struct KvbTimer {
     uint8_t name[(message_size) * (message_count)] \
         __attribute__((aligned(portBYTE_ALIGNMENT)))
 #define KVB_QUEUE_STORAGE_MEM(name) ((void *)(name))
+
+#else /* configSUPPORT_STATIC_ALLOCATION != 1 */
+
+/* Dynamic FreeRTOS builds do not consume caller-provided stack or queue
+ * storage.  Keep a one-byte aligned placeholder so the shared KVB tests
+ * compile unchanged, but return the requested usable stack size through
+ * the *_SIZE() macros so xTaskCreate() receives the same stack budget as
+ * the static-allocation builds. */
+#define KVB_THREAD_STACK_DEFINE(name, usable_bytes) \
+    uint8_t name[1] __attribute__((aligned(portBYTE_ALIGNMENT))); \
+    enum { name##_kvb_stack_size = KVB_FREERTOS_STACK_BYTES(usable_bytes) }
+#define KVB_THREAD_STACK_ARRAY_DEFINE(name, count, usable_bytes) \
+    uint8_t name[(count)][1] __attribute__((aligned(portBYTE_ALIGNMENT))); \
+    enum { name##_kvb_stack_size = KVB_FREERTOS_STACK_BYTES(usable_bytes) }
+
+#define KVB_THREAD_STACK_MEM(name) ((void *)(name))
+#define KVB_THREAD_STACK_SIZE(name) ((size_t)(name##_kvb_stack_size))
+#define KVB_THREAD_STACK_ARRAY_MEM(name, index) ((void *)((name)[(index)]))
+#define KVB_THREAD_STACK_ARRAY_SIZE(name, index) ((size_t)(name##_kvb_stack_size))
+
+#define KVB_QUEUE_STORAGE_DEFINE(name, message_size, message_count) \
+    uint8_t name[1] __attribute__((aligned(portBYTE_ALIGNMENT)))
+#define KVB_QUEUE_STORAGE_MEM(name) ((void *)(name))
+
+#endif /* configSUPPORT_STATIC_ALLOCATION */
 
 #ifdef __cplusplus
 }

@@ -63,6 +63,16 @@
  * peak.  The 1024 B figure here covers vsnprintf and the call chain. */
 #define KVB_RUNNER_STACK_SIZE   1024u
 #define KVB_DEFAULT_STACK_SIZE  256u
+#define KVB_TEST_THREAD_STACK_SIZE   192u
+#define KVB_SCHED_WORKER_STACK_SIZE  128u
+#define KVB_RT_THREAD_STACK_SIZE     128u
+#define KVB_SYNC_THREAD_STACK_SIZE   128u
+
+/* STM32F030R8 has only 8 KB SRAM. Keep the runner at 1024 B because it
+ * executes kvb_logf/newlib-nano formatting, but size the helper threads
+ * separately. These workers do not format log strings; they block, wake,
+ * yield, and touch kernel objects only. The target-local value avoids
+ * carrying the larger nRF5x/nRF54 helper-thread budget into this board. */
 
 #define KVB_WORKER_THREAD_COUNT 3u
 
@@ -95,5 +105,15 @@
  * wall-clock time uncomfortably long.  SysTick-derived timing has CPU-
  * cycle resolution so smaller batches stay accurate. */
 #define KVB_THROUGHPUT_BATCH    256u
+
+#define KVB_ENABLE_RT_TESTS          1u
+#define KVB_RT_LATENCY_ITERATIONS    64u
+#define KVB_RT_JITTER_ITERATIONS     32u
+
+/* STM32F0308 is Cortex-M0, so there is no DWT cycle counter.
+ * The STM32F0308 platform port provides a SysTick-derived microsecond
+ * timebase, and the RT tests use that fallback with reduced iteration
+ * counts and shared helper stacks. This keeps the canonical KVB test set
+ * active on the 8 KB SRAM target. */
 
 #endif /* KVB_CONFIG_STM32F0308_H */
