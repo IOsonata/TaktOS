@@ -286,10 +286,28 @@ All targets: `-std=gnu++23 -fno-exceptions -fno-rtti -Os`
 
 ### Configuration
 
-There is no user config header. All kernel parameters are passed at runtime:
+There is no user config header. All kernel parameters are passed at runtime
+through a single `TaktOSCfg_t` struct.  Any zero field falls back to the
+documented per-field default, so the standard configuration only needs the
+chip clock specified:
 
 ```c
-TaktOSInit(64000000u, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR, 0u);   // tick input Hz, tick rate Hz, tick clock source, handler base
+TaktOSCfg_t cfg = { .KernClockHz = 64000000u };
+TaktOSInit(&cfg);
+```
+
+Override only the fields that deviate from the default — typical full
+example for a chip that needs an explicit software-interrupt address:
+
+```c
+TaktOSCfg_t cfg = {
+    .KernClockHz = 16000000u,            // tick peripheral input clock (Hz)
+    .TickHz      = 1000u,                // default; can be omitted
+    .TickClockSrc    = TAKTOS_TICK_CLOCK_PROCESSOR,  // default; can be omitted
+    .HandlerBaseAddr = (uintptr_t)gRamVectorTable,   // ARM MPU vector relocation
+    .SoftIntAddr     = 0x600C00D8u,      // RISC-V ESP32-C3 SYSTEM_CPU_INTR_FROM_CPU_0
+};
+TaktOSInit(&cfg);
 ```
 
 Stack overflow detection (paint+check guard word) is always active.
