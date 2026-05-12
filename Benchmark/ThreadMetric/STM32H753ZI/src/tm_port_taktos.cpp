@@ -277,8 +277,11 @@ extern "C" void tm_initialize(void (*test_initialization_function)(void))
 
     tm_set_system_handler_priorities();
 
-    if (TaktOSInit(TM_TAKTOS_CORE_CLOCK_HZ, TM_TAKTOS_TICK_HZ,
-                   TAKTOS_TICK_CLOCK_PROCESSOR, 0u) != TAKTOS_OK) {
+    TaktOSCfg_t cfg = {
+        .KernClockHz     = TM_TAKTOS_CORE_CLOCK_HZ,
+        .TickHz          = TM_TAKTOS_TICK_HZ,
+    };
+    if (TaktOSInit(&cfg) != TAKTOS_OK) {
         tm_check_fail("FATAL: TaktOSInit failed\n");
     }
 

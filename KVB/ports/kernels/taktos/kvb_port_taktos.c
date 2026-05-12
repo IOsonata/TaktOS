@@ -103,10 +103,11 @@ KvbStatus kvb_kernel_start(KvbRunnerEntry runner, void *arg)
     g_runner_entry = runner;
     g_runner_arg = arg;
 
-    if (TaktOSInit(KVB_CORE_CLOCK_HZ,
-                   KVB_TICK_HZ,
-                   TAKTOS_TICK_CLOCK_PROCESSOR,
-                   0u) != TAKTOS_OK) {
+    TaktOSCfg_t cfg = {
+        .KernClockHz     = KVB_CORE_CLOCK_HZ,
+        .TickHz          = KVB_TICK_HZ,
+    };
+    if (TaktOSInit(&cfg) != TAKTOS_OK) {
         return KVB_ERR_KERNEL;
     }
 

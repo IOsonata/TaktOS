@@ -99,7 +99,8 @@ static void ProducerThread(void *arg)
 
 void TaktOS_MPU_Example(uint32_t coreClockHz)
 {
-    TaktOSInit(coreClockHz, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR, 0u);
+    TaktOSCfg_t cfg = { .KernClockHz     = coreClockHz };
+    TaktOSInit(&cfg);
     TaktOSSemInit(&gSem, 0u, 1u);
 
     TaktOSThreadCreate(gConsumerThreadMem, sizeof(gConsumerThreadMem),

@@ -241,8 +241,11 @@ int main(void)
 {
     RelocateVectorTableToRam();
 
-    if (TaktOSInit(APP_CORE_CLOCK_HZ, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR,
-                   (uintptr_t)gRamVectorTable) != TAKTOS_OK)
+    TaktOSCfg_t cfg = {
+        .KernClockHz     = APP_CORE_CLOCK_HZ,
+        .HandlerBaseAddr = (uintptr_t)gRamVectorTable,
+    };
+    if (TaktOSInit(&cfg) != TAKTOS_OK)
     {
         for (;;)
         {

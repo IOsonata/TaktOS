@@ -189,7 +189,8 @@ static void BootstrapThreadEntry(void *)
 
 int main()
 {
-    TaktOSInit(APP_CORE_CLOCK_HZ, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR, 0u);
+    TaktOSCfg_t cfg = { .KernClockHz     = APP_CORE_CLOCK_HZ };
+    TaktOSInit(&cfg);
     gBootstrapThread.Create(gBootstrapThreadMem, sizeof(gBootstrapThreadMem),
                             BootstrapThreadEntry, nullptr, TAKTOS_PRIORITY_NORMAL);
     TaktOSStart();

@@ -10,279 +10,560 @@ Finished building: FreeRTOS_STM32F0308_KvbSuite.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "FreeRTOS_STM32F0308_KvbSuite.elf"
    text     data      bss      dec      hex  filename
-  20899      460     6400    27759     6c6f  FreeRTOS_STM32F0308_KvbSuite.elf
+  32208      456     5644    38308     95a4  FreeRTOS_STM32F0308_KvbSuite.elf
 Finished building: FreeRTOS_STM32F0308_KvbSuite.siz
 
 
+
 [KVB] BEGIN RUN
 [KVB] VERSION 0.1.0-private
 [KVB] KERNEL name=FreeRTOS version=V11.1.0+
 [KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=0
-[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=g
+[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=gcc version="15.2.1 20251203"
+[KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16
+[KVB] CONFIG_STACK default=256 test=256 sched=256 rt=256 sync=256 runner=1024 rt_tests=1
+[KVB] BUILD opt=size fpu=off float_abi=soft timing=port-default safety="port-defined" heap=port-defined
 [KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
 [KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
 [KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1775300 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=591766 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=591767 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1808448 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=602816 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=602816 unit=iterations
 [KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
 [KVB] END id=SCHED_COOP_001 state=PASS
 [KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
 [KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1126656 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000977 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=112654 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1097728 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000931 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=109762 unit=pairs_per_sec
 [KVB] END id=SYNC_SEM_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=781056 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001078 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=78097 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=751360 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001334 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=75125 unit=pairs_per_sec
 [KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
+[KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=755968 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000167 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=75595 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pi_variant value=1 unit=
+[KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
 [KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
 [KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
 [KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
 [KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
 [KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=393216 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10001281 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=39316 unit=pairs_per_sec
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=386048 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10002872 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=38593 unit=pairs_per_sec
 [KVB] END id=IPC_QUEUE_FAST_001 state=PASS
-[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
-[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
-[KVB] METRIC id=TIME_SLEEP_001 name=requested_ticks value=10 unit=ticks
+[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep accuracy across durations"
+[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep accuracy measured across multiple durations"
+[KVB] METRIC id=TIME_SLEEP_001 name=sleep_cases value=10 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=odd_sleep_cases value=7 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=even_sleep_cases value=3 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=repeat_count value=8 unit=samples_per_case
+[KVB] METRIC id=TIME_SLEEP_001 name=total_samples value=80 unit=samples
 [KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=10005 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_requested_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_elapsed_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=worst_requested_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=early_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=late_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=max_early_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=max_late_ticks value=0 unit=ticks
 [KVB] END id=TIME_SLEEP_001 state=PASS
-[KVB] SUMMARY pass=6 fail=0 unsupported=0 skipped=0 invalid=0 total=6
+[KVB] BEGIN id=RT_SEM_WAKE_001 group=RT name="semaphore wake-to-run latency"
+[KVB] RESULT id=RT_SEM_WAKE_001 group=RT state=PASS message="blocked semaphore waiter wake latency measured"
+[KVB] METRIC id=RT_SEM_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_SEM_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_SEM_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_latency value=29 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_latency value=31 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_latency value=36 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_ns value=29000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_ns value=31000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_ns value=36000 unit=ns
+[KVB] END id=RT_SEM_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_QUEUE_WAKE_001 group=RT name="queue receiver wake-to-run latency"
+[KVB] RESULT id=RT_QUEUE_WAKE_001 group=RT state=PASS message="blocked queue receiver wake latency measured"
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_latency value=40 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_latency value=43 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_latency value=49 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_ns value=40000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_ns value=43000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_ns value=49000 unit=ns
+[KVB] END id=RT_QUEUE_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_MUTEX_WAKE_001 group=RT name="mutex waiter wake-to-run latency"
+[KVB] RESULT id=RT_MUTEX_WAKE_001 group=RT state=PASS message="blocked mutex waiter wake latency measured"
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_latency value=34 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_latency value=37 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_latency value=43 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_ns value=34000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_ns value=37000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_ns value=43000 unit=ns
+[KVB] END id=RT_MUTEX_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_TICK_JITTER_001 group=RT name="sleep wake target jitter"
+[KVB] RESULT id=RT_TICK_JITTER_001 group=RT state=PASS message="multi-duration sleep jitter measured against target wake time"
+[KVB] METRIC id=RT_TICK_JITTER_001 name=sleep_cases value=7 unit=cases
+[KVB] METRIC id=RT_TICK_JITTER_001 name=samples_per_case value=4 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=total_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=tick_cycles value=1000 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_target_cycles value=19142 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_observed_cycles value=19106 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_error_cycles value=-36 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=min_error_cycles value=-45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_error_cycles value=-2 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_cycles value=45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_ns value=45000 unit=ns
+[KVB] METRIC id=RT_TICK_JITTER_001 name=worst_requested_sleep_ticks value=5 unit=ticks
+[KVB] METRIC id=RT_TICK_JITTER_001 name=early_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=late_samples value=0 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_early_cycles value=45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_late_cycles value=0 unit=cycles
+[KVB] END id=RT_TICK_JITTER_001 state=PASS
+[KVB] BEGIN id=RT_IRQ_MASK_001 group=RT name="IRQ response and ISR-to-thread latency"
+[KVB] RESULT id=RT_IRQ_MASK_001 group=RT state=PASS message="IRQ trigger-to-thread responsiveness measured"
+[KVB] METRIC id=RT_IRQ_MASK_001 name=irq_probe_supported value=1 unit=bool
+[KVB] METRIC id=RT_IRQ_MASK_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_IRQ_MASK_001 name=errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=isr_errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_irq_cycles value=18 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_cycles value=25 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_ns value=25000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_irq_to_thread_cycles value=31 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_cycles value=35 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_ns value=35000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_thread_cycles value=49 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_cycles value=53 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_ns value=53000 unit=ns
+[KVB] END id=RT_IRQ_MASK_001 state=PASS
+[KVB] SUMMARY pass=12 fail=0 unsupported=0 skipped=0 invalid=0 total=12
 [KVB] END RUN
+
+
 [KVB] BEGIN RUN
 [KVB] VERSION 0.1.0-private
 [KVB] KERNEL name=FreeRTOS version=V11.1.0+
 [KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=0
-[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=g
+[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=gcc version="15.2.1 20251203"
+[KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16
+[KVB] CONFIG_STACK default=256 test=256 sched=256 rt=256 sync=256 runner=1024 rt_tests=1
+[KVB] BUILD opt=size fpu=off float_abi=soft timing=port-default safety="port-defined" heap=port-defined
 [KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
 [KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
 [KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1775300 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=591766 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=591767 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1808448 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=602816 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=602816 unit=iterations
 [KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
 [KVB] END id=SCHED_COOP_001 state=PASS
 [KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
 [KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1126656 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000979 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=112654 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1097728 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000931 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=109762 unit=pairs_per_sec
 [KVB] END id=SYNC_SEM_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=781056 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001078 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=78097 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=751360 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001334 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=75125 unit=pairs_per_sec
 [KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
+[KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=755968 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000167 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=75595 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pi_variant value=1 unit=
+[KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
 [KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
 [KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
 [KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
 [KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
 [KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=393216 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10001281 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=39316 unit=pairs_per_sec
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=386048 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10002872 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=38593 unit=pairs_per_sec
 [KVB] END id=IPC_QUEUE_FAST_001 state=PASS
-[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
-[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
-[KVB] METRIC id=TIME_SLEEP_001 name=requested_ticks value=10 unit=ticks
+[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep accuracy across durations"
+[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep accuracy measured across multiple durations"
+[KVB] METRIC id=TIME_SLEEP_001 name=sleep_cases value=10 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=odd_sleep_cases value=7 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=even_sleep_cases value=3 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=repeat_count value=8 unit=samples_per_case
+[KVB] METRIC id=TIME_SLEEP_001 name=total_samples value=80 unit=samples
 [KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=10005 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_requested_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_elapsed_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=worst_requested_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=early_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=late_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=max_early_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=max_late_ticks value=0 unit=ticks
 [KVB] END id=TIME_SLEEP_001 state=PASS
-[KVB] SUMMARY pass=6 fail=0 unsupported=0 skipped=0 invalid=0 total=6
+[KVB] BEGIN id=RT_SEM_WAKE_001 group=RT name="semaphore wake-to-run latency"
+[KVB] RESULT id=RT_SEM_WAKE_001 group=RT state=PASS message="blocked semaphore waiter wake latency measured"
+[KVB] METRIC id=RT_SEM_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_SEM_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_SEM_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_latency value=29 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_latency value=31 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_latency value=36 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_ns value=29000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_ns value=31000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_ns value=36000 unit=ns
+[KVB] END id=RT_SEM_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_QUEUE_WAKE_001 group=RT name="queue receiver wake-to-run latency"
+[KVB] RESULT id=RT_QUEUE_WAKE_001 group=RT state=PASS message="blocked queue receiver wake latency measured"
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_latency value=40 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_latency value=43 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_latency value=49 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_ns value=40000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_ns value=43000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_ns value=49000 unit=ns
+[KVB] END id=RT_QUEUE_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_MUTEX_WAKE_001 group=RT name="mutex waiter wake-to-run latency"
+[KVB] RESULT id=RT_MUTEX_WAKE_001 group=RT state=PASS message="blocked mutex waiter wake latency measured"
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_latency value=34 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_latency value=37 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_latency value=43 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_ns value=34000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_ns value=37000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_ns value=43000 unit=ns
+[KVB] END id=RT_MUTEX_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_TICK_JITTER_001 group=RT name="sleep wake target jitter"
+[KVB] RESULT id=RT_TICK_JITTER_001 group=RT state=PASS message="multi-duration sleep jitter measured against target wake time"
+[KVB] METRIC id=RT_TICK_JITTER_001 name=sleep_cases value=7 unit=cases
+[KVB] METRIC id=RT_TICK_JITTER_001 name=samples_per_case value=4 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=total_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=tick_cycles value=1000 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_target_cycles value=19142 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_observed_cycles value=19106 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_error_cycles value=-36 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=min_error_cycles value=-45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_error_cycles value=-2 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_cycles value=45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_ns value=45000 unit=ns
+[KVB] METRIC id=RT_TICK_JITTER_001 name=worst_requested_sleep_ticks value=5 unit=ticks
+[KVB] METRIC id=RT_TICK_JITTER_001 name=early_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=late_samples value=0 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_early_cycles value=45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_late_cycles value=0 unit=cycles
+[KVB] END id=RT_TICK_JITTER_001 state=PASS
+[KVB] BEGIN id=RT_IRQ_MASK_001 group=RT name="IRQ response and ISR-to-thread latency"
+[KVB] RESULT id=RT_IRQ_MASK_001 group=RT state=PASS message="IRQ trigger-to-thread responsiveness measured"
+[KVB] METRIC id=RT_IRQ_MASK_001 name=irq_probe_supported value=1 unit=bool
+[KVB] METRIC id=RT_IRQ_MASK_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_IRQ_MASK_001 name=errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=isr_errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_irq_cycles value=18 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_cycles value=25 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_ns value=25000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_irq_to_thread_cycles value=31 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_cycles value=35 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_ns value=35000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_thread_cycles value=49 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_cycles value=53 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_ns value=53000 unit=ns
+[KVB] END id=RT_IRQ_MASK_001 state=PASS
+[KVB] SUMMARY pass=12 fail=0 unsupported=0 skipped=0 invalid=0 total=12
 [KVB] END RUN
+
+
 [KVB] BEGIN RUN
 [KVB] VERSION 0.1.0-private
 [KVB] KERNEL name=FreeRTOS version=V11.1.0+
 [KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=0
-[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=g
+[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=gcc version="15.2.1 20251203"
+[KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16
+[KVB] CONFIG_STACK default=256 test=256 sched=256 rt=256 sync=256 runner=1024 rt_tests=1
+[KVB] BUILD opt=size fpu=off float_abi=soft timing=port-default safety="port-defined" heap=port-defined
 [KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
 [KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
 [KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1775300 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=591766 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=591767 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1808448 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=602816 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=602816 unit=iterations
 [KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
 [KVB] END id=SCHED_COOP_001 state=PASS
 [KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
 [KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1126656 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000979 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=112654 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1097728 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000931 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=109762 unit=pairs_per_sec
 [KVB] END id=SYNC_SEM_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=781056 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001078 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=78097 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=751360 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001334 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=75125 unit=pairs_per_sec
 [KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
+[KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=755968 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000167 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=75595 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pi_variant value=1 unit=
+[KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
 [KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
 [KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
 [KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
 [KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
 [KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=393216 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10001281 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=39316 unit=pairs_per_sec
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=386048 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10002872 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=38593 unit=pairs_per_sec
 [KVB] END id=IPC_QUEUE_FAST_001 state=PASS
-[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
-[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
-[KVB] METRIC id=TIME_SLEEP_001 name=requested_ticks value=10 unit=ticks
+[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep accuracy across durations"
+[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep accuracy measured across multiple durations"
+[KVB] METRIC id=TIME_SLEEP_001 name=sleep_cases value=10 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=odd_sleep_cases value=7 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=even_sleep_cases value=3 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=repeat_count value=8 unit=samples_per_case
+[KVB] METRIC id=TIME_SLEEP_001 name=total_samples value=80 unit=samples
 [KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=10005 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_requested_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_elapsed_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=worst_requested_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=early_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=late_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=max_early_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=max_late_ticks value=0 unit=ticks
 [KVB] END id=TIME_SLEEP_001 state=PASS
-[KVB] SUMMARY pass=6 fail=0 unsupported=0 skipped=0 invalid=0 total=6
+[KVB] BEGIN id=RT_SEM_WAKE_001 group=RT name="semaphore wake-to-run latency"
+[KVB] RESULT id=RT_SEM_WAKE_001 group=RT state=PASS message="blocked semaphore waiter wake latency measured"
+[KVB] METRIC id=RT_SEM_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_SEM_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_SEM_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_latency value=29 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_latency value=31 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_latency value=36 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_ns value=29000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_ns value=31000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_ns value=36000 unit=ns
+[KVB] END id=RT_SEM_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_QUEUE_WAKE_001 group=RT name="queue receiver wake-to-run latency"
+[KVB] RESULT id=RT_QUEUE_WAKE_001 group=RT state=PASS message="blocked queue receiver wake latency measured"
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_latency value=40 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_latency value=43 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_latency value=49 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_ns value=40000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_ns value=43000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_ns value=49000 unit=ns
+[KVB] END id=RT_QUEUE_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_MUTEX_WAKE_001 group=RT name="mutex waiter wake-to-run latency"
+[KVB] RESULT id=RT_MUTEX_WAKE_001 group=RT state=PASS message="blocked mutex waiter wake latency measured"
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_latency value=34 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_latency value=37 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_latency value=43 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_ns value=34000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_ns value=37000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_ns value=43000 unit=ns
+[KVB] END id=RT_MUTEX_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_TICK_JITTER_001 group=RT name="sleep wake target jitter"
+[KVB] RESULT id=RT_TICK_JITTER_001 group=RT state=PASS message="multi-duration sleep jitter measured against target wake time"
+[KVB] METRIC id=RT_TICK_JITTER_001 name=sleep_cases value=7 unit=cases
+[KVB] METRIC id=RT_TICK_JITTER_001 name=samples_per_case value=4 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=total_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=tick_cycles value=1000 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_target_cycles value=19142 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_observed_cycles value=19106 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_error_cycles value=-36 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=min_error_cycles value=-45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_error_cycles value=-2 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_cycles value=45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_ns value=45000 unit=ns
+[KVB] METRIC id=RT_TICK_JITTER_001 name=worst_requested_sleep_ticks value=5 unit=ticks
+[KVB] METRIC id=RT_TICK_JITTER_001 name=early_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=late_samples value=0 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_early_cycles value=45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_late_cycles value=0 unit=cycles
+[KVB] END id=RT_TICK_JITTER_001 state=PASS
+[KVB] BEGIN id=RT_IRQ_MASK_001 group=RT name="IRQ response and ISR-to-thread latency"
+[KVB] RESULT id=RT_IRQ_MASK_001 group=RT state=PASS message="IRQ trigger-to-thread responsiveness measured"
+[KVB] METRIC id=RT_IRQ_MASK_001 name=irq_probe_supported value=1 unit=bool
+[KVB] METRIC id=RT_IRQ_MASK_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_IRQ_MASK_001 name=errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=isr_errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_irq_cycles value=18 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_cycles value=25 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_ns value=25000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_irq_to_thread_cycles value=31 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_cycles value=35 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_ns value=35000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_thread_cycles value=49 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_cycles value=53 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_ns value=53000 unit=ns
+[KVB] END id=RT_IRQ_MASK_001 state=PASS
+[KVB] SUMMARY pass=12 fail=0 unsupported=0 skipped=0 invalid=0 total=12
 [KVB] END RUN
+
+
 [KVB] BEGIN RUN
 [KVB] VERSION 0.1.0-private
 [KVB] KERNEL name=FreeRTOS version=V11.1.0+
 [KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=0
-[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=g
+[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=gcc version="15.2.1 20251203"
+[KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16
+[KVB] CONFIG_STACK default=256 test=256 sched=256 rt=256 sync=256 runner=1024 rt_tests=1
+[KVB] BUILD opt=size fpu=off float_abi=soft timing=port-default safety="port-defined" heap=port-defined
 [KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
 [KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
 [KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1775300 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=591766 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=591767 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1808448 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=602816 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=602816 unit=iterations
 [KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
 [KVB] END id=SCHED_COOP_001 state=PASS
 [KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
 [KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1126656 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000979 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=112654 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1097728 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000931 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=109762 unit=pairs_per_sec
 [KVB] END id=SYNC_SEM_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=781056 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001078 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=78097 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=751360 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001334 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=75125 unit=pairs_per_sec
 [KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
+[KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=755968 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000167 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=75595 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pi_variant value=1 unit=
+[KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
 [KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
 [KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
 [KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
 [KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
 [KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=393216 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10001281 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=39316 unit=pairs_per_sec
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=386048 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10002872 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=38593 unit=pairs_per_sec
 [KVB] END id=IPC_QUEUE_FAST_001 state=PASS
-[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
-[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
-[KVB] METRIC id=TIME_SLEEP_001 name=requested_ticks value=10 unit=ticks
+[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep accuracy across durations"
+[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep accuracy measured across multiple durations"
+[KVB] METRIC id=TIME_SLEEP_001 name=sleep_cases value=10 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=odd_sleep_cases value=7 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=even_sleep_cases value=3 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=repeat_count value=8 unit=samples_per_case
+[KVB] METRIC id=TIME_SLEEP_001 name=total_samples value=80 unit=samples
 [KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=10005 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_requested_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_elapsed_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=worst_requested_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=early_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=late_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=max_early_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=max_late_ticks value=0 unit=ticks
 [KVB] END id=TIME_SLEEP_001 state=PASS
-[KVB] SUMMARY pass=6 fail=0 unsupported=0 skipped=0 invalid=0 total=6
-[KVB] END RUN
-[KVB] BEGIN RUN
-[KVB] VERSION 0.1.0-private
-[KVB] KERNEL name=FreeRTOS version=V11.1.0+
-[KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=0
-[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=g
-[KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
-[KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
-[KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1775300 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=591766 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=591767 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
-[KVB] END id=SCHED_COOP_001 state=PASS
-[KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
-[KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1126656 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000979 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=112654 unit=pairs_per_sec
-[KVB] END id=SYNC_SEM_FAST_001 state=PASS
-[KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
-[KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=781056 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001078 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=78097 unit=pairs_per_sec
-[KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
-[KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
-[KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
-[KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
-[KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
-[KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
-[KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=393216 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10001281 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=39316 unit=pairs_per_sec
-[KVB] END id=IPC_QUEUE_FAST_001 state=PASS
-[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
-[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
-[KVB] METRIC id=TIME_SLEEP_001 name=requested_ticks value=10 unit=ticks
-[KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=10005 unit=us
-[KVB] END id=TIME_SLEEP_001 state=PASS
-[KVB] SUMMARY pass=6 fail=0 unsupported=0 skipped=0 invalid=0 total=6
-[KVB] END RUN
-[KVB] BEGIN RUN
-[KVB] VERSION 0.1.0-private
-[KVB] KERNEL name=FreeRTOS version=V11.1.0+
-[KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=0
-[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=g
-[KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
-[KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
-[KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1775300 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=591766 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=591767 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
-[KVB] END id=SCHED_COOP_001 state=PASS
-[KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
-[KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1126656 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000979 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=112654 unit=pairs_per_sec
-[KVB] END id=SYNC_SEM_FAST_001 state=PASS
-[KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
-[KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=781056 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001078 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=78097 unit=pairs_per_sec
-[KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
-[KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
-[KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
-[KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
-[KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
-[KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
-[KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=393216 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10001281 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=39316 unit=pairs_per_sec
-[KVB] END id=IPC_QUEUE_FAST_001 state=PASS
-[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
-[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
-[KVB] METRIC id=TIME_SLEEP_001 name=requested_ticks value=10 unit=ticks
-[KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=10005 unit=us
-[KVB] END id=TIME_SLEEP_001 state=PASS
-[KVB] SUMMARY pass=6 fail=0 unsupported=0 skipped=0 invalid=0 total=6
+[KVB] BEGIN id=RT_SEM_WAKE_001 group=RT name="semaphore wake-to-run latency"
+[KVB] RESULT id=RT_SEM_WAKE_001 group=RT state=PASS message="blocked semaphore waiter wake latency measured"
+[KVB] METRIC id=RT_SEM_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_SEM_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_SEM_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_latency value=29 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_latency value=31 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_latency value=36 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_ns value=29000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_ns value=31000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_ns value=36000 unit=ns
+[KVB] END id=RT_SEM_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_QUEUE_WAKE_001 group=RT name="queue receiver wake-to-run latency"
+[KVB] RESULT id=RT_QUEUE_WAKE_001 group=RT state=PASS message="blocked queue receiver wake latency measured"
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_latency value=40 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_latency value=43 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_latency value=49 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_ns value=40000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_ns value=43000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_ns value=49000 unit=ns
+[KVB] END id=RT_QUEUE_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_MUTEX_WAKE_001 group=RT name="mutex waiter wake-to-run latency"
+[KVB] RESULT id=RT_MUTEX_WAKE_001 group=RT state=PASS message="blocked mutex waiter wake latency measured"
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_latency value=34 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_latency value=37 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_latency value=43 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_ns value=34000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_ns value=37000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_ns value=43000 unit=ns
+[KVB] END id=RT_MUTEX_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_TICK_JITTER_001 group=RT name="sleep wake target jitter"
+[KVB] RESULT id=RT_TICK_JITTER_001 group=RT state=PASS message="multi-duration sleep jitter measured against target wake time"
+[KVB] METRIC id=RT_TICK_JITTER_001 name=sleep_cases value=7 unit=cases
+[KVB] METRIC id=RT_TICK_JITTER_001 name=samples_per_case value=4 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=total_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=tick_cycles value=1000 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_target_cycles value=19142 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_observed_cycles value=19106 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_error_cycles value=-36 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=min_error_cycles value=-45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_error_cycles value=-2 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_cycles value=45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_ns value=45000 unit=ns
+[KVB] METRIC id=RT_TICK_JITTER_001 name=worst_requested_sleep_ticks value=5 unit=ticks
+[KVB] METRIC id=RT_TICK_JITTER_001 name=early_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=late_samples value=0 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_early_cycles value=45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_late_cycles value=0 unit=cycles
+[KVB] END id=RT_TICK_JITTER_001 state=PASS
+[KVB] BEGIN id=RT_IRQ_MASK_001 group=RT name="IRQ response and ISR-to-thread latency"
+[KVB] RESULT id=RT_IRQ_MASK_001 group=RT state=PASS message="IRQ trigger-to-thread responsiveness measured"
+[KVB] METRIC id=RT_IRQ_MASK_001 name=irq_probe_supported value=1 unit=bool
+[KVB] METRIC id=RT_IRQ_MASK_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_IRQ_MASK_001 name=errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=isr_errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_irq_cycles value=18 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_cycles value=25 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_ns value=25000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_irq_to_thread_cycles value=31 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_cycles value=35 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_ns value=35000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_thread_cycles value=49 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_cycles value=53 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_ns value=53000 unit=ns
+[KVB] END id=RT_IRQ_MASK_001 state=PASS
+[KVB] SUMMARY pass=12 fail=0 unsupported=0 skipped=0 invalid=0 total=12
 [KVB] END RUN
 
 
@@ -296,236 +577,563 @@ Finished building: TaktOS_STM32F0308_KvbSuite.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "TaktOS_STM32F0308_KvbSuite.elf"
    text     data      bss      dec      hex  filename
-  20039      452     3924    24415     5f5f  TaktOS_STM32F0308_KvbSuite.elf
+  31784      452     4292    36528     8eb0  TaktOS_STM32F0308_KvbSuite.elf
 Finished building: TaktOS_STM32F0308_KvbSuite.siz
 
 
 
+
 [KVB] BEGIN RUN
 [KVB] VERSION 0.1.0-private
 [KVB] KERNEL name=TaktOS version=private-dev
 [KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=0 mutex_pp=1 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=1
-[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=g
+[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=gcc version="15.2.1 20251203"
+[KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16
+[KVB] CONFIG_STACK default=256 test=192 sched=128 rt=128 sync=128 runner=1024 rt_tests=1
+[KVB] BUILD opt=size fpu=off float_abi=soft timing=port-default safety="port-defined" heap=port-defined
 [KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
 [KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
 [KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=2518433 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=839477 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=839478 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=2518635 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=839545 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=839545 unit=iterations
 [KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
 [KVB] END id=SCHED_COOP_001 state=PASS
 [KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
 [KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=2443520 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000109 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=244349 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=2470656 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000629 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=247050 unit=pairs_per_sec
 [KVB] END id=SYNC_SEM_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=1760512 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10000626 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=176040 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=2168576 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001080 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=216834 unit=pairs_per_sec
 [KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
+[KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=1083392 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000387 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=108335 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pcp_variant value=1 unit=
+[KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
 [KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
 [KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
 [KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
 [KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
 [KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=791296 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10003146 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=79104 unit=pairs_per_sec
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=779776 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10000286 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=77975 unit=pairs_per_sec
 [KVB] END id=IPC_QUEUE_FAST_001 state=PASS
-[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
-[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
-[KVB] METRIC id=TIME_SLEEP_001 name=requested_ticks value=10 unit=ticks
+[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep accuracy across durations"
+[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep accuracy measured across multiple durations"
+[KVB] METRIC id=TIME_SLEEP_001 name=sleep_cases value=10 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=odd_sleep_cases value=7 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=even_sleep_cases value=3 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=repeat_count value=8 unit=samples_per_case
+[KVB] METRIC id=TIME_SLEEP_001 name=total_samples value=80 unit=samples
 [KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=10476 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_requested_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_elapsed_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=worst_requested_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=early_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=late_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=max_early_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=max_late_ticks value=0 unit=ticks
 [KVB] END id=TIME_SLEEP_001 state=PASS
-[KVB] SUMMARY pass=6 fail=0 unsupported=0 skipped=0 invalid=0 total=6
+[KVB] BEGIN id=RT_SEM_WAKE_001 group=RT name="semaphore wake-to-run latency"
+[KVB] RESULT id=RT_SEM_WAKE_001 group=RT state=PASS message="blocked semaphore waiter wake latency measured"
+[KVB] METRIC id=RT_SEM_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_SEM_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_SEM_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_latency value=20 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_latency value=21 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_latency value=27 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_ns value=20000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_ns value=21000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_ns value=27000 unit=ns
+[KVB] END id=RT_SEM_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_QUEUE_WAKE_001 group=RT name="queue receiver wake-to-run latency"
+[KVB] RESULT id=RT_QUEUE_WAKE_001 group=RT state=PASS message="blocked queue receiver wake latency measured"
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_latency value=21 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_latency value=23 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_latency value=31 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_ns value=21000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_ns value=23000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_ns value=31000 unit=ns
+[KVB] END id=RT_QUEUE_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_MUTEX_WAKE_001 group=RT name="mutex waiter wake-to-run latency"
+[KVB] RESULT id=RT_MUTEX_WAKE_001 group=RT state=PASS message="blocked mutex waiter wake latency measured"
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_latency value=21 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_latency value=24 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_latency value=30 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_ns value=21000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_ns value=24000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_ns value=30000 unit=ns
+[KVB] END id=RT_MUTEX_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_TICK_JITTER_001 group=RT name="sleep wake target jitter"
+[KVB] RESULT id=RT_TICK_JITTER_001 group=RT state=PASS message="multi-duration sleep jitter measured against target wake time"
+[KVB] METRIC id=RT_TICK_JITTER_001 name=sleep_cases value=7 unit=cases
+[KVB] METRIC id=RT_TICK_JITTER_001 name=samples_per_case value=4 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=total_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=tick_cycles value=1000 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_target_cycles value=19142 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_observed_cycles value=19108 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_error_cycles value=-34 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=min_error_cycles value=-43 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_error_cycles value=-9 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_cycles value=43 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_ns value=43000 unit=ns
+[KVB] METRIC id=RT_TICK_JITTER_001 name=worst_requested_sleep_ticks value=5 unit=ticks
+[KVB] METRIC id=RT_TICK_JITTER_001 name=early_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=late_samples value=0 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_early_cycles value=43 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_late_cycles value=0 unit=cycles
+[KVB] END id=RT_TICK_JITTER_001 state=PASS
+[KVB] BEGIN id=RT_IRQ_MASK_001 group=RT name="IRQ response and ISR-to-thread latency"
+[KVB] RESULT id=RT_IRQ_MASK_001 group=RT state=PASS message="IRQ trigger-to-thread responsiveness measured"
+[KVB] METRIC id=RT_IRQ_MASK_001 name=irq_probe_supported value=1 unit=bool
+[KVB] METRIC id=RT_IRQ_MASK_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_IRQ_MASK_001 name=errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=isr_errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_irq_cycles value=17 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_cycles value=21 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_ns value=21000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_irq_to_thread_cycles value=24 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_cycles value=29 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_ns value=29000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_thread_cycles value=41 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_cycles value=47 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_ns value=47000 unit=ns
+[KVB] END id=RT_IRQ_MASK_001 state=PASS
+[KVB] SUMMARY pass=12 fail=0 unsupported=0 skipped=0 invalid=0 total=12
 [KVB] END RUN
+
+
 [KVB] BEGIN RUN
 [KVB] VERSION 0.1.0-private
 [KVB] KERNEL name=TaktOS version=private-dev
 [KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=0 mutex_pp=1 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=1
-[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=g
+[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=gcc version="15.2.1 20251203"
+[KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16
+[KVB] CONFIG_STACK default=256 test=192 sched=128 rt=128 sync=128 runner=1024 rt_tests=1
+[KVB] BUILD opt=size fpu=off float_abi=soft timing=port-default safety="port-defined" heap=port-defined
 [KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
 [KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
 [KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=2518433 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=839477 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=839478 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=2518635 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=839545 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=839545 unit=iterations
 [KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
 [KVB] END id=SCHED_COOP_001 state=PASS
 [KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
 [KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=2443520 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000109 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=244349 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=2470656 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000424 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=247055 unit=pairs_per_sec
 [KVB] END id=SYNC_SEM_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=1760512 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10000626 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=176040 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=2168576 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001081 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=216834 unit=pairs_per_sec
 [KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
+[KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=1083392 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000393 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=108334 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pcp_variant value=1 unit=
+[KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
 [KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
 [KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
 [KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
 [KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
 [KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=791296 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10003146 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=79104 unit=pairs_per_sec
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=779776 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10000288 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=77975 unit=pairs_per_sec
 [KVB] END id=IPC_QUEUE_FAST_001 state=PASS
-[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
-[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
-[KVB] METRIC id=TIME_SLEEP_001 name=requested_ticks value=10 unit=ticks
+[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep accuracy across durations"
+[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep accuracy measured across multiple durations"
+[KVB] METRIC id=TIME_SLEEP_001 name=sleep_cases value=10 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=odd_sleep_cases value=7 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=even_sleep_cases value=3 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=repeat_count value=8 unit=samples_per_case
+[KVB] METRIC id=TIME_SLEEP_001 name=total_samples value=80 unit=samples
 [KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=10476 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_requested_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_elapsed_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=worst_requested_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=early_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=late_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=max_early_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=max_late_ticks value=0 unit=ticks
 [KVB] END id=TIME_SLEEP_001 state=PASS
-[KVB] SUMMARY pass=6 fail=0 unsupported=0 skipped=0 invalid=0 total=6
+[KVB] BEGIN id=RT_SEM_WAKE_001 group=RT name="semaphore wake-to-run latency"
+[KVB] RESULT id=RT_SEM_WAKE_001 group=RT state=PASS message="blocked semaphore waiter wake latency measured"
+[KVB] METRIC id=RT_SEM_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_SEM_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_SEM_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_latency value=20 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_latency value=21 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_latency value=27 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_ns value=20000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_ns value=21000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_ns value=27000 unit=ns
+[KVB] END id=RT_SEM_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_QUEUE_WAKE_001 group=RT name="queue receiver wake-to-run latency"
+[KVB] RESULT id=RT_QUEUE_WAKE_001 group=RT state=PASS message="blocked queue receiver wake latency measured"
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_latency value=21 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_latency value=23 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_latency value=31 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_ns value=21000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_ns value=23000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_ns value=31000 unit=ns
+[KVB] END id=RT_QUEUE_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_MUTEX_WAKE_001 group=RT name="mutex waiter wake-to-run latency"
+[KVB] RESULT id=RT_MUTEX_WAKE_001 group=RT state=PASS message="blocked mutex waiter wake latency measured"
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_latency value=21 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_latency value=24 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_latency value=30 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_ns value=21000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_ns value=24000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_ns value=30000 unit=ns
+[KVB] END id=RT_MUTEX_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_TICK_JITTER_001 group=RT name="sleep wake target jitter"
+[KVB] RESULT id=RT_TICK_JITTER_001 group=RT state=PASS message="multi-duration sleep jitter measured against target wake time"
+[KVB] METRIC id=RT_TICK_JITTER_001 name=sleep_cases value=7 unit=cases
+[KVB] METRIC id=RT_TICK_JITTER_001 name=samples_per_case value=4 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=total_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=tick_cycles value=1000 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_target_cycles value=19142 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_observed_cycles value=19108 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_error_cycles value=-34 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=min_error_cycles value=-43 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_error_cycles value=-9 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_cycles value=43 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_ns value=43000 unit=ns
+[KVB] METRIC id=RT_TICK_JITTER_001 name=worst_requested_sleep_ticks value=5 unit=ticks
+[KVB] METRIC id=RT_TICK_JITTER_001 name=early_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=late_samples value=0 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_early_cycles value=43 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_late_cycles value=0 unit=cycles
+[KVB] END id=RT_TICK_JITTER_001 state=PASS
+[KVB] BEGIN id=RT_IRQ_MASK_001 group=RT name="IRQ response and ISR-to-thread latency"
+[KVB] RESULT id=RT_IRQ_MASK_001 group=RT state=PASS message="IRQ trigger-to-thread responsiveness measured"
+[KVB] METRIC id=RT_IRQ_MASK_001 name=irq_probe_supported value=1 unit=bool
+[KVB] METRIC id=RT_IRQ_MASK_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_IRQ_MASK_001 name=errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=isr_errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_irq_cycles value=17 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_cycles value=21 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_ns value=21000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_irq_to_thread_cycles value=24 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_cycles value=29 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_ns value=29000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_thread_cycles value=41 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_cycles value=47 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_ns value=47000 unit=ns
+[KVB] END id=RT_IRQ_MASK_001 state=PASS
+[KVB] SUMMARY pass=12 fail=0 unsupported=0 skipped=0 invalid=0 total=12
 [KVB] END RUN
+
+
 [KVB] BEGIN RUN
 [KVB] VERSION 0.1.0-private
 [KVB] KERNEL name=TaktOS version=private-dev
 [KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=0 mutex_pp=1 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=1
-[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=g
+[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=gcc version="15.2.1 20251203"
+[KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16
+[KVB] CONFIG_STACK default=256 test=192 sched=128 rt=128 sync=128 runner=1024 rt_tests=1
+[KVB] BUILD opt=size fpu=off float_abi=soft timing=port-default safety="port-defined" heap=port-defined
 [KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
 [KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
 [KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=2518433 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=839477 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=839478 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=2518635 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=839545 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=839545 unit=iterations
 [KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
 [KVB] END id=SCHED_COOP_001 state=PASS
 [KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
 [KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=2443520 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000109 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=244349 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=2470656 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000424 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=247055 unit=pairs_per_sec
 [KVB] END id=SYNC_SEM_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=1760512 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10000626 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=176040 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=2168576 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001081 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=216834 unit=pairs_per_sec
 [KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
+[KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=1083392 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000393 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=108334 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pcp_variant value=1 unit=
+[KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
 [KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
 [KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
 [KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
 [KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
 [KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=791296 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10003146 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=79104 unit=pairs_per_sec
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=779776 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10000288 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=77975 unit=pairs_per_sec
 [KVB] END id=IPC_QUEUE_FAST_001 state=PASS
-[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
-[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
-[KVB] METRIC id=TIME_SLEEP_001 name=requested_ticks value=10 unit=ticks
+[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep accuracy across durations"
+[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep accuracy measured across multiple durations"
+[KVB] METRIC id=TIME_SLEEP_001 name=sleep_cases value=10 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=odd_sleep_cases value=7 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=even_sleep_cases value=3 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=repeat_count value=8 unit=samples_per_case
+[KVB] METRIC id=TIME_SLEEP_001 name=total_samples value=80 unit=samples
 [KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=10476 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_requested_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_elapsed_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=worst_requested_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=early_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=late_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=max_early_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=max_late_ticks value=0 unit=ticks
 [KVB] END id=TIME_SLEEP_001 state=PASS
-[KVB] SUMMARY pass=6 fail=0 unsupported=0 skipped=0 invalid=0 total=6
+[KVB] BEGIN id=RT_SEM_WAKE_001 group=RT name="semaphore wake-to-run latency"
+[KVB] RESULT id=RT_SEM_WAKE_001 group=RT state=PASS message="blocked semaphore waiter wake latency measured"
+[KVB] METRIC id=RT_SEM_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_SEM_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_SEM_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_latency value=20 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_latency value=21 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_latency value=27 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_ns value=20000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_ns value=21000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_ns value=27000 unit=ns
+[KVB] END id=RT_SEM_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_QUEUE_WAKE_001 group=RT name="queue receiver wake-to-run latency"
+[KVB] RESULT id=RT_QUEUE_WAKE_001 group=RT state=PASS message="blocked queue receiver wake latency measured"
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_latency value=21 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_latency value=23 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_latency value=31 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_ns value=21000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_ns value=23000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_ns value=31000 unit=ns
+[KVB] END id=RT_QUEUE_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_MUTEX_WAKE_001 group=RT name="mutex waiter wake-to-run latency"
+[KVB] RESULT id=RT_MUTEX_WAKE_001 group=RT state=PASS message="blocked mutex waiter wake latency measured"
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_latency value=21 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_latency value=24 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_latency value=30 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_ns value=21000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_ns value=24000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_ns value=30000 unit=ns
+[KVB] END id=RT_MUTEX_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_TICK_JITTER_001 group=RT name="sleep wake target jitter"
+[KVB] RESULT id=RT_TICK_JITTER_001 group=RT state=PASS message="multi-duration sleep jitter measured against target wake time"
+[KVB] METRIC id=RT_TICK_JITTER_001 name=sleep_cases value=7 unit=cases
+[KVB] METRIC id=RT_TICK_JITTER_001 name=samples_per_case value=4 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=total_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=tick_cycles value=1000 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_target_cycles value=19142 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_observed_cycles value=19108 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_error_cycles value=-34 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=min_error_cycles value=-43 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_error_cycles value=-9 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_cycles value=43 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_ns value=43000 unit=ns
+[KVB] METRIC id=RT_TICK_JITTER_001 name=worst_requested_sleep_ticks value=5 unit=ticks
+[KVB] METRIC id=RT_TICK_JITTER_001 name=early_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=late_samples value=0 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_early_cycles value=43 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_late_cycles value=0 unit=cycles
+[KVB] END id=RT_TICK_JITTER_001 state=PASS
+[KVB] BEGIN id=RT_IRQ_MASK_001 group=RT name="IRQ response and ISR-to-thread latency"
+[KVB] RESULT id=RT_IRQ_MASK_001 group=RT state=PASS message="IRQ trigger-to-thread responsiveness measured"
+[KVB] METRIC id=RT_IRQ_MASK_001 name=irq_probe_supported value=1 unit=bool
+[KVB] METRIC id=RT_IRQ_MASK_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_IRQ_MASK_001 name=errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=isr_errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_irq_cycles value=17 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_cycles value=21 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_ns value=21000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_irq_to_thread_cycles value=24 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_cycles value=29 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_ns value=29000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_thread_cycles value=41 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_cycles value=47 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_ns value=47000 unit=ns
+[KVB] END id=RT_IRQ_MASK_001 state=PASS
+[KVB] SUMMARY pass=12 fail=0 unsupported=0 skipped=0 invalid=0 total=12
 [KVB] END RUN
+
+
 [KVB] BEGIN RUN
 [KVB] VERSION 0.1.0-private
 [KVB] KERNEL name=TaktOS version=private-dev
 [KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=0 mutex_pp=1 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=1
-[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=g
+[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=gcc version="15.2.1 20251203"
+[KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16
+[KVB] CONFIG_STACK default=256 test=192 sched=128 rt=128 sync=128 runner=1024 rt_tests=1
+[KVB] BUILD opt=size fpu=off float_abi=soft timing=port-default safety="port-defined" heap=port-defined
 [KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
 [KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
 [KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=2518433 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=839477 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=839478 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=2518635 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=839545 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=839545 unit=iterations
 [KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
 [KVB] END id=SCHED_COOP_001 state=PASS
 [KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
 [KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=2443520 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000109 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=244349 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=2470656 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000424 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=247055 unit=pairs_per_sec
 [KVB] END id=SYNC_SEM_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=1760512 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10000626 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=176040 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=2168576 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001081 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=216834 unit=pairs_per_sec
 [KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
+[KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=1083392 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000393 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=108334 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pcp_variant value=1 unit=
+[KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
 [KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
 [KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
 [KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
 [KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
 [KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=791296 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10003146 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=79104 unit=pairs_per_sec
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=779776 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10000288 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=77975 unit=pairs_per_sec
 [KVB] END id=IPC_QUEUE_FAST_001 state=PASS
-[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
-[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
-[KVB] METRIC id=TIME_SLEEP_001 name=requested_ticks value=10 unit=ticks
+[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep accuracy across durations"
+[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep accuracy measured across multiple durations"
+[KVB] METRIC id=TIME_SLEEP_001 name=sleep_cases value=10 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=odd_sleep_cases value=7 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=even_sleep_cases value=3 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=repeat_count value=8 unit=samples_per_case
+[KVB] METRIC id=TIME_SLEEP_001 name=total_samples value=80 unit=samples
 [KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=10476 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_requested_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_elapsed_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=worst_requested_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=early_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=late_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=max_early_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=max_late_ticks value=0 unit=ticks
 [KVB] END id=TIME_SLEEP_001 state=PASS
-[KVB] SUMMARY pass=6 fail=0 unsupported=0 skipped=0 invalid=0 total=6
+[KVB] BEGIN id=RT_SEM_WAKE_001 group=RT name="semaphore wake-to-run latency"
+[KVB] RESULT id=RT_SEM_WAKE_001 group=RT state=PASS message="blocked semaphore waiter wake latency measured"
+[KVB] METRIC id=RT_SEM_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_SEM_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_SEM_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_latency value=20 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_latency value=21 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_latency value=27 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_ns value=20000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_ns value=21000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_ns value=27000 unit=ns
+[KVB] END id=RT_SEM_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_QUEUE_WAKE_001 group=RT name="queue receiver wake-to-run latency"
+[KVB] RESULT id=RT_QUEUE_WAKE_001 group=RT state=PASS message="blocked queue receiver wake latency measured"
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_latency value=21 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_latency value=23 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_latency value=31 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_ns value=21000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_ns value=23000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_ns value=31000 unit=ns
+[KVB] END id=RT_QUEUE_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_MUTEX_WAKE_001 group=RT name="mutex waiter wake-to-run latency"
+[KVB] RESULT id=RT_MUTEX_WAKE_001 group=RT state=PASS message="blocked mutex waiter wake latency measured"
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_latency value=21 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_latency value=24 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_latency value=30 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_ns value=21000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_ns value=24000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_ns value=30000 unit=ns
+[KVB] END id=RT_MUTEX_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_TICK_JITTER_001 group=RT name="sleep wake target jitter"
+[KVB] RESULT id=RT_TICK_JITTER_001 group=RT state=PASS message="multi-duration sleep jitter measured against target wake time"
+[KVB] METRIC id=RT_TICK_JITTER_001 name=sleep_cases value=7 unit=cases
+[KVB] METRIC id=RT_TICK_JITTER_001 name=samples_per_case value=4 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=total_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=tick_cycles value=1000 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_target_cycles value=19142 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_observed_cycles value=19108 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_error_cycles value=-34 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=min_error_cycles value=-43 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_error_cycles value=-9 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_cycles value=43 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_ns value=43000 unit=ns
+[KVB] METRIC id=RT_TICK_JITTER_001 name=worst_requested_sleep_ticks value=5 unit=ticks
+[KVB] METRIC id=RT_TICK_JITTER_001 name=early_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=late_samples value=0 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_early_cycles value=43 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_late_cycles value=0 unit=cycles
+[KVB] END id=RT_TICK_JITTER_001 state=PASS
+[KVB] BEGIN id=RT_IRQ_MASK_001 group=RT name="IRQ response and ISR-to-thread latency"
+[KVB] RESULT id=RT_IRQ_MASK_001 group=RT state=PASS message="IRQ trigger-to-thread responsiveness measured"
+[KVB] METRIC id=RT_IRQ_MASK_001 name=irq_probe_supported value=1 unit=bool
+[KVB] METRIC id=RT_IRQ_MASK_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_IRQ_MASK_001 name=errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=isr_errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_irq_cycles value=17 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_cycles value=21 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_ns value=21000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_irq_to_thread_cycles value=24 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_cycles value=29 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_ns value=29000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_thread_cycles value=41 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_cycles value=47 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_ns value=47000 unit=ns
+[KVB] END id=RT_IRQ_MASK_001 state=PASS
+[KVB] SUMMARY pass=12 fail=0 unsupported=0 skipped=0 invalid=0 total=12
 [KVB] END RUN
-[KVB] BEGIN RUN
-[KVB] VERSION 0.1.0-private
-[KVB] KERNEL name=TaktOS version=private-dev
-[KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=0 mutex_pp=1 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=1
-[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=g
-[KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
-[KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
-[KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=2518433 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=839477 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=839478 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
-[KVB] END id=SCHED_COOP_001 state=PASS
-[KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
-[KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=2443520 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000109 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=244349 unit=pairs_per_sec
-[KVB] END id=SYNC_SEM_FAST_001 state=PASS
-[KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
-[KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=1760512 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10000626 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=176040 unit=pairs_per_sec
-[KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
-[KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
-[KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
-[KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
-[KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
-[KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
-[KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=791296 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10003146 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=79104 unit=pairs_per_sec
-[KVB] END id=IPC_QUEUE_FAST_001 state=PASS
-[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
-[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
-[KVB] METRIC id=TIME_SLEEP_001 name=requested_ticks value=10 unit=ticks
-[KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=10476 unit=us
-[KVB] END id=TIME_SLEEP_001 state=PASS
-[KVB] SUMMARY pass=6 fail=0 unsupported=0 skipped=0 invalid=0 total=6
-[KVB] END RUN
+
 
 
 
@@ -539,236 +1147,562 @@ Finished building: ThreadX_STM32F0308_KvbSuite.hex
 Invoking: Cross ARM GNU Print Size
 arm-none-eabi-size --format=berkeley "ThreadX_STM32F0308_KvbSuite.elf"
    text     data      bss      dec      hex  filename
-  24679      456     6780    31915     7cab  ThreadX_STM32F0308_KvbSuite.elf
+  35764      456     6020    42240     a500  ThreadX_STM32F0308_KvbSuite.elf
 Finished building: ThreadX_STM32F0308_KvbSuite.siz
 
 
+
+
 [KVB] BEGIN RUN
 [KVB] VERSION 0.1.0-private
 [KVB] KERNEL name=ThreadX version=Eclipse ThreadX 6.x
 [KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=1
-[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=g
+[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=gcc version="15.2.1 20251203"
+[KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16
+[KVB] CONFIG_STACK default=768 test=384 sched=384 rt=384 sync=384 runner=1024 rt_tests=1
+[KVB] BUILD opt=size fpu=off float_abi=soft timing=port-default safety="port-defined" heap=port-defined
 [KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
 [KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
 [KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1196796 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=398932 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=398932 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1196863 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=398954 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=398955 unit=iterations
 [KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
 [KVB] END id=SCHED_COOP_001 state=PASS
 [KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
 [KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1963008 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000254 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=196295 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1955584 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000943 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=195539 unit=pairs_per_sec
 [KVB] END id=SYNC_SEM_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
 [KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=883712 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10002081 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=88352 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=878848 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001032 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=87875 unit=pairs_per_sec
 [KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
+[KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=885248 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000188 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=88523 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pi_variant value=1 unit=
+[KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
 [KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
 [KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
 [KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
 [KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
 [KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
 [KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=646400 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10002524 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=64623 unit=pairs_per_sec
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=608512 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10000338 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=60849 unit=pairs_per_sec
 [KVB] END id=IPC_QUEUE_FAST_001 state=PASS
-[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
-[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
-[KVB] METRIC id=TIME_SLEEP_001 name=requested_ticks value=10 unit=ticks
+[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep accuracy across durations"
+[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep accuracy measured across multiple durations"
+[KVB] METRIC id=TIME_SLEEP_001 name=sleep_cases value=10 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=odd_sleep_cases value=7 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=even_sleep_cases value=3 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=repeat_count value=8 unit=samples_per_case
+[KVB] METRIC id=TIME_SLEEP_001 name=total_samples value=80 unit=samples
 [KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=9537 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_requested_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_elapsed_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=worst_requested_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=early_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=late_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=max_early_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=max_late_ticks value=0 unit=ticks
 [KVB] END id=TIME_SLEEP_001 state=PASS
-[KVB] SUMMARY pass=6 fail=0 unsupported=0 skipped=0 invalid=0 total=6
-[KVB] END RUN
-[KVB] BEGIN RUN
-[KVB] VERSION 0.1.0-private
-[KVB] KERNEL name=ThreadX version=Eclipse ThreadX 6.x
-[KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=1
-[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=g
-[KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
-[KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
-[KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1196797 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=398932 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=398933 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
-[KVB] END id=SCHED_COOP_001 state=PASS
-[KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
-[KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1963008 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000253 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=196295 unit=pairs_per_sec
-[KVB] END id=SYNC_SEM_FAST_001 state=PASS
-[KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
-[KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=883712 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10002081 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=88352 unit=pairs_per_sec
-[KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
-[KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
-[KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
-[KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
-[KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
-[KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
-[KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=646400 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10002524 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=64623 unit=pairs_per_sec
-[KVB] END id=IPC_QUEUE_FAST_001 state=PASS
-[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
-[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
-[KVB] METRIC id=TIME_SLEEP_001 name=requested_ticks value=10 unit=ticks
-[KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=9537 unit=us
-[KVB] END id=TIME_SLEEP_001 state=PASS
-[KVB] SUMMARY pass=6 fail=0 unsupported=0 skipped=0 invalid=0 total=6
-[KVB] END RUN
-[KVB] BEGIN RUN
-[KVB] VERSION 0.1.0-private
-[KVB] KERNEL name=ThreadX version=Eclipse ThreadX 6.x
-[KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=1
-[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=g
-[KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
-[KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
-[KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1196797 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=398932 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=398933 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
-[KVB] END id=SCHED_COOP_001 state=PASS
-[KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
-[KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1963008 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000253 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=196295 unit=pairs_per_sec
-[KVB] END id=SYNC_SEM_FAST_001 state=PASS
-[KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
-[KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=883712 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10002081 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=88352 unit=pairs_per_sec
-[KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
-[KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
-[KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
-[KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
-[KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
-[KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
-[KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=646400 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10002524 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=64623 unit=pairs_per_sec
-[KVB] END id=IPC_QUEUE_FAST_001 state=PASS
-[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
-[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
-[KVB] METRIC id=TIME_SLEEP_001 name=requested_ticks value=10 unit=ticks
-[KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=9537 unit=us
-[KVB] END id=TIME_SLEEP_001 state=PASS
-[KVB] SUMMARY pass=6 fail=0 unsupported=0 skipped=0 invalid=0 total=6
-[KVB] END RUN
-[KVB] BEGIN RUN
-[KVB] VERSION 0.1.0-private
-[KVB] KERNEL name=ThreadX version=Eclipse ThreadX 6.x
-[KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=1
-[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=g
-[KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
-[KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
-[KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1196797 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=398932 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=398933 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
-[KVB] END id=SCHED_COOP_001 state=PASS
-[KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
-[KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1963008 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000253 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=196295 unit=pairs_per_sec
-[KVB] END id=SYNC_SEM_FAST_001 state=PASS
-[KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
-[KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=883712 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10002081 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=88352 unit=pairs_per_sec
-[KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
-[KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
-[KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
-[KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
-[KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
-[KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
-[KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=646400 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10002524 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=64623 unit=pairs_per_sec
-[KVB] END id=IPC_QUEUE_FAST_001 state=PASS
-[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
-[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
-[KVB] METRIC id=TIME_SLEEP_001 name=requested_ticks value=10 unit=ticks
-[KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=9537 unit=us
-[KVB] END id=TIME_SLEEP_001 state=PASS
-[KVB] SUMMARY pass=6 fail=0 unsupported=0 skipped=0 invalid=0 total=6
-[KVB] END RUN
-[KVB] BEGIN RUN
-[KVB] VERSION 0.1.0-private
-[KVB] KERNEL name=ThreadX version=Eclipse ThreadX 6.x
-[KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=1
-[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=g
-[KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
-[KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
-[KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
-[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1196797 unit=yields
-[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=398932 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=398933 unit=iterations
-[KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
-[KVB] END id=SCHED_COOP_001 state=PASS
-[KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
-[KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1963008 unit=pairs
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000253 unit=us
-[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=196295 unit=pairs_per_sec
-[KVB] END id=SYNC_SEM_FAST_001 state=PASS
-[KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
-[KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=883712 unit=pairs
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10002081 unit=us
-[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=88352 unit=pairs_per_sec
-[KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
-[KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
-[KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
-[KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
-[KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
-[KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
-[KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=646400 unit=send_recv_pairs
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10002524 unit=us
-[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=64623 unit=pairs_per_sec
-[KVB] END id=IPC_QUEUE_FAST_001 state=PASS
-[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep duration accuracy"
-[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep duration valid"
-[KVB] METRIC id=TIME_SLEEP_001 name=requested_ticks value=10 unit=ticks
-[KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=nominal_us value=10000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=min_expected_us value=9000 unit=us
-[KVB] METRIC id=TIME_SLEEP_001 name=elapsed_us value=9537 unit=us
-[KVB] END id=TIME_SLEEP_001 state=PASS
-[KVB] SUMMARY pass=6 fail=0 unsupported=0 skipped=0 invalid=0 total=6
+[KVB] BEGIN id=RT_SEM_WAKE_001 group=RT name="semaphore wake-to-run latency"
+[KVB] RESULT id=RT_SEM_WAKE_001 group=RT state=PASS message="blocked semaphore waiter wake latency measured"
+[KVB] METRIC id=RT_SEM_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_SEM_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_SEM_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_latency value=26 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_latency value=29 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_latency value=35 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_ns value=26000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_ns value=29000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_ns value=35000 unit=ns
+[KVB] END id=RT_SEM_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_QUEUE_WAKE_001 group=RT name="queue receiver wake-to-run latency"
+[KVB] RESULT id=RT_QUEUE_WAKE_001 group=RT state=PASS message="blocked queue receiver wake latency measured"
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_latency value=28 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_latency value=31 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_latency value=37 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_ns value=28000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_ns value=31000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_ns value=37000 unit=ns
+[KVB] END id=RT_QUEUE_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_MUTEX_WAKE_001 group=RT name="mutex waiter wake-to-run latency"
+[KVB] RESULT id=RT_MUTEX_WAKE_001 group=RT state=PASS message="blocked mutex waiter wake latency measured"
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_latency value=40 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_latency value=43 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_latency value=51 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_ns value=40000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_ns value=43000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_ns value=51000 unit=ns
+[KVB] END id=RT_MUTEX_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_TICK_JITTER_001 group=RT name="sleep wake target jitter"
+[KVB] RESULT id=RT_TICK_JITTER_001 group=RT state=PASS message="multi-duration sleep jitter measured against target wake time"
+[KVB] METRIC id=RT_TICK_JITTER_001 name=sleep_cases value=7 unit=cases
+[KVB] METRIC id=RT_TICK_JITTER_001 name=samples_per_case value=4 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=total_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=tick_cycles value=1000 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_target_cycles value=19142 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_observed_cycles value=19105 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_error_cycles value=-37 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=min_error_cycles value=-45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_error_cycles value=-9 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_cycles value=45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_ns value=45000 unit=ns
+[KVB] METRIC id=RT_TICK_JITTER_001 name=worst_requested_sleep_ticks value=5 unit=ticks
+[KVB] METRIC id=RT_TICK_JITTER_001 name=early_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=late_samples value=0 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_early_cycles value=45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_late_cycles value=0 unit=cycles
+[KVB] END id=RT_TICK_JITTER_001 state=PASS
+[KVB] BEGIN id=RT_IRQ_MASK_001 group=RT name="IRQ response and ISR-to-thread latency"
+[KVB] RESULT id=RT_IRQ_MASK_001 group=RT state=PASS message="IRQ trigger-to-thread responsiveness measured"
+[KVB] METRIC id=RT_IRQ_MASK_001 name=irq_probe_supported value=1 unit=bool
+[KVB] METRIC id=RT_IRQ_MASK_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_IRQ_MASK_001 name=errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=isr_errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_irq_cycles value=17 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_cycles value=23 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_ns value=23000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_irq_to_thread_cycles value=31 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_cycles value=38 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_ns value=38000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_thread_cycles value=49 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_cycles value=55 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_ns value=55000 unit=ns
+[KVB] END id=RT_IRQ_MASK_001 state=PASS
+[KVB] SUMMARY pass=12 fail=0 unsupported=0 skipped=0 invalid=0 total=12
 [KVB] END RUN
 
+
+[KVB] BEGIN RUN
+[KVB] VERSION 0.1.0-private
+[KVB] KERNEL name=ThreadX version=Eclipse ThreadX 6.x
+[KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=1
+[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=gcc version="15.2.1 20251203"
+[KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16
+[KVB] CONFIG_STACK default=768 test=384 sched=384 rt=384 sync=384 runner=1024 rt_tests=1
+[KVB] BUILD opt=size fpu=off float_abi=soft timing=port-default safety="port-defined" heap=port-defined
+[KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
+[KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
+[KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1196863 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=398954 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=398955 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
+[KVB] END id=SCHED_COOP_001 state=PASS
+[KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
+[KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1955584 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000736 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=195544 unit=pairs_per_sec
+[KVB] END id=SYNC_SEM_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
+[KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=878848 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001068 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=87875 unit=pairs_per_sec
+[KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
+[KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=885248 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000200 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=88523 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pi_variant value=1 unit=
+[KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
+[KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
+[KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
+[KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
+[KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
+[KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=608512 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10000359 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=60849 unit=pairs_per_sec
+[KVB] END id=IPC_QUEUE_FAST_001 state=PASS
+[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep accuracy across durations"
+[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep accuracy measured across multiple durations"
+[KVB] METRIC id=TIME_SLEEP_001 name=sleep_cases value=10 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=odd_sleep_cases value=7 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=even_sleep_cases value=3 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=repeat_count value=8 unit=samples_per_case
+[KVB] METRIC id=TIME_SLEEP_001 name=total_samples value=80 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_requested_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_elapsed_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=worst_requested_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=early_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=late_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=max_early_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=max_late_ticks value=0 unit=ticks
+[KVB] END id=TIME_SLEEP_001 state=PASS
+[KVB] BEGIN id=RT_SEM_WAKE_001 group=RT name="semaphore wake-to-run latency"
+[KVB] RESULT id=RT_SEM_WAKE_001 group=RT state=PASS message="blocked semaphore waiter wake latency measured"
+[KVB] METRIC id=RT_SEM_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_SEM_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_SEM_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_latency value=26 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_latency value=29 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_latency value=35 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_ns value=26000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_ns value=29000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_ns value=35000 unit=ns
+[KVB] END id=RT_SEM_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_QUEUE_WAKE_001 group=RT name="queue receiver wake-to-run latency"
+[KVB] RESULT id=RT_QUEUE_WAKE_001 group=RT state=PASS message="blocked queue receiver wake latency measured"
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_latency value=28 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_latency value=31 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_latency value=37 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_ns value=28000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_ns value=31000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_ns value=37000 unit=ns
+[KVB] END id=RT_QUEUE_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_MUTEX_WAKE_001 group=RT name="mutex waiter wake-to-run latency"
+[KVB] RESULT id=RT_MUTEX_WAKE_001 group=RT state=PASS message="blocked mutex waiter wake latency measured"
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_latency value=40 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_latency value=43 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_latency value=51 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_ns value=40000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_ns value=43000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_ns value=51000 unit=ns
+[KVB] END id=RT_MUTEX_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_TICK_JITTER_001 group=RT name="sleep wake target jitter"
+[KVB] RESULT id=RT_TICK_JITTER_001 group=RT state=PASS message="multi-duration sleep jitter measured against target wake time"
+[KVB] METRIC id=RT_TICK_JITTER_001 name=sleep_cases value=7 unit=cases
+[KVB] METRIC id=RT_TICK_JITTER_001 name=samples_per_case value=4 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=total_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=tick_cycles value=1000 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_target_cycles value=19142 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_observed_cycles value=19105 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_error_cycles value=-37 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=min_error_cycles value=-45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_error_cycles value=-9 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_cycles value=45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_ns value=45000 unit=ns
+[KVB] METRIC id=RT_TICK_JITTER_001 name=worst_requested_sleep_ticks value=5 unit=ticks
+[KVB] METRIC id=RT_TICK_JITTER_001 name=early_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=late_samples value=0 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_early_cycles value=45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_late_cycles value=0 unit=cycles
+[KVB] END id=RT_TICK_JITTER_001 state=PASS
+[KVB] BEGIN id=RT_IRQ_MASK_001 group=RT name="IRQ response and ISR-to-thread latency"
+[KVB] RESULT id=RT_IRQ_MASK_001 group=RT state=PASS message="IRQ trigger-to-thread responsiveness measured"
+[KVB] METRIC id=RT_IRQ_MASK_001 name=irq_probe_supported value=1 unit=bool
+[KVB] METRIC id=RT_IRQ_MASK_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_IRQ_MASK_001 name=errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=isr_errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_irq_cycles value=17 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_cycles value=23 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_ns value=23000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_irq_to_thread_cycles value=31 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_cycles value=38 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_ns value=38000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_thread_cycles value=49 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_cycles value=55 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_ns value=55000 unit=ns
+[KVB] END id=RT_IRQ_MASK_001 state=PASS
+[KVB] SUMMARY pass=12 fail=0 unsupported=0 skipped=0 invalid=0 total=12
+[KVB] END RUN
+
+
+[KVB] BEGIN RUN
+[KVB] VERSION 0.1.0-private
+[KVB] KERNEL name=ThreadX version=Eclipse ThreadX 6.x
+[KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=1
+[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=gcc version="15.2.1 20251203"
+[KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16
+[KVB] CONFIG_STACK default=768 test=384 sched=384 rt=384 sync=384 runner=1024 rt_tests=1
+[KVB] BUILD opt=size fpu=off float_abi=soft timing=port-default safety="port-defined" heap=port-defined
+[KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
+[KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
+[KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1196863 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=398954 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=398955 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
+[KVB] END id=SCHED_COOP_001 state=PASS
+[KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
+[KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1955584 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000736 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=195544 unit=pairs_per_sec
+[KVB] END id=SYNC_SEM_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
+[KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=878848 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001068 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=87875 unit=pairs_per_sec
+[KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
+[KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=885248 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000200 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=88523 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pi_variant value=1 unit=
+[KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
+[KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
+[KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
+[KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
+[KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
+[KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=608512 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10000359 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=60849 unit=pairs_per_sec
+[KVB] END id=IPC_QUEUE_FAST_001 state=PASS
+[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep accuracy across durations"
+[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep accuracy measured across multiple durations"
+[KVB] METRIC id=TIME_SLEEP_001 name=sleep_cases value=10 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=odd_sleep_cases value=7 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=even_sleep_cases value=3 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=repeat_count value=8 unit=samples_per_case
+[KVB] METRIC id=TIME_SLEEP_001 name=total_samples value=80 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_requested_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_elapsed_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=worst_requested_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=early_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=late_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=max_early_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=max_late_ticks value=0 unit=ticks
+[KVB] END id=TIME_SLEEP_001 state=PASS
+[KVB] BEGIN id=RT_SEM_WAKE_001 group=RT name="semaphore wake-to-run latency"
+[KVB] RESULT id=RT_SEM_WAKE_001 group=RT state=PASS message="blocked semaphore waiter wake latency measured"
+[KVB] METRIC id=RT_SEM_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_SEM_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_SEM_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_latency value=26 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_latency value=29 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_latency value=35 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_ns value=26000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_ns value=29000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_ns value=35000 unit=ns
+[KVB] END id=RT_SEM_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_QUEUE_WAKE_001 group=RT name="queue receiver wake-to-run latency"
+[KVB] RESULT id=RT_QUEUE_WAKE_001 group=RT state=PASS message="blocked queue receiver wake latency measured"
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_latency value=28 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_latency value=31 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_latency value=37 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_ns value=28000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_ns value=31000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_ns value=37000 unit=ns
+[KVB] END id=RT_QUEUE_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_MUTEX_WAKE_001 group=RT name="mutex waiter wake-to-run latency"
+[KVB] RESULT id=RT_MUTEX_WAKE_001 group=RT state=PASS message="blocked mutex waiter wake latency measured"
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_latency value=40 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_latency value=43 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_latency value=51 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_ns value=40000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_ns value=43000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_ns value=51000 unit=ns
+[KVB] END id=RT_MUTEX_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_TICK_JITTER_001 group=RT name="sleep wake target jitter"
+[KVB] RESULT id=RT_TICK_JITTER_001 group=RT state=PASS message="multi-duration sleep jitter measured against target wake time"
+[KVB] METRIC id=RT_TICK_JITTER_001 name=sleep_cases value=7 unit=cases
+[KVB] METRIC id=RT_TICK_JITTER_001 name=samples_per_case value=4 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=total_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=tick_cycles value=1000 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_target_cycles value=19142 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_observed_cycles value=19105 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_error_cycles value=-37 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=min_error_cycles value=-45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_error_cycles value=-9 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_cycles value=45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_ns value=45000 unit=ns
+[KVB] METRIC id=RT_TICK_JITTER_001 name=worst_requested_sleep_ticks value=5 unit=ticks
+[KVB] METRIC id=RT_TICK_JITTER_001 name=early_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=late_samples value=0 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_early_cycles value=45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_late_cycles value=0 unit=cycles
+[KVB] END id=RT_TICK_JITTER_001 state=PASS
+[KVB] BEGIN id=RT_IRQ_MASK_001 group=RT name="IRQ response and ISR-to-thread latency"
+[KVB] RESULT id=RT_IRQ_MASK_001 group=RT state=PASS message="IRQ trigger-to-thread responsiveness measured"
+[KVB] METRIC id=RT_IRQ_MASK_001 name=irq_probe_supported value=1 unit=bool
+[KVB] METRIC id=RT_IRQ_MASK_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_IRQ_MASK_001 name=errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=isr_errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_irq_cycles value=17 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_cycles value=23 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_ns value=23000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_irq_to_thread_cycles value=31 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_cycles value=38 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_ns value=38000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_thread_cycles value=49 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_cycles value=55 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_ns value=55000 unit=ns
+[KVB] END id=RT_IRQ_MASK_001 state=PASS
+[KVB] SUMMARY pass=12 fail=0 unsupported=0 skipped=0 invalid=0 total=12
+[KVB] END RUN
+
+
+[KVB] BEGIN RUN
+[KVB] VERSION 0.1.0-private
+[KVB] KERNEL name=ThreadX version=Eclipse ThreadX 6.x
+[KVB] FEATURES dyn_threads=1 sem=1 mutex=1 mutex_pi=1 mutex_pp=0 queue=1 timer=0 stack_guard=1 null_check=1 invalid_obj=1
+[KVB] PLATFORM board=STM32F0308-DISCO cpu=Cortex-M0 @ 48 MHz (STM32F030R8) clock_hz=48000000 cycle_hz=0 tick_hz=1000 compiler=gcc version="15.2.1 20251203"
+[KVB] CONFIG measurement_ms=10000 warmup_ms=100 throughput_batch=256 workers=3 queue_depth=8 queue_msg_size=16
+[KVB] CONFIG_STACK default=768 test=384 sched=384 rt=384 sync=384 runner=1024 rt_tests=1
+[KVB] BUILD opt=size fpu=off float_abi=soft timing=port-default safety="port-defined" heap=port-defined
+[KVB] BEGIN id=SCHED_COOP_001 group=SCHED name="cooperative yield throughput"
+[KVB] RESULT id=SCHED_COOP_001 group=SCHED state=PASS message="cooperative yield benchmark valid"
+[KVB] METRIC id=SCHED_COOP_001 name=workers value=3 unit=threads
+[KVB] METRIC id=SCHED_COOP_001 name=total_yields value=1196863 unit=yields
+[KVB] METRIC id=SCHED_COOP_001 name=min_thread_count value=398954 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=max_thread_count value=398955 unit=iterations
+[KVB] METRIC id=SCHED_COOP_001 name=measurement_ms value=10000 unit=ms
+[KVB] END id=SCHED_COOP_001 state=PASS
+[KVB] BEGIN id=SYNC_SEM_FAST_001 group=SYNC name="uncontended semaphore wait/post"
+[KVB] RESULT id=SYNC_SEM_FAST_001 group=SYNC state=PASS message="semaphore wait/post fast path valid"
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=operations value=1955584 unit=pairs
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=elapsed_us value=10000736 unit=us
+[KVB] METRIC id=SYNC_SEM_FAST_001 name=throughput value=195544 unit=pairs_per_sec
+[KVB] END id=SYNC_SEM_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_FAST_001 group=SYNC name="uncontended mutex lock/unlock"
+[KVB] RESULT id=SYNC_MUTEX_FAST_001 group=SYNC state=PASS message="mutex lock/unlock fast path valid"
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=operations value=878848 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=elapsed_us value=10001068 unit=us
+[KVB] METRIC id=SYNC_MUTEX_FAST_001 name=throughput value=87875 unit=pairs_per_sec
+[KVB] END id=SYNC_MUTEX_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_PCP_FAST_001 group=SYNC name="uncontended PI/PCP mutex lock/unlock"
+[KVB] RESULT id=SYNC_MUTEX_PCP_FAST_001 group=SYNC state=PASS message="PI/PCP mutex lock/unlock fast path valid"
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=operations value=885248 unit=pairs
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=elapsed_us value=10000200 unit=us
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=throughput value=88523 unit=pairs_per_sec
+[KVB] METRIC id=SYNC_MUTEX_PCP_FAST_001 name=pi_variant value=1 unit=
+[KVB] END id=SYNC_MUTEX_PCP_FAST_001 state=PASS
+[KVB] BEGIN id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC name="mutex unlock by non-owner"
+[KVB] RESULT id=SYNC_MUTEX_OWNERSHIP_001 group=SYNC state=PASS message="non-owner mutex unlock rejected"
+[KVB] METRIC id=SYNC_MUTEX_OWNERSHIP_001 name=non_owner_status value=3 unit=status
+[KVB] END id=SYNC_MUTEX_OWNERSHIP_001 state=PASS
+[KVB] BEGIN id=IPC_QUEUE_FAST_001 group=IPC name="queue send/receive same thread"
+[KVB] RESULT id=IPC_QUEUE_FAST_001 group=IPC state=PASS message="queue fast path preserves payload"
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=operations value=608512 unit=send_recv_pairs
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=elapsed_us value=10000359 unit=us
+[KVB] METRIC id=IPC_QUEUE_FAST_001 name=throughput value=60849 unit=pairs_per_sec
+[KVB] END id=IPC_QUEUE_FAST_001 state=PASS
+[KVB] BEGIN id=TIME_SLEEP_001 group=TIME name="thread sleep accuracy across durations"
+[KVB] RESULT id=TIME_SLEEP_001 group=TIME state=PASS message="sleep accuracy measured across multiple durations"
+[KVB] METRIC id=TIME_SLEEP_001 name=sleep_cases value=10 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=odd_sleep_cases value=7 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=even_sleep_cases value=3 unit=cases
+[KVB] METRIC id=TIME_SLEEP_001 name=repeat_count value=8 unit=samples_per_case
+[KVB] METRIC id=TIME_SLEEP_001 name=total_samples value=80 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=tick_us value=1000 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_requested_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_elapsed_us value=19500 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=avg_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=max_abs_error_us value=0 unit=us
+[KVB] METRIC id=TIME_SLEEP_001 name=worst_requested_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=early_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=late_count value=0 unit=samples
+[KVB] METRIC id=TIME_SLEEP_001 name=max_early_ticks value=0 unit=ticks
+[KVB] METRIC id=TIME_SLEEP_001 name=max_late_ticks value=0 unit=ticks
+[KVB] END id=TIME_SLEEP_001 state=PASS
+[KVB] BEGIN id=RT_SEM_WAKE_001 group=RT name="semaphore wake-to-run latency"
+[KVB] RESULT id=RT_SEM_WAKE_001 group=RT state=PASS message="blocked semaphore waiter wake latency measured"
+[KVB] METRIC id=RT_SEM_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_SEM_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_SEM_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_latency value=26 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_latency value=29 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_latency value=35 unit=us
+[KVB] METRIC id=RT_SEM_WAKE_001 name=min_ns value=26000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=avg_ns value=29000 unit=ns
+[KVB] METRIC id=RT_SEM_WAKE_001 name=max_ns value=35000 unit=ns
+[KVB] END id=RT_SEM_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_QUEUE_WAKE_001 group=RT name="queue receiver wake-to-run latency"
+[KVB] RESULT id=RT_QUEUE_WAKE_001 group=RT state=PASS message="blocked queue receiver wake latency measured"
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_latency value=28 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_latency value=31 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_latency value=37 unit=us
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=min_ns value=28000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=avg_ns value=31000 unit=ns
+[KVB] METRIC id=RT_QUEUE_WAKE_001 name=max_ns value=37000 unit=ns
+[KVB] END id=RT_QUEUE_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_MUTEX_WAKE_001 group=RT name="mutex waiter wake-to-run latency"
+[KVB] RESULT id=RT_MUTEX_WAKE_001 group=RT state=PASS message="blocked mutex waiter wake latency measured"
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=timebase_hz value=1000000 unit=Hz
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=cycle_counter value=0 unit=bool
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_latency value=40 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_latency value=43 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_latency value=51 unit=us
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=min_ns value=40000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=avg_ns value=43000 unit=ns
+[KVB] METRIC id=RT_MUTEX_WAKE_001 name=max_ns value=51000 unit=ns
+[KVB] END id=RT_MUTEX_WAKE_001 state=PASS
+[KVB] BEGIN id=RT_TICK_JITTER_001 group=RT name="sleep wake target jitter"
+[KVB] RESULT id=RT_TICK_JITTER_001 group=RT state=PASS message="multi-duration sleep jitter measured against target wake time"
+[KVB] METRIC id=RT_TICK_JITTER_001 name=sleep_cases value=7 unit=cases
+[KVB] METRIC id=RT_TICK_JITTER_001 name=samples_per_case value=4 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=total_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=tick_cycles value=1000 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_target_cycles value=19142 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_observed_cycles value=19105 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=avg_error_cycles value=-37 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=min_error_cycles value=-45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_error_cycles value=-9 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_cycles value=45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_abs_jitter_ns value=45000 unit=ns
+[KVB] METRIC id=RT_TICK_JITTER_001 name=worst_requested_sleep_ticks value=5 unit=ticks
+[KVB] METRIC id=RT_TICK_JITTER_001 name=early_samples value=28 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=late_samples value=0 unit=samples
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_early_cycles value=45 unit=cycles
+[KVB] METRIC id=RT_TICK_JITTER_001 name=max_late_cycles value=0 unit=cycles
+[KVB] END id=RT_TICK_JITTER_001 state=PASS
+[KVB] BEGIN id=RT_IRQ_MASK_001 group=RT name="IRQ response and ISR-to-thread latency"
+[KVB] RESULT id=RT_IRQ_MASK_001 group=RT state=PASS message="IRQ trigger-to-thread responsiveness measured"
+[KVB] METRIC id=RT_IRQ_MASK_001 name=irq_probe_supported value=1 unit=bool
+[KVB] METRIC id=RT_IRQ_MASK_001 name=iterations value=64 unit=samples
+[KVB] METRIC id=RT_IRQ_MASK_001 name=errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=isr_errors value=0 unit=count
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_irq_cycles value=17 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_cycles value=23 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_irq_ns value=23000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_irq_to_thread_cycles value=31 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_cycles value=38 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_irq_to_thread_ns value=38000 unit=ns
+[KVB] METRIC id=RT_IRQ_MASK_001 name=avg_trigger_to_thread_cycles value=49 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_cycles value=55 unit=us
+[KVB] METRIC id=RT_IRQ_MASK_001 name=max_trigger_to_thread_ns value=55000 unit=ns
+[KVB] END id=RT_IRQ_MASK_001 state=PASS
+[KVB] SUMMARY pass=12 fail=0 unsupported=0 skipped=0 invalid=0 total=12
+[KVB] END RUN
 
 
 

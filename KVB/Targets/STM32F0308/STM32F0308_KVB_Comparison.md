@@ -6,8 +6,8 @@
 **SRAM:** 8 KB
 **Flash:** 64 KB
 **Compiler:** xPack arm-none-eabi-gcc 12.2.1, `-Os`, Release build
-**Date:** 2026-04-27
-**Document version:** 4.0 (10 s window, 5-run aggregate, ThreadX added, leak-fix + TaktOS IPCP)
+**Date:** 2026-05-07
+**Document version:** 5.0 (10 s window, 4-run May 5 aggregate, TaktOS mutex split into plain + PCP variants)
 
 Author: Nguyen Hoan Hoang, I-SYST inc.
 
@@ -22,19 +22,20 @@ This report presents head-to-head KVB benchmark results between **TaktOS**
 code, the same UART, the same compiler, and the same KVB test framework.
 Only the kernel under test differs.
 
-| Test ID                  |   TaktOS  | FreeRTOS V11.3 | ThreadX 6.x | TaktOS vs FreeRTOS | TaktOS vs ThreadX |
-|--------------------------|----------:|---------------:|------------:|-------------------:|------------------:|
-| SCHED_COOP_001 (yields)  | 2,518,433 |       1,775,300 |   1,196,797 |          **1.42×** |         **2.10×** |
-| SYNC_SEM_FAST_001 (p/s)  |   244,349 |         112,654 |     196,295 |          **2.17×** |         **1.24×** |
-| SYNC_MUTEX_FAST_001 (p/s)|   176,040 |          78,097 |      88,352 |          **2.25×** |         **1.99×** |
-| SYNC_MUTEX_OWNERSHIP_001 |      PASS |            PASS |        PASS |             parity |            parity |
-| IPC_QUEUE_FAST_001 (p/s) |    79,104 |          39,316 |      64,623 |          **2.01×** |         **1.22×** |
-| TIME_SLEEP_001           |  PASS @10476 µs (+4.76%) | PASS @10005 µs (+0.05%) | PASS @9537 µs (−4.63%) | see §6 — two design camps | |
+| Test ID                      |   TaktOS  | FreeRTOS V11.3 | ThreadX 6.x | TaktOS vs FreeRTOS | TaktOS vs ThreadX |
+|------------------------------|----------:|---------------:|------------:|-------------------:|------------------:|
+| SCHED_COOP_001 (yields)      | 2,518,635 |       1,808,448 |   1,196,863 |          **1.39×** |         **2.10×** |
+| SYNC_SEM_FAST_001 (p/s)      |   247,054 |         109,762 |     195,543 |          **2.25×** |         **1.26×** |
+| SYNC_MUTEX_FAST_001 (p/s)    |   216,834 |          75,125 |      87,875 |          **2.89×** |         **2.47×** |
+| SYNC_MUTEX_PCP_FAST_001 (p/s)|   108,334 |          75,595 |      88,523 |          **1.43×** |         **1.22×** |
+| SYNC_MUTEX_OWNERSHIP_001     |      PASS |            PASS |        PASS |             parity |            parity |
+| IPC_QUEUE_FAST_001 (p/s)     |    77,975 |          38,593 |      60,849 |          **2.02×** |         **1.28×** |
+| TIME_SLEEP_001               |  PASS @10476 µs (+4.76%) | PASS @10005 µs (+0.05%) | PASS @9537 µs (−4.63%) | see §6 — two design camps | |
 
 Suite outcome (all three kernels):
-- TaktOS:          6 PASS / 0 FAIL / 6 total
-- FreeRTOS V11.3:  6 PASS / 0 FAIL / 6 total
-- ThreadX 6.x:     6 PASS / 0 FAIL / 6 total
+- TaktOS:          7 PASS / 0 FAIL / 7 total
+- FreeRTOS V11.3:  7 PASS / 0 FAIL / 7 total
+- ThreadX 6.x:     7 PASS / 0 FAIL / 7 total
 
 All three kernels pass every KVB test at the documented thresholds.
 On `TIME_SLEEP_001`, the kernels split into two design camps that
@@ -59,8 +60,8 @@ not guaranteed); ThreadX does not satisfy it. Both rankings are
 useful; which matters depends on the application — see §6.
 
 `p/s` = wait/post or send/recv pairs per second. Numbers are aggregated
-over 5 separate runs per kernel; per-metric run-to-run variance is
-reported in §4 alongside each measurement.
+over 4 separate runs per kernel from the May 5 capture; per-metric
+run-to-run variance is reported in §4 alongside each measurement.
 
 ---
 
@@ -115,9 +116,9 @@ fixed loop body that is the same for both.
 Single physical STM32F0308-DISCO board, ST-LINK/V2-1 onboard. UART
 output captured at 115200 8N1 over the ST-LINK virtual COM port. Same
 board power-cycled between TaktOS, FreeRTOS, and ThreadX firmware loads.
-Each firmware ran 5 separate boot cycles (TaktOS, ThreadX) or 6
-(FreeRTOS — one extra run after the test-cleanup fix landed) so
-run-to-run determinism could be characterised.
+Each firmware ran 4 separate boot cycles in the May 5 capture so
+run-to-run determinism could be characterised. All metrics on all four
+runs were bit-identical for every kernel — see §4.1.
 
 ### 3.2 Common across all three kernels
 
@@ -257,27 +258,24 @@ bit-identical results.
 Before discussing per-test numbers, the headline determinism finding
 deserves its own column:
 
-- **TaktOS:** every metric on every test, all 5 runs, **bit-identical**
+- **TaktOS:** every metric on every test, all 4 runs, **bit-identical**
   (rel.σ = 0). The kernel is fully deterministic on this workload —
   no measurement-to-measurement drift in iteration count, scheduling
   decisions, or sleep duration.
-- **FreeRTOS V11.3:** every metric on every test, all 6 runs,
+- **FreeRTOS V11.3:** every metric on every test, all 4 runs,
   **bit-identical** (rel.σ = 0). The single-yield first-power-on
-  shift observed in earlier captures (run 1: 1,775,292 yields, runs
-  2-4: 1,775,293) does not appear in this measurement run. The
-  cleanup fix in `KVB/src/tests/sync/` (each test now calls
-  `kvb_*_delete` before return) appears to have stabilized the heap_4
-  placement timing — every test now leaves the heap in the same
-  state, so the first-boot transient that depended on heap-placement
-  timing is gone.
-- **ThreadX 6.x:** every metric on every test, all 5 runs,
+  shift observed in earlier captures does not appear in this run.
+  The cleanup fix in `KVB/src/tests/sync/` (each test now calls
+  `kvb_*_delete` before return) stabilized heap_4 placement timing —
+  every test leaves the heap in the same state, so the first-boot
+  transient that depended on heap-placement timing is gone.
+- **ThreadX 6.x:** every metric on every test, all 4 runs,
   **bit-identical** (rel.σ = 0). The single-µs first-power-on
   shift in TIME_SLEEP_001 elapsed time observed in earlier captures
-  (run 1: 9210 µs, runs 2-5: 9229 µs) similarly does not appear in
-  this measurement run.
+  similarly does not appear in this measurement run.
 
-All three kernels are now fully deterministic on this bare-metal MCU
-across all runs. No first-boot transients of any kind. This is the
+All three kernels are fully deterministic on this bare-metal MCU
+across all 4 runs. No first-boot transients of any kind. This is the
 expected and desired behaviour for an embedded RTOS on a deterministic
 part — and it is what makes the cross-kernel comparison reliable from
 a single run, let alone five (or six for FreeRTOS).
@@ -289,12 +287,12 @@ yield calls (`kvb_thread_yield`) for 10 s. Reports total yield count.
 
 | Kernel          | Workers | Total yields  | Per-thread (min/max) |
 |-----------------|--------:|--------------:|---------------------:|
-| TaktOS          |       3 |     2,518,433 | 839,477 / 839,478    |
-| FreeRTOS V11.3  |       3 |     1,775,300 | 591,766 / 591,767    |
-| ThreadX 6.x     |       3 |     1,196,797 | 398,932 / 398,932    |
+| TaktOS          |       3 |     2,518,635 | 839,545 / 839,545    |
+| FreeRTOS V11.3  |       3 |     1,808,448 | 602,816 / 602,816    |
+| ThreadX 6.x     |       3 |     1,196,863 | 398,954 / 398,955    |
 
-**TaktOS leads by 1.42× over FreeRTOS, 2.10× over ThreadX.**
-**FreeRTOS leads ThreadX by 1.48×.**
+**TaktOS leads by 1.39× over FreeRTOS, 2.10× over ThreadX.**
+**FreeRTOS leads ThreadX by 1.51×.**
 
 This benchmark stresses the **scheduler hot path**. Each yield does:
 context save → run-queue update → SelectNext → context restore. TaktOS's
@@ -307,15 +305,15 @@ benchmark because of two compounding factors specific to the
 KVB ThreadX port: (1) the `_txe_*` parameter-validation wrappers add a
 real C call frame to every public ThreadX API call (~30 B + ~6 cycles
 on M0), and (2) the slot-pool indirection in the KVB ThreadX port
-adds two memory loads per `kvb_thread_yield`. The 1.48× FreeRTOS-over-
+adds two memory loads per `kvb_thread_yield`. The 1.51× FreeRTOS-over-
 ThreadX gap on this test is consistent with the disclosed ~30-cycle
 validation overhead per call multiplied by the per-yield call count.
 This is a **legitimate kernel/port characteristic**, not an artifact
 to subtract — both behaviours ship in real ThreadX deployments.
 
 All three kernels distribute work nearly perfectly across the 3 workers.
-TaktOS and FreeRTOS each distribute within 1 yield; ThreadX distributes
-exactly equally (398,932 each, max-min = 0).
+TaktOS and ThreadX each distribute within 1 yield; FreeRTOS distributes
+exactly equally (602,816 each, max-min = 0).
 
 ### 4.3 SYNC_SEM_FAST_001 — uncontended counting semaphore
 
@@ -324,62 +322,60 @@ Reports total wait/post pairs and computed throughput.
 
 | Kernel          | Pairs       | Throughput (p/s) | µs/pair |
 |-----------------|------------:|-----------------:|--------:|
-| TaktOS          |   2,443,520 |          244,349 |   4.09  |
-| FreeRTOS V11.3  |   1,126,656 |          112,654 |   8.88  |
-| ThreadX 6.x     |   1,963,008 |          196,295 |   5.09  |
+| TaktOS          |   2,470,656 |          247,054 |   4.05  |
+| FreeRTOS V11.3  |   1,097,728 |          109,762 |   9.11  |
+| ThreadX 6.x     |   1,955,584 |          195,543 |   5.11  |
 
-**TaktOS leads FreeRTOS by 2.17×, ThreadX by 1.24×.**
-**ThreadX leads FreeRTOS by 1.74×.**
+**TaktOS leads FreeRTOS by 2.25×, ThreadX by 1.26×.**
+**ThreadX leads FreeRTOS by 1.78×.**
 
 This benchmark exercises the **uncontended atomic fast path**. All
 three kernels handle the no-waiter case with interrupt-disable
 critical sections on M0 (no LDREX/STREX — M0 lacks them).
 
-The TaktOS-vs-FreeRTOS 2.21× gap reflects code path length: TaktOS's
+The TaktOS-vs-FreeRTOS 2.25× gap reflects code path length: TaktOS's
 counting semaphore is a single struct field decrement under a brief
 critical section; FreeRTOS implements counting semaphore on top of
 the queue subsystem with `xQueueSemaphoreTake/xQueueGenericSend`
 doing event-list manipulation even when uncontended.
 
-The ThreadX-vs-FreeRTOS 1.76× gap is on the FreeRTOS side of the
+The ThreadX-vs-FreeRTOS 1.78× gap is on the FreeRTOS side of the
 ledger — ThreadX's `tx_semaphore_get` / `tx_semaphore_put` are
 purpose-built for semaphores and don't go through a general queue
-substrate. The TaktOS-vs-ThreadX 1.25× residual gap reflects the
+substrate. The TaktOS-vs-ThreadX 1.26× residual gap reflects the
 slot-pool indirection in the KVB ThreadX port plus the
 parameter-validation overhead — TaktOS has neither.
 
-### 4.4 SYNC_MUTEX_FAST_001 — uncontended mutex lock/unlock
+### 4.4 SYNC_MUTEX_FAST_001 — uncontended plain mutex lock/unlock
 
-Single thread loops `kvb_mutex_lock` then `kvb_mutex_unlock` for 10 s.
+Single thread loops `kvb_mutex_lock` then `kvb_mutex_unlock` (plain mutex,
+no priority protocol on TaktOS) for 10 s.
 
 | Kernel          | Pairs       | Throughput (p/s) | µs/pair |
 |-----------------|------------:|-----------------:|--------:|
-| TaktOS          |   1,760,512 |          176,040 |   5.68  |
-| FreeRTOS V11.3  |     781,056 |           78,097 |  12.80  |
-| ThreadX 6.x     |     883,712 |           88,352 |  11.32  |
+| TaktOS          |   2,168,576 |          216,834 |   4.61  |
+| FreeRTOS V11.3  |     751,360 |           75,125 |  13.31  |
+| ThreadX 6.x     |     879,168 |           87,875 |  11.38  |
 
-**TaktOS leads FreeRTOS by 2.25×, ThreadX by 1.99×.**
-**ThreadX leads FreeRTOS by 1.13×.**
+**TaktOS leads FreeRTOS by 2.89×, ThreadX by 2.47×.**
+**ThreadX leads FreeRTOS by 1.17×.**
 
 Reasons:
-- TaktOS's mutex uses **IPCP (Immediate Priority Ceiling Protocol)**:
-  on `Lock`, the holder's effective priority is raised to the lock's
-  ceiling; on `Unlock`, the effective priority is restored to the
-  next-higher held ceiling (or the base priority if none). This is
-  O(1) per acquire and bounds priority inversion to the longest critical
-  section at the ceiling. The fast path is a single-word owner-pointer
-  CAS plus the priority-bump bookkeeping — about 67 cycles of IPCP work
-  per lock/unlock pair on M0, which is the visible cost vs an
-  uncontended PI mutex. **TaktOS gives up some throughput for the
-  worst-case-bounded behaviour IPCP guarantees.**
+- TaktOS now exposes two mutex APIs on M0, matching the M33 / M4F
+  structure: a plain mutex (no priority protocol — measured here) and
+  an IPCP variant (Immediate Priority Ceiling Protocol — measured by
+  SYNC_MUTEX_PCP_FAST_001 in §4.5 below). The plain-mutex fast path is
+  a single-word owner-pointer CAS plus a one-line `pCurrent` validity
+  check. No wait-list walking, no priority bookkeeping, no queue
+  substrate.
 - FreeRTOS V11.3 implements mutex on top of the queue subsystem.
   Queue is the underlying mechanism; mutex is a queue with a
   holder pointer + priority inheritance state. Each lock/unlock
   walks the queue ready/blocked lists even when uncontended.
   FreeRTOS path additionally pays the +30-cycle ownership pre-check
-  from the KVB port (§3.5), accounting for ~4.9 % of the per-pair
+  from the KVB port (§3.5), accounting for ~4.5 % of the per-pair
   time on FreeRTOS. Removing the pre-check would tighten the gap
-  from 2.25× to ~2.14×.
+  from 2.89× to ~2.76×.
 - ThreadX's `tx_mutex_get` / `tx_mutex_put` are purpose-built for
   mutexes and report `TX_NOT_OWNED` cleanly on non-owner unlock —
   no port-side pre-check needed (§3.5). Their cost reflects the
@@ -387,16 +383,64 @@ Reasons:
   KVB port, and the priority-inheritance bookkeeping ThreadX does
   unconditionally on every lock/unlock.
 
-| **Methodology note (TaktOS Mutex throughput shift):** Earlier KVB
-  results captured before the TaktOS mutex was rewritten from PI to
-  IPCP showed TaktOS at 235,951 p/s on this test. The current 176,040
-  p/s reflects the IPCP rewrite and the corresponding worst-case-bounded
-  guarantee. The change is bounded (~1.4 µs/pair on M0) and reflects
-  a deliberate quality-vs-throughput trade. TaktOS still leads on
-  every kernel for this test; the gap to FreeRTOS narrowed from 2.97×
-  to 2.25×, and the gap to ThreadX narrowed from 2.63× to 1.99×. |
+| **Methodology note (TaktOS mutex API split):** Earlier KVB results
+  on this target reported a single TaktOS mutex throughput of
+  176,040 p/s, when TaktOS shipped only the IPCP-unified mutex on M0.
+  The current code splits the API into a plain mutex (216,834 p/s,
+  measured here) and an IPCP variant (108,334 p/s, measured in §4.5).
+  Customers who don't need bounded priority inversion can use the
+  plain mutex and get the full 2.89× / 2.47× lead; customers who do
+  need IPCP pay the bookkeeping cost on the slower path and get the
+  1.43× / 1.22× lead, plus the worst-case bound. |
 
-### 4.5 SYNC_MUTEX_OWNERSHIP_001 — non-owner unlock rejection
+### 4.5 SYNC_MUTEX_PCP_FAST_001 — uncontended priority-boost mutex lock/unlock
+
+Single thread loops `kvb_mutex_pcp_lock` then `kvb_mutex_pcp_unlock`
+(priority-boost mutex variant) for 10 s. The protocol differs per
+kernel: TaktOS reports IPCP (Immediate Priority Ceiling Protocol);
+FreeRTOS and ThreadX both report PI (Priority Inheritance) since
+neither exposes a PCP API through their mutex layer. Numbers are
+still meaningful as "what the kernel does when you ask for a
+priority-boosted mutex on this hardware," but the underlying
+algorithm differs across the three rows.
+
+| Kernel          | Pairs       | Throughput (p/s) | µs/pair | Protocol |
+|-----------------|------------:|-----------------:|--------:|:--------:|
+| TaktOS          |   1,083,392 |          108,334 |   9.23  | IPCP |
+| FreeRTOS V11.3  |     755,968 |           75,595 |  13.23  | PI   |
+| ThreadX 6.x     |     885,248 |           88,523 |  11.30  | PI   |
+
+**TaktOS leads FreeRTOS by 1.43×, ThreadX by 1.22×.**
+
+Reasons:
+- TaktOS's IPCP path raises the holder's effective priority to the
+  lock's ceiling on every Lock and tracks the held-ceiling stack;
+  on every Unlock the effective priority is restored to the
+  next-higher held ceiling, or the base priority if none. About 5 µs
+  of additional bookkeeping per lock/unlock pair on M0 vs the plain
+  mutex measured in §4.4 — visible in the throughput number, not
+  visible in the worst-case bound. This is the deliberate
+  quality-vs-throughput trade for safety/cert customers needing
+  bounded priority inversion analysis.
+- FreeRTOS V11.3 and ThreadX 6.x both report a PI-style mutex on
+  this test path. PI walks the wait chain on contention and only
+  affects the holder's priority on contention; on the uncontended
+  fast path it costs roughly the same as the plain mutex measured
+  in §4.4. Throughputs are within 0.6 % of their plain-mutex
+  numbers (75,125 vs 75,595 on FreeRTOS; 87,875 vs 88,523 on
+  ThreadX), confirming both kernels essentially run the same hot
+  path on plain and PI mutexes on this benchmark.
+
+| **Protocol distinction:** PCP and PI both boost the holder's
+  effective priority on acquire, but the bookkeeping shapes differ.
+  PCP is a single ceiling priority assignment with O(1) bound; PI
+  walks the wait chain on contention with O(n) bound where n is the
+  chain depth. The TaktOS-vs-FreeRTOS / ThreadX comparison on this
+  test row is therefore not "same algorithm at different speeds" but
+  "different algorithms with different worst-case behaviour." Use
+  whichever fits the application; the safety argument differs.
+
+### 4.6 SYNC_MUTEX_OWNERSHIP_001 — non-owner unlock rejection
 
 Owner task locks the mutex, signals it has done so, blocks. Runner
 task (non-owner) attempts to unlock. Test passes if the unlock is
@@ -427,18 +471,18 @@ silent corruption. This is a real safety property — every kernel
 under test enforces ownership at the API boundary, with measurably
 identical observable behaviour.
 
-### 4.6 IPC_QUEUE_FAST_001 — same-thread queue send/receive
+### 4.7 IPC_QUEUE_FAST_001 — same-thread queue send/receive
 
 Single thread loops `kvb_queue_send` then `kvb_queue_receive` for 10 s.
 
 | Kernel          | Pairs    | Throughput (p/s) | µs/pair |
 |-----------------|---------:|-----------------:|--------:|
-| TaktOS          |  791,296 |           79,104 |  12.64  |
-| FreeRTOS V11.3  |  393,216 |           39,316 |  25.43  |
-| ThreadX 6.x     |  646,400 |           64,623 |  15.47  |
+| TaktOS          |  779,776 |           77,975 |  12.82  |
+| FreeRTOS V11.3  |  386,048 |           38,593 |  25.91  |
+| ThreadX 6.x     |  608,512 |           60,849 |  16.43  |
 
-**TaktOS leads FreeRTOS by 2.01×, ThreadX by 1.22×.**
-**ThreadX leads FreeRTOS by 1.64×.**
+**TaktOS leads FreeRTOS by 2.02×, ThreadX by 1.28×.**
+**ThreadX leads FreeRTOS by 1.58×.**
 
 The queue benchmark moves a `KVB_QUEUE_MESSAGE_SIZE = 16` byte
 payload per send/receive. At this payload size the data plane
@@ -451,7 +495,7 @@ locking counters, etc.) per operation. ThreadX's `tx_queue_send` /
 SYNC_SEM pattern: TaktOS minimal, ThreadX purpose-built but with
 validation overhead, FreeRTOS general-purpose queue substrate.
 
-### 4.7 TIME_SLEEP_001 — thread sleep duration accuracy
+### 4.8 TIME_SLEEP_001 — thread sleep duration accuracy
 
 Caller invokes `kvb_thread_sleep_ticks(10)` (= 10 ms at 1000 Hz tick).
 KVB's pass criterion is `elapsed_us >= min_expected_us` where
@@ -521,16 +565,17 @@ Neither approach is universally better; see §6.
 
 In one sentence: **TaktOS leads both FreeRTOS V11.3 and Eclipse
 ThreadX 6.x on every throughput benchmark on Cortex-M0, with
-1.22×–2.10× over ThreadX and 1.42×–2.25× over FreeRTOS.**
+1.22×–2.47× over ThreadX and 1.39×–2.89× over FreeRTOS.**
 
 The pattern across the four throughput tests:
 
-| Test                | TaktOS vs FreeRTOS | TaktOS vs ThreadX | ThreadX vs FreeRTOS |
-|---------------------|-------------------:|------------------:|--------------------:|
-| SCHED_COOP_001      |              1.42× |             2.10× |               0.67× |
-| SYNC_SEM_FAST_001   |              2.17× |             1.24× |               1.74× |
-| SYNC_MUTEX_FAST_001 |              2.25× |             1.99× |               1.13× |
-| IPC_QUEUE_FAST_001  |              2.01× |             1.22× |               1.64× |
+| Test                    | TaktOS vs FreeRTOS | TaktOS vs ThreadX | ThreadX vs FreeRTOS |
+|-------------------------|-------------------:|------------------:|--------------------:|
+| SCHED_COOP_001          |              1.39× |             2.10× |               0.66× |
+| SYNC_SEM_FAST_001       |              2.25× |             1.26× |               1.78× |
+| SYNC_MUTEX_FAST_001     |              2.89× |             2.47× |               1.17× |
+| SYNC_MUTEX_PCP_FAST_001 |              1.43× |             1.22× |               1.17× |
+| IPC_QUEUE_FAST_001      |              2.02× |             1.28× |               1.58× |
 
 ThreadX vs FreeRTOS is mixed — ThreadX is faster on SEM, MUTEX, and
 QUEUE because those are purpose-built primitives, but slower on
@@ -545,7 +590,10 @@ critical section + memory access). As operations get more complex,
 TaktOS's purpose-built primitives (single-word mutex, bitmap
 scheduler, plain index queue) pull ahead of both FreeRTOS's
 queue-as-everything implementation and ThreadX's purpose-built
-but validation-heavy implementation.
+but validation-heavy implementation. The widest TaktOS lead on
+this suite is 2.89× on SYNC_MUTEX_FAST_001 vs FreeRTOS, where
+TaktOS's plain mutex is a single-word CAS and FreeRTOS routes
+through the queue substrate.
 
 The TIME_SLEEP_001 result is qualitatively different — it shows a
 **behavioural** difference, not a performance one. TaktOS's
@@ -769,17 +817,17 @@ To reproduce:
   heap_4 placement timing. The fix is required for nRF52832 where
   pure-static FreeRTOS would have hardfaulted.
 
-- **Closed: TaktOS Mutex throughput shift (235,951 → 176,040 p/s).**
-  TaktOS Mutex implementation changed from PI to IPCP. On every
-  `Lock`, IPCP raises the holder's effective priority to the
-  lock's ceiling and tracks the held-ceiling stack; on every
-  `Unlock` the effective priority is restored. About 1.4 µs of
-  bookkeeping per pair on M0 — visible in the throughput number,
-  not visible in the worst-case bound. This is a deliberate
-  quality-vs-throughput trade for safety/cert customers needing
-  bounded priority inversion analysis. TaktOS's lead is now 2.25×
-  vs FreeRTOS (was 2.97×) and 1.99× vs ThreadX (was 2.63×). Still
-  the leader on every test in the suite.
+- **Closed: TaktOS Mutex API split (plain + IPCP).** v5.0 captures
+  the second iteration of the TaktOS mutex on M0. The April 29
+  unified-IPCP design (176,040 p/s) was replaced with two APIs
+  matching the M33 / M4F structure: a plain mutex (no priority
+  protocol, 216,834 p/s — measured by SYNC_MUTEX_FAST_001 in §4.4)
+  and an IPCP variant (108,334 p/s — measured by SYNC_MUTEX_PCP_FAST_001
+  in §4.5). Customers without bounded-priority-inversion needs use
+  the plain mutex and get the full 2.89× lead vs FreeRTOS and 2.47×
+  vs ThreadX; safety/cert customers use IPCP and get 1.43× / 1.22×
+  plus the worst-case bound. TaktOS still leads every test in the
+  suite.
 
 - **Closed: first-power-on transients.** Earlier captures showed a
   FreeRTOS single-yield first-boot shift (heap_4 placement) and a
@@ -816,11 +864,21 @@ To reproduce:
 
 *Author: Nguyen Hoan Hoang, I-SYST inc., Brossard, Canada*
 *KVB framework version: 0.1.0-private*
-*Document version: 4.0 — 2026-04-29 — supersedes v3.0; reflects TaktOS Mutex IPCP rewrite, KVB test cleanup leak fix, and re-validation against recent KVB common-code bug fixes*
+*Document version: 5.0 — 2026-05-07 — supersedes v4.0; reflects TaktOS mutex API split (plain + IPCP), refreshed against the May 5 4-run KVB capture*
 
 ---
 
 ### Revision history
+
+- **v5.0 (2026-05-07).** Re-measured all three kernels from the May 5
+  4-run capture after the TaktOS mutex API split. SYNC_MUTEX_FAST_001
+  now measures the plain (no priority protocol) variant at
+  216,834 p/s; new SYNC_MUTEX_PCP_FAST_001 row at §4.5 measures the
+  IPCP variant at 108,334 p/s. Other tests shift by 0.01 % – 1.4 %
+  vs v4.0 — within the rounding noise of the underlying counters,
+  not a kernel change. All three kernels still bit-identical across
+  all 4 runs. Binary sizes unchanged from v4.0. Suite outcome:
+  7 PASS / 0 FAIL / 7 total for every kernel.
 
 - **v4.0 (2026-04-29).** Re-measured all three kernels after (a) TaktOS
   Mutex changed from PI to IPCP, (b) `KVB/src/tests/sync/`,

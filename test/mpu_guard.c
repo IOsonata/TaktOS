@@ -88,7 +88,8 @@ int main(void)
 {
     BSP_SystemInit();
 
-    TaktOSInit(SystemCoreClock, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR, 0u);
+    TaktOSCfg_t cfg = { .KernClockHz     = SystemCoreClock };
+    TaktOSInit(&cfg);
     /* Pass the application RAM vector-table base instead of 0u to bind the
      * MPU-aware PendSV / SVC handlers. 0u keeps the default no-MPU path. */
 

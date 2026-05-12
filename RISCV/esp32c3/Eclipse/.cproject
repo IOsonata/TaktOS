@@ -1,0 +1,393 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<?fileVersion 4.0.0?>
+<!--
+  TaktOS_ESP32C3 Eclipse CDT Managed Build project
+  Toolchain: xPack GNU RISC-V Embedded GCC  (riscv32-unknown-elf-)
+  Target:    ESP32-C3 (RV32IMC, 160 MHz)
+             ESP32-C6 (RV32IMAFC + Zbb, 160 MHz) — change -march/-mabi in Release_C6
+
+  Include paths (relative to Eclipse project root RISCV/esp32c3/Eclipse/):
+    ../../../include              — portable kernel headers
+    ../include                   — port-specific headers (TaktOSCriticalSection.h, etc.)
+    ../src                       — port land-layer headers (systimer, intmtx)
+
+  Defined symbols:
+    TAKT_ARCH_RISCV=1
+    TAKT_CLINT_BASE=0             — unused on ESP32-C3 but satisfies arch_hal guard
+    ESP32_C3=1                    — BSP gate for application code
+    TAKTOS_PMP_ENABLE=0           — set to 1 to enable 32-byte stack guard
+
+  ISA flags (Debug / Release):
+    ESP32-C3:  -march=rv32imc  -mabi=ilp32
+    ESP32-C6:  -march=rv32imafc_zbb  -mabi=ilp32f  (Release_C6 config)
+-->
+<cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+	<storageModule moduleId="org.eclipse.cdt.core.settings">
+
+		<!-- ================================================================
+		     Debug configuration — ESP32-C3 (rv32imc)
+		     ================================================================ -->
+		<cconfiguration id="ilg.gnuarmeclipse.managedbuild.cross.config.lib.debug.esp32c3.1">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider"
+			               id="ilg.gnuarmeclipse.managedbuild.cross.config.lib.debug.esp32c3.1"
+			               moduleId="org.eclipse.cdt.core.settings" name="Debug">
+				<externalSettings>
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath"   name="/TaktOS_ESP32C3"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath"   name="/TaktOS_ESP32C3/Debug"/>
+						<entry flags="RESOLVED"             kind="libraryFile"   name="TaktOS_ESP32C3" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GNU_ELF"       point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator"     point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="a" artifactName="${ProjName}"
+				               buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib"
+				               buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug"
+				               cleanCommand="${cross_rm} -rf" description=""
+				               id="ilg.gnuarmeclipse.managedbuild.cross.config.lib.debug.esp32c3.1"
+				               name="Debug"
+				               parent="ilg.gnuarmeclipse.managedbuild.cross.config.lib.debug">
+
+					<folderInfo id="ilg.gnuarmeclipse.managedbuild.cross.config.lib.debug.esp32c3.1." name="/" resourcePath="">
+						<toolChain id="ilg.gnuarmeclipse.managedbuild.cross.toolchain.lib.debug.esp32c3.1"
+						           name="RISC-V Cross GCC"
+						           superClass="ilg.gnuarmeclipse.managedbuild.cross.toolchain.lib.debug">
+
+							<!-- ── Toolchain identity ─────────────────────────── -->
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.toolchain.name.esp32c3.1"
+							        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.toolchain.name"
+							        value="xPack GNU RISC-V Embedded GCC" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.prefix.esp32c3.1"
+							        name="Prefix"
+							        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.prefix"
+							        value="riscv32-unknown-elf-" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.c.esp32c3.1"
+							        name="C compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.c"
+							        value="gcc" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.cpp.esp32c3.1"
+							        name="C++ compiler" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.cpp"
+							        value="g++" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.ar.esp32c3.1"
+							        name="Archiver" superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.ar"
+							        value="ar" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.objcopy.esp32c3.1"
+							        name="Hex/Bin converter"
+							        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.objcopy"
+							        value="objcopy" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.size.esp32c3.1"
+							        name="Size command"
+							        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.size"
+							        value="size" valueType="string"/>
+
+							<!-- ── Optimisation ───────────────────────────────── -->
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.level.esp32c3.1"
+							        name="Optimization Level"
+							        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.level"
+							        value="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.level.none"
+							        valueType="enumerated"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.functionsections.esp32c3.1"
+							        name="Function sections (-ffunction-sections)"
+							        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.functionsections"
+							        value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.datasections.esp32c3.1"
+							        name="Data sections (-fdata-sections)"
+							        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.datasections"
+							        value="true" valueType="boolean"/>
+
+							<!-- ── Debug level ────────────────────────────────── -->
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.debugging.level.esp32c3.1"
+							        name="Debug level"
+							        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.debugging.level"
+							        value="ilg.gnuarmeclipse.managedbuild.cross.option.debugging.level.max"
+							        valueType="enumerated"/>
+
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.printsize.esp32c3.1"
+							        name="Print size"
+							        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.addtools.printsize"
+							        value="true" valueType="boolean"/>
+
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.GNU_ELF"
+							                id="ilg.gnuarmeclipse.managedbuild.cross.targetPlatform.esp32c3.1"
+							                isAbstract="false" osList="all"
+							                superClass="ilg.gnuarmeclipse.managedbuild.cross.targetPlatform"/>
+
+							<builder buildPath="${workspace_loc:/TaktOS_ESP32C3}/Debug"
+							         id="ilg.gnuarmeclipse.managedbuild.cross.builder.esp32c3.1"
+							         keepEnvironmentInBuildfile="false" managedBuildOn="true"
+							         name="Gnu Make Builder"
+							         superClass="ilg.gnuarmeclipse.managedbuild.cross.builder"/>
+
+							<!-- ── Assembler ──────────────────────────────────── -->
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.esp32c3.1"
+							      name="GNU RISC-V Cross Assembler"
+							      superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler">
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.usepreprocessor.esp32c3.1"
+								        name="Use preprocessor"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.usepreprocessor"
+								        value="true" valueType="boolean"/>
+								<!-- ISA: rv32imc, soft-float ABI -->
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.other.esp32c3.1"
+								        name="Other assembler flags"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.other"
+								        value="-march=rv32imc -mabi=ilp32" valueType="string"/>
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.input.esp32c3.1"
+								           superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.input"/>
+							</tool>
+
+							<!-- ── C compiler ─────────────────────────────────── -->
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.esp32c3.1"
+							      name="GNU RISC-V Cross C Compiler"
+							      superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false"
+								        id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.include.paths.esp32c3.1"
+								        name="Include paths (-I)"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.include.paths"
+								        useByScannerDiscovery="true" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;../../../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../../../../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../src&quot;"/>
+								</option>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false"
+								        id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.defs.esp32c3.1"
+								        name="Defined symbols (-D)"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.defs"
+								        useByScannerDiscovery="true" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="TAKT_ARCH_RISCV=1"/>
+									<listOptionValue builtIn="false" value="ESP32_C3=1"/>
+									<listOptionValue builtIn="false" value="TAKTOS_PMP_ENABLE=0"/>
+								</option>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.std.esp32c3.1"
+								        name="Language standard"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.std"
+								        value="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.std.gnu17"
+								        valueType="enumerated"/>
+								<!-- ISA: rv32imc, soft-float -->
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.other.esp32c3.1"
+								        name="Other compiler flags"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.c.compiler.other"
+								        value="-march=rv32imc -mabi=ilp32" valueType="string"/>
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input.esp32c3.1"
+								           superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.c.compiler.input"/>
+							</tool>
+
+							<!-- ── C++ compiler ───────────────────────────────── -->
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.esp32c3.1"
+							      name="GNU RISC-V Cross C++ Compiler"
+							      superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false"
+								        id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.include.paths.esp32c3.1"
+								        name="Include paths (-I)"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.include.paths"
+								        useByScannerDiscovery="true" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;../../../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../../../../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../src&quot;"/>
+								</option>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false"
+								        id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.defs.esp32c3.1"
+								        name="Defined symbols (-D)"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.defs"
+								        useByScannerDiscovery="true" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="TAKT_ARCH_RISCV=1"/>
+									<listOptionValue builtIn="false" value="ESP32_C3=1"/>
+									<listOptionValue builtIn="false" value="TAKTOS_PMP_ENABLE=0"/>
+								</option>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.noexceptions.esp32c3.1"
+								        name="Do not use exceptions (-fno-exceptions)"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.noexceptions"
+								        value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.nortti.esp32c3.1"
+								        name="Do not use RTTI (-fno-rtti)"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.nortti"
+								        value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.std.esp32c3.1"
+								        name="Language standard"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.std"
+								        value="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.std.gnucpp23"
+								        valueType="enumerated"/>
+								<!-- ISA: rv32imc, soft-float -->
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.other.esp32c3.1"
+								        name="Other compiler flags"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.other"
+								        value="-march=rv32imc -mabi=ilp32" valueType="string"/>
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input.esp32c3.1"
+								           superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input"/>
+							</tool>
+
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.archiver.esp32c3.1"
+							      name="GNU RISC-V Cross Archiver"
+							      superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.archiver"/>
+
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.printsize.esp32c3.1"
+							      name="GNU RISC-V Cross Print Size"
+							      superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.printsize"/>
+
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+
+		<!-- ================================================================
+		     Release configuration — ESP32-C6 (rv32imafc_zbb, -O2)
+		     Duplicate this config for C3 Release by removing _zbb from -march.
+		     ================================================================ -->
+		<cconfiguration id="ilg.gnuarmeclipse.managedbuild.cross.config.lib.release.esp32c6.1">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider"
+			               id="ilg.gnuarmeclipse.managedbuild.cross.config.lib.release.esp32c6.1"
+			               moduleId="org.eclipse.cdt.core.settings" name="Release_C6_Zbb">
+				<externalSettings>
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath"   name="/TaktOS_ESP32C3"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath"   name="/TaktOS_ESP32C3/Release_C6_Zbb"/>
+						<entry flags="RESOLVED"             kind="libraryFile"   name="TaktOS_ESP32C3" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.GNU_ELF"         point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser"   point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser"   point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator"       point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser"   point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="a" artifactName="${ProjName}"
+				               buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.staticLib"
+				               buildProperties="org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.staticLib,org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.release"
+				               cleanCommand="${cross_rm} -rf" description=""
+				               id="ilg.gnuarmeclipse.managedbuild.cross.config.lib.release.esp32c6.1"
+				               name="Release_C6_Zbb"
+				               parent="ilg.gnuarmeclipse.managedbuild.cross.config.lib.release">
+
+					<folderInfo id="ilg.gnuarmeclipse.managedbuild.cross.config.lib.release.esp32c6.1." name="/" resourcePath="">
+						<toolChain id="ilg.gnuarmeclipse.managedbuild.cross.toolchain.lib.release.esp32c6.1"
+						           name="RISC-V Cross GCC"
+						           superClass="ilg.gnuarmeclipse.managedbuild.cross.toolchain.lib.release">
+
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.toolchain.name.esp32c6.1"
+							        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.toolchain.name"
+							        value="xPack GNU RISC-V Embedded GCC" valueType="string"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.command.prefix.esp32c6.1"
+							        name="Prefix"
+							        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.command.prefix"
+							        value="riscv32-unknown-elf-" valueType="string"/>
+
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.level.esp32c6.1"
+							        name="Optimization Level"
+							        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.level"
+							        value="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.level.optimize2"
+							        valueType="enumerated"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.functionsections.esp32c6.1"
+							        name="Function sections (-ffunction-sections)"
+							        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.functionsections"
+							        value="true" valueType="boolean"/>
+							<option id="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.datasections.esp32c6.1"
+							        name="Data sections (-fdata-sections)"
+							        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.optimization.datasections"
+							        value="true" valueType="boolean"/>
+
+							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.GNU_ELF"
+							                id="ilg.gnuarmeclipse.managedbuild.cross.targetPlatform.esp32c6.1"
+							                isAbstract="false" osList="all"
+							                superClass="ilg.gnuarmeclipse.managedbuild.cross.targetPlatform"/>
+
+							<builder buildPath="${workspace_loc:/TaktOS_ESP32C3}/Release_C6_Zbb"
+							         id="ilg.gnuarmeclipse.managedbuild.cross.builder.esp32c6.1"
+							         keepEnvironmentInBuildfile="false" managedBuildOn="true"
+							         name="Gnu Make Builder"
+							         superClass="ilg.gnuarmeclipse.managedbuild.cross.builder"/>
+
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.esp32c6.1"
+							      name="GNU RISC-V Cross Assembler"
+							      superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler">
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.usepreprocessor.esp32c6.1"
+								        name="Use preprocessor"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.usepreprocessor"
+								        value="true" valueType="boolean"/>
+								<!-- ESP32-C6: rv32imafc + Zbb, single-precision FPU, soft-float ABI -->
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.other.esp32c6.1"
+								        name="Other assembler flags"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.assembler.other"
+								        value="-march=rv32imafc_zbb -mabi=ilp32f" valueType="string"/>
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.input.esp32c6.1"
+								           superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.assembler.input"/>
+							</tool>
+
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.esp32c6.1"
+							      name="GNU RISC-V Cross C++ Compiler"
+							      superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler">
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false"
+								        id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.include.paths.esp32c6.1"
+								        name="Include paths (-I)"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.include.paths"
+								        useByScannerDiscovery="true" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;../../../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../../../../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../include&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;../src&quot;"/>
+								</option>
+								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false"
+								        id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.defs.esp32c6.1"
+								        name="Defined symbols (-D)"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.defs"
+								        useByScannerDiscovery="true" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="TAKT_ARCH_RISCV=1"/>
+									<listOptionValue builtIn="false" value="ESP32_C6=1"/>
+									<listOptionValue builtIn="false" value="TAKTOS_PMP_ENABLE=0"/>
+								</option>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.noexceptions.esp32c6.1"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.noexceptions"
+								        value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.nortti.esp32c6.1"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.nortti"
+								        value="true" valueType="boolean"/>
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.std.esp32c6.1"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.std"
+								        value="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.std.gnucpp23"
+								        valueType="enumerated"/>
+								<!-- ESP32-C6: rv32imafc + Zbb enables hardware clz in TAKT_CLZ() -->
+								<option id="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.other.esp32c6.1"
+								        name="Other compiler flags"
+								        superClass="ilg.gnuarmeclipse.managedbuild.cross.option.cpp.compiler.other"
+								        value="-march=rv32imafc_zbb -mabi=ilp32f" valueType="string"/>
+								<inputType id="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input.esp32c6.1"
+								           superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.cpp.compiler.input"/>
+							</tool>
+
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.archiver.esp32c6.1"
+							      name="GNU RISC-V Cross Archiver"
+							      superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.archiver"/>
+
+							<tool id="ilg.gnuarmeclipse.managedbuild.cross.tool.printsize.esp32c6.1"
+							      name="GNU RISC-V Cross Print Size"
+							      superClass="ilg.gnuarmeclipse.managedbuild.cross.tool.printsize"/>
+
+						</toolChain>
+					</folderInfo>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
+	<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+		<project id="TaktOS_ESP32C3.null" name="TaktOS_ESP32C3"/>
+	</storageModule>
+	<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+</cproject>

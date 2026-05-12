@@ -4,9 +4,8 @@
 @brief  TaktOS kernel  initialisation, scheduler, tick handler, and idle task
 
 Clock note:
-  TaktOSInit(KernClockHz, TickHz, TickClockSrc, HandlerBaseAddr) stores
-  KernClockHz and TickClockSrc and passes them unchanged to TaktOSTickInit()
-  at startup.
+  TaktOSInit(&cfg) reads cfg.KernClockHz / cfg.TickHz / cfg.TickClockSrc
+  and passes them unchanged to TaktOSTickInit() at startup.
   The kernel never interprets
   KernClockHz as the CPU frequency  it is solely the input clock of the
   tick peripheral.  The caller (application or HAL) is responsible for
@@ -59,10 +58,26 @@ SOFTWARE.
 #include "TaktOSWakeTrace.h"
 #endif
 
+/* Port-portable fallback for the software-interrupt trigger default.
+ * Ports that need a non-zero default (RV32 → CLINT MSIP) define this
+ * macro in their TaktKernelCore.h (pulled in transitively above).  ARM
+ * Cortex-M doesn't use this value — its TaktOSCtxSwitch is hardcoded to
+ * the architecturally fixed SCB ICSR — so the 0 fallback is fine. */
+#ifndef TAKT_DEFAULT_SOFT_INT_ADDR
+#define TAKT_DEFAULT_SOFT_INT_ADDR  0u
+#endif
+
 //--- Run queue  definition is in TaktKernel.h (inline primitives) ---
 
 uint32_t g_TickCount;
 TaktRunQueue_t g_TaktRunQueue;
+
+// Deferred-context-switch trigger register pointer.  Set by TaktOSInit() from
+// the SoftIntAddr parameter.  Used by TaktOSCtxSwitch() in TaktOSCriticalSection.h
+// for ports that need a configurable MMIO address (RISC-V).  ARM Cortex-M ports
+// ignore this and use the architecturally fixed SCB ICSR.
+volatile uint32_t *g_TaktSoftIntReg = nullptr;
+
 static uint32_t s_KernClockHz;		// Tick peripheral input clock in Hz
 static uint32_t s_TickFreq;			// Tick freq in Hz
 static TaktOSTickClockSrc_t s_TickClockSrc;	// Selected tick clock path
@@ -401,19 +416,33 @@ void TaktOSThreadYield(void)
  *                          See TaktOS.h for the full per-architecture spec.
  * @return	TAKTOS_OK on success, TAKTOS_ERR_INVALID if arguments are out of range.
  */
-TaktOSErr_t TaktOSInit(uint32_t KernClockHz, uint32_t TickHz,
-                      TaktOSTickClockSrc_t TickClockSrc, uintptr_t HandlerBaseAddr)
+TaktOSErr_t TaktOSInit(const TaktOSCfg_t *Cfg)
 {
+    if (Cfg == nullptr || Cfg->KernClockHz == 0u) {
+        return TAKTOS_ERR_INVALID;
+    }
+
+    /* Apply defaults for any zero field, so the minimum-effort init
+     *    TaktOSCfg_t cfg = { .KernClockHz = X };  just works on the
+     * standard configuration for the active port.  TickClockSrc needs
+     * no special handling because TAKTOS_TICK_CLOCK_PROCESSOR == 0 — a
+     * zero-initialised field naturally selects the default. */
+    uint32_t   tickHz  = (Cfg->TickHz      != 0u) ? Cfg->TickHz     : TAKTOS_DEFAULT_TICK_HZ;
+    uintptr_t  softInt = (Cfg->SoftIntAddr != 0u) ? Cfg->SoftIntAddr : TAKT_DEFAULT_SOFT_INT_ADDR;
+    /* HandlerBaseAddr 0 already means "use port default" per TaktKernelHandlerAssign
+     * convention; the port resolves it. */
+
     memset(&g_TaktRunQueue, 0, sizeof(g_TaktRunQueue));
     memset(&g_TaktosCtx, 0, sizeof(g_TaktosCtx));
 
     s_DeferredYieldFor = nullptr;   // clear any stale deferred yield from prior run
     g_TaktRunQueue.TopPri = 0u;
     g_TickCount = 0;
-    s_KernClockHz = KernClockHz;
-    s_TickFreq = TickHz;
-    s_TickClockSrc = TickClockSrc;
-    s_KernelMpuActive = TaktKernelHandlerAssign(HandlerBaseAddr);
+    s_KernClockHz     = Cfg->KernClockHz;
+    s_TickFreq        = tickHz;
+    s_TickClockSrc    = Cfg->TickClockSrc;
+    s_KernelMpuActive = TaktKernelHandlerAssign(Cfg->HandlerBaseAddr);
+    g_TaktSoftIntReg  = (volatile uint32_t *)softInt;
 
     // Idle thread at priority 0  bypasses user priority guard
 

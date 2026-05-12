@@ -78,7 +78,8 @@ static void test_scheduler(void)
 {
     SUITE("scheduler");
 
-    TaktOSInit(1000000u, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR, 0u);
+    TaktOSCfg_t cfg = { .KernClockHz     = 1000000u };
+    TaktOSInit(&cfg);
 
     TaktOSThread_t *tA = MakeThread(gStack0, sizeof(gStack0), 1u);
     TaktOSThread_t *tB = MakeThread(gStack1, sizeof(gStack1), 2u);
@@ -235,7 +236,8 @@ static void test_suspend_blocked(void)
     SUITE("suspend_blocked");
 
     TaktOSSem_t sem;
-    TaktOSInit(1000000u, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR, 0u);
+    TaktOSCfg_t cfg = { .KernClockHz     = 1000000u };
+    TaktOSInit(&cfg);
     TaktOSSemInit(&sem, 0u, 1u);
 
     // Manually construct a "blocked in sem wait" scenario without
@@ -287,7 +289,8 @@ static void test_dead_state(void)
 {
     SUITE("dead_state");
 
-    TaktOSInit(1000000u, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR, 0u);
+    TaktOSCfg_t cfg = { .KernClockHz     = 1000000u };
+    TaktOSInit(&cfg);
 
     //  Destroy stamps DEAD 
     TaktOSThread_t *tA = MakeThread(gStack0, sizeof(gStack0), 2u);
@@ -396,7 +399,8 @@ static void test_yield_caller_check(void)
 {
     SUITE("yield_caller_check");
 
-    TaktOSInit(1000000u, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR, 0u);
+    TaktOSCfg_t cfg = { .KernClockHz     = 1000000u };
+    TaktOSInit(&cfg);
 
     // A thread at the same priority as itself  singleton  Yield is a no-op.
     TaktOSThread_t *tY = MakeThread(gStack0, sizeof(gStack0), 4u);
@@ -425,7 +429,8 @@ static void test_deferred_yield(void)
 {
     SUITE("deferred_yield");
 
-    TaktOSInit(1000000u, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR, 0u);
+    TaktOSCfg_t cfg = { .KernClockHz     = 1000000u };
+    TaktOSInit(&cfg);
 
     // Two threads at the same priority  round-robin peers.
     TaktOSThread_t *tA = MakeThread(gStack0, sizeof(gStack0), 5u);
@@ -505,7 +510,8 @@ static void test_handoff_guarantee(void)
     SUITE("handoff_guarantee");
 
     //  Case A 
-    TaktOSInit(1000000u, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR, 0u);
+    TaktOSCfg_t cfg = { .KernClockHz     = 1000000u };
+    TaktOSInit(&cfg);
 
     TaktOSThread_t *tA = MakeThread(gStack0, sizeof(gStack0), 5u);
     TaktOSThread_t *tB = MakeThread(gStack1, sizeof(gStack1), 5u);
@@ -527,7 +533,8 @@ static void test_handoff_guarantee(void)
     CHECK(tB->State            == TAKTOS_READY);  // B still ready, deferred one turn
 
     //  Case B 
-    TaktOSInit(1000000u, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR, 0u);
+    TaktOSCfg_t cfg = { .KernClockHz     = 1000000u };
+    TaktOSInit(&cfg);
 
     tA = MakeThread(gStack0, sizeof(gStack0), 5u);
     tB = MakeThread(gStack1, sizeof(gStack1), 5u);

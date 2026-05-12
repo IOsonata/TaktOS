@@ -100,10 +100,33 @@ TAKT_STATIC_ASSERT(TAKTOS_DEAD <= 0xFFu, "TaktOSState_t must fit in uint8_t");
 // Selects which clock path drives the kernel tick source when the target
 // tick implementation supports multiple SysTick clock domains.
 // For non-SysTick targets, the port may ignore this value.
+// PROCESSOR is the default (value 0), so a zero-initialised cfg field
+// selects it automatically without explicit assignment.
 typedef enum {
-    TAKTOS_TICK_CLOCK_REFERENCE = 0,
-    TAKTOS_TICK_CLOCK_PROCESSOR = 1,
+    TAKTOS_TICK_CLOCK_PROCESSOR = 0,
+    TAKTOS_TICK_CLOCK_REFERENCE = 1,
 } TaktOSTickClockSrc_t;
+
+//--- Portable defaults ---------------------------------
+// Fall-back value used by TaktOSInit() when TaktOSCfg_t.TickHz is 0.
+// Port-specific defaults (e.g. SoftIntAddr on RV32) live in the active
+// port's TaktKernelCore.h.
+#define TAKTOS_DEFAULT_TICK_HZ          1000u
+
+//--- Kernel configuration --------------------------------
+// Passed to TaktOSInit() at kernel startup.  Any field left zero is
+// filled in by TaktOSInit() from the documented per-field default, so the
+// minimum-effort init is:
+//     TaktOSCfg_t cfg = { .KernClockHz = <chip clock> };
+//     TaktOSInit(&cfg);
+// Set only the fields that deviate from the default for your chip.
+typedef struct __TaktOSCfg {
+    uint32_t              KernClockHz;     // Tick peripheral input clock (Hz).  REQUIRED — 0 → error.
+    uint32_t              TickHz;          // Kernel tick rate (Hz).  0 → TAKTOS_DEFAULT_TICK_HZ (1000).
+    TaktOSTickClockSrc_t  TickClockSrc;    // Tick clock domain.  0 → PROCESSOR.
+    uintptr_t             HandlerBaseAddr; // Arch exception/trap base address.  0 → port's statically linked handlers.
+    uintptr_t             SoftIntAddr;     // Software-interrupt trigger MMIO.  0 → port's TAKT_DEFAULT_SOFT_INT_ADDR.
+} TaktOSCfg_t;
 
 //--- Priority level defines -------------------------------------
 // Priority 0 is reserved for the idle thread.
@@ -146,40 +169,37 @@ extern "C" {
 /**
  * @brief	Initialize the kernel
  *
- *  This function must be called first to initialize the kernel.
+ * Sets up scheduler state, the idle thread, the tick source, and the
+ * deferred-context-switch trigger.  All configuration is passed in a single
+ * TaktOSCfg_t struct; see its field documentation above for per-field
+ * meaning.  Any zero / DEFAULT field is replaced with the port's documented
+ * default — only KernClockHz is required.
  *
- * @param	KernClockHz : Frequency of the tick counter input in Hz.
- *                        This is the clock that drives the tick peripheral
- *                        (SysTick, GP timer, CLINT, etc.)  NOT necessarily
- *                        the CPU frequency.
+ * Minimum-effort init for a standard CLINT-based RV32 chip:
+ * @code
+ *     TaktOSCfg_t cfg = { .KernClockHz = 16000000u };
+ *     TaktOSInit(&cfg);
+ *     TaktOSStart();
+ * @endcode
  *
- *                        Examples:
- *                          nRF52832  (M4,  64 MHz): SystemCoreClock
- *                          nRF54L15  (M33, 128 MHz): SystemCoreClock
- *                          STM32 HCLK/8 ref path:   SystemCoreClock / 8
+ * Init that overrides one default (ESP32-C3 — no CLINT, so SoftIntAddr
+ * must be set explicitly to the SYSTEM_CPU_INTR_FROM_CPU_0 register):
+ * @code
+ *     TaktOSCfg_t cfg = {
+ *         .KernClockHz = 16000000u,
+ *         .SoftIntAddr = 0x600C00D8u,
+ *     };
+ *     TaktOSInit(&cfg);
+ *     TaktOSStart();
+ * @endcode
  *
- *                        The HAL or application owns this value.
- *                        TaktOS passes it straight to TaktOSTickInit().
+ * @param  Cfg : Pointer to a filled-in TaktOSCfg_t.  Must remain valid
+ *               for the duration of the call; TaktOS copies what it needs.
  *
- * @param 	TickHz : Desired kernel tick rate in Hz (e.g. 1000)
- *
- * @param  TickClockSrc : Tick clock source selection for targets that support
- *                        multiple SysTick clock paths.
- *                        Use TAKTOS_TICK_CLOCK_PROCESSOR when the tick runs
- *                        from the CPU clock, or TAKTOS_TICK_CLOCK_REFERENCE
- *                        when it runs from a reference / divided clock path.
- *
- * @param  HandlerBaseAddr : Architecture-defined exception / trap handler base address.
- *                          ARM: base address of the application-owned RAM vector table
- *                               to patch. Pass 0 to keep the default statically linked
- *                               handlers (no-MPU fallback).
- *                          RISC-V: trap base address (e.g. mtvec base) when the port
- *                               uses one. Pass 0 to keep the port default.
- *
- * @return	Error code
+ * @return	TAKTOS_OK on success, TAKTOS_ERR_INVALID if Cfg is null or
+ *          KernClockHz is 0.
  */
-TaktOSErr_t TaktOSInit(uint32_t KernClockHz, uint32_t TickHz,
-                      TaktOSTickClockSrc_t TickClockSrc, uintptr_t HandlerBaseAddr);
+TaktOSErr_t TaktOSInit(const TaktOSCfg_t *Cfg);
 
 /**
  * @brief	Start the kernel
