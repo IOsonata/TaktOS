@@ -12,7 +12,7 @@
 
 **TaktOS does not own application interrupts.** The kernel installs three system handlers: the context switch handler, the first-task launcher, and the tick source (declared weak so the application may override it). All application IRQ vectors are owned and installed by the application. The application signals the kernel from any IRQ handler using `TaktOSSemGive()` / `sem_post()`.
 
-**Zero dynamic memory.** The kernel never calls `malloc` or any allocator. Every object — threads (TCB + stack in one user-supplied buffer), semaphores, mutexes, queues (backing storage user-supplied) — is statically declared by the application. Memory layout is fully determined at compile time.
+**Zero dynamic memory.** The kernel never calls `malloc` or any allocator. Every object - threads (TCB + stack in one user-supplied buffer), semaphores, mutexes, queues (backing storage user-supplied) - is statically declared by the application. Memory layout is fully determined at compile time.
 
 ### Yield semantics
 
@@ -32,15 +32,15 @@ So the operational rule is: **immediate yield in normal Thread mode; deferred yi
 | | ARM Cortex-M |
 |---|---|
 | **Targets** | Cortex-M0/M0+, M4/M4F, M7, M33, M55 |
-| **Context switch** | ~47 cycles ¹ |
+| **Context switch** | ~47 cycles ^1 |
 | **Interrupt model** | Application owns all IRQ vectors |
-| **Memory model** | Static allocation only — zero heap |
+| **Memory model** | Static allocation only - zero heap |
 | **Scheduler core** | ~590 LOC portable C++23 |
 | **Public API** | POSIX PSE51 (`pthread`, `sem_t`, `mq`, `timer`) + native C/C++ |
-| **Certification target** | IEC 61508 SIL 2 → ASIL D (SEooC) |
+| **Certification target** | IEC 61508 SIL 2 -> ASIL D (SEooC) |
 | **Platform integration** | IOsonata Land-layer primitives |
 
-¹ Design target from llvm-mca cycle budget. Measured performance via Thread-Metric on real hardware (nRF52832 M4, nRF54L15 M33).
+^1 Design target from llvm-mca cycle budget. Measured performance via Thread-Metric on real hardware (nRF52832 M4, nRF54L15 M33).
 
 **RISC-V RV32 port:** placeholder, not in v1.x scope. The `RISCV/`
 directory and the `Benchmark/ThreadMetric/ESP32C*/` projects in this
@@ -49,34 +49,34 @@ intended for any v1.x release. No RISC-V Thread-Metric results exist.
 Do not treat anything under `RISCV/` as a working port. RISC-V will be
 revisited as a separate scoped effort when product demand justifies the
 silicon validation campaign and the IOsonata build path. See
-*TaktOS Engineering Specification* §11 #6 for the canonical statement.
+*TaktOS Engineering Specification* section11 #6 for the canonical statement.
 
 ---
 
-## On-target benchmark results — Thread-Metric
+## On-target benchmark results - Thread-Metric
 
-**Suite:** eclipse-threadx/threadx Thread-Metric (MIT) — steady-state iteration counts, higher = better.  
+**Suite:** eclipse-threadx/threadx Thread-Metric (MIT) - steady-state iteration counts, higher = better.  
 **Build:** All RTOSes compiled with identical flags on the same MCU. ThreadX tested with source code.
 
-### nRF54L15 · Cortex-M33 · 128 MHz · GCC 15.2.1 · `-Os` · 1 kHz tick
+### nRF54L15 * Cortex-M33 * 128 MHz * GCC 15.2.1 * `-Os` * 1 kHz tick
 
 | Test | TaktOS | ThreadX | FreeRTOS | T / TX | T / FR |
 |---|---|---|---|---|---|
-| TM1  Basic Processing      |    374,404 |    374,403 |    374,303 | 1.00× | 1.00× |
-| TM2  Cooperative Scheduling | 39,161,183 | 26,466,010 | 26,474,445 | **1.48×** | **1.48×** |
-| TM3  Preemptive Scheduling  | 13,287,261 | 11,757,316 |  6,721,773 | **1.13×** | **1.98×** |
-| TM6  Message Processing     | 27,608,741 | 19,092,528 |  6,947,836 | **1.45×** | **3.97×** |
-| TM7  Synchronization        | 59,961,406 | 38,375,092 | 11,555,762 | **1.56×** | **5.19×** |
-| TM8  Mutex Processing       | 19,679,521 | 10,105,427 |  7,259,902 | **1.95×** | **2.71×** |
-| **Geometric mean (TM2–TM8)** | | | | **1.49×** | **2.77×** |
+| TM1  Basic Processing      |    374,404 |    374,403 |    374,303 | 1.00x | 1.00x |
+| TM2  Cooperative Scheduling | 39,161,183 | 26,466,010 | 26,474,445 | **1.48x** | **1.48x** |
+| TM3  Preemptive Scheduling  | 13,287,261 | 11,757,316 |  6,721,773 | **1.13x** | **1.98x** |
+| TM6  Message Processing     | 27,608,741 | 19,092,528 |  6,947,836 | **1.45x** | **3.97x** |
+| TM7  Synchronization        | 59,961,406 | 38,375,092 | 11,555,762 | **1.56x** | **5.19x** |
+| TM8  Mutex Processing       | 19,679,521 | 10,105,427 |  7,259,902 | **1.95x** | **2.71x** |
+| **Geometric mean (TM2-TM8)** | | | | **1.49x** | **2.77x** |
 
-**TM1 note:** All three RTOSes score within 0.03 % of each other on single-thread compute — no context switches occur during the TM1 window.
+**TM1 note:** All three RTOSes score within 0.03 % of each other on single-thread compute - no context switches occur during the TM1 window.
 
-**Binary size — TM7 Synchronization `.text`** *(via `arm-none-eabi-size --format=berkeley` on the linked ELF; all three built with GCC 15.2.1, `-Os`, `--gc-sections`, same Thread-Metric harness)*:
+**Binary size - TM7 Synchronization `.text`** *(via `arm-none-eabi-size --format=berkeley` on the linked ELF; all three built with GCC 15.2.1, `-Os`, `--gc-sections`, same Thread-Metric harness)*:
 
 | RTOS | .text bytes | vs TaktOS |
 |---|---|---|
-| TaktOS   |  6,494 | — |
+| TaktOS   |  6,494 | - |
 | ThreadX  |  7,239 | +11.5% |
 | FreeRTOS |  8,824 | +35.9% |
 
@@ -84,31 +84,31 @@ silicon validation campaign and the IOsonata build path. See
 
 ---
 
-### nRF52832 · Cortex-M4 · 64 MHz · GCC 15.2.1 · `-Os` · 1 kHz tick
+### nRF52832 * Cortex-M4 * 64 MHz * GCC 15.2.1 * `-Os` * 1 kHz tick
 
-FreeRTOS TM2 ⚠ — determinism error every window, value is informational only.
+FreeRTOS TM2 WARNING - determinism error every window, value is informational only.
 
 | Test | TaktOS | ThreadX | FreeRTOS | T / TX | T / FR |
 |---|---|---|---|---|---|
-| TM1  Basic Processing       |    143,765 |    124,641 |    124,608 | 1.15× | 1.15× |
-| TM2  Cooperative Scheduling | 13,823,020 | 10,497,840 |  8,369,345⚠ | 1.32× | 1.65× |
-| TM3  Preemptive Scheduling  |  4,793,897 |  4,354,376 |  2,380,390 | **1.10×** | **2.01×** |
-| TM6  Message Processing     |  8,952,189 |  6,564,371 |  2,158,116 | **1.36×** | **4.15×** |
-| TM7  Synchronization        | 20,381,897 | 14,632,422 |  3,910,892 | **1.39×** | **5.21×** |
-| TM8  Mutex Processing       |  6,916,236 |  3,693,281 |  2,421,976 | **1.87×** | **2.86×** |
-| **Geometric mean (TM2–TM8)** | | | | **1.39×** | **2.90×** |
+| TM1  Basic Processing       |    143,765 |    124,641 |    124,608 | 1.15x | 1.15x |
+| TM2  Cooperative Scheduling | 13,823,020 | 10,497,840 |  8,369,345WARNING | 1.32x | 1.65x |
+| TM3  Preemptive Scheduling  |  4,793,897 |  4,354,376 |  2,380,390 | **1.10x** | **2.01x** |
+| TM6  Message Processing     |  8,952,189 |  6,564,371 |  2,158,116 | **1.36x** | **4.15x** |
+| TM7  Synchronization        | 20,381,897 | 14,632,422 |  3,910,892 | **1.39x** | **5.21x** |
+| TM8  Mutex Processing       |  6,916,236 |  3,693,281 |  2,421,976 | **1.87x** | **2.86x** |
+| **Geometric mean (TM2-TM8)** | | | | **1.39x** | **2.90x** |
 
-**Binary size — TM7 Synchronization `.text`:**
+**Binary size - TM7 Synchronization `.text`:**
 
 | RTOS | .text bytes | vs TaktOS |
 |---|---|---|
-| TaktOS   |  6,102 | — |
+| TaktOS   |  6,102 | - |
 | ThreadX  |  6,625 | +8.6% |
 | FreeRTOS | 10,164 | +66.6% |
 
 **PX5 on nRF52832:** Eclipse projects for PX5 exist under `Benchmark/ThreadMetric/nRF52832/` but no PX5 number is published in this repo. The PX5 demo package cannot be configured the same way TaktOS, FreeRTOS, and ThreadX are tuned for this benchmark (optimization level, inlining, kernel options), so running it against them would violate the like-for-like methodology used throughout this work. Published PX5 numbers (Beningo, 2024) are cited separately in the engineering benchmark report where relevant, but are not re-run or presented as our measurement.
 
-**TM4 and TM5 are not run.** TM4 requires a hardware timer IRQ owned by the test harness — TaktOS does not own application IRQs by design. TM5 measures dynamic memory allocation — TaktOS has no heap by design.
+**TM4 and TM5 are not run.** TM4 requires a hardware timer IRQ owned by the test harness - TaktOS does not own application IRQs by design. TM5 measures dynamic memory allocation - TaktOS has no heap by design.
 
 ---
 
@@ -116,12 +116,12 @@ FreeRTOS TM2 ⚠ — determinism error every window, value is informational only
 
 `TAKT_INLINE_OPTIMIZATION` forces `TAKT_ALWAYS_INLINE` on the semaphore, mutex, and queue fast paths. Removing the define reverts those to regular function calls.
 
-| Test | nRF52832 M4  with | without | M4 Δ | nRF54L15 M33  with | without | M33 Δ |
+| Test | nRF52832 M4  with | without | M4 Delta | nRF54L15 M33  with | without | M33 Delta |
 |---|---|---|---|---|---|---|
-| TM6 Message         |  8,952,189 |  7,663,774 | −14.4% | 27,608,741 | 22,310,845 | −19.2% |
-| TM7 Synchronization | 20,381,897 | 15,203,494 | −25.4% | 59,961,406 | 43,116,795 | −28.1% |
+| TM6 Message         |  8,952,189 |  7,663,774 | -14.4% | 27,608,741 | 22,310,845 | -19.2% |
+| TM7 Synchronization | 20,381,897 | 15,203,494 | -25.4% | 59,961,406 | 43,116,795 | -28.1% |
 
-TM7 is affected more than TM6 on both boards — the entire workload is semaphore give/take. The M33 takes a larger penalty than the M4: its instruction cache eliminates flash wait states, making BL/BX call overhead proportionally more expensive. For certification builds where `TAKT_ALWAYS_INLINE` is disabled, the *without* column is the expected performance baseline.
+TM7 is affected more than TM6 on both boards - the entire workload is semaphore give/take. The M33 takes a larger penalty than the M4: its instruction cache eliminates flash wait states, making BL/BX call overhead proportionally more expensive. For certification builds where `TAKT_ALWAYS_INLINE` is disabled, the *without* column is the expected performance baseline.
 
 ---
 
@@ -131,36 +131,36 @@ TM7 is affected more than TM6 on both boards — the entire workload is semaphor
 
 ```
 TaktOS/
-├── include/
-│   ├── TaktOS.h              # public API + arch port function declarations
-│   ├── TaktKernel.h          # private API (kernel objects only)
-│   ├── TaktOSThread.h        # SAFETY BOUNDARY
-│   ├── TaktOSSem.h           # SAFETY BOUNDARY — fast path always_inline
-│   ├── TaktOSMutex.h         # SAFETY BOUNDARY
-│   ├── TaktOSQueue.h         # SAFETY BOUNDARY — fast path always_inline
-│   └── posix/                # POSIX PSE51 layer — QM
-├── ARM/
-│   ├── include/TaktOSCriticalSection.h  # SAFETY BOUNDARY — inline PRIMASK
-│   ├── src/systick.h         # IOsonata Land-layer: SysTick MMIO primitives
-│   ├── src/TaktKernelCM.cpp  # TaktOSTickInit() + TaktOSStackInit()
-│   ├── cm0/PendSV_M0.S       # SAFETY BOUNDARY — M0/M0+
-│   ├── cm4/PendSV_M4.S       # SAFETY BOUNDARY — M4/M4F
-│   ├── cm7/PendSV_M7.S       # SAFETY BOUNDARY — M7
-│   ├── cm33/PendSV_M33.S     # SAFETY BOUNDARY — M33
-│   └── cm55/PendSV_M55.S     # SAFETY BOUNDARY — M55
-├── RISCV/                    # PLACEHOLDER — not in v1.x scope, not functional
-│   └── rv32/                 # design sketch only; do not use
-├── src/
-│   ├── taktos.cpp            # scheduler, init
-│   ├── taktos_sem.cpp        # semaphore slow paths
-│   ├── taktos_mutex.cpp      # mutex slow paths
-│   ├── taktos_queue.cpp      # queue slow paths
-│   ├── taktos_thread.cpp     # thread lifecycle
-│   └── posix/                # PSE51 implementation
-├── Benchmark/Thread-Metric/  # Thread-Metric Eclipse projects (nRF52832, nRF54L15)
-├── KVB/                      # Kernel Validation Benchmark — primary on-target test harness
-├── examples/                 # basic, mutex, posix, queue
-└── test/                     # MPU vector reloc tests (on-target)
++-- include/
+|   +-- TaktOS.h              # public API + arch port function declarations
+|   +-- TaktKernel.h          # private API (kernel objects only)
+|   +-- TaktOSThread.h        # SAFETY BOUNDARY
+|   +-- TaktOSSem.h           # SAFETY BOUNDARY - fast path always_inline
+|   +-- TaktOSMutex.h         # SAFETY BOUNDARY
+|   +-- TaktOSQueue.h         # SAFETY BOUNDARY - fast path always_inline
+|   +-- posix/                # POSIX PSE51 layer - QM
++-- ARM/
+|   +-- include/TaktOSCriticalSection.h  # SAFETY BOUNDARY - inline PRIMASK
+|   +-- src/systick.h         # IOsonata Land-layer: SysTick MMIO primitives
+|   +-- src/TaktKernelCM.cpp  # TaktOSTickInit() + TaktOSStackInit()
+|   +-- cm0/PendSV_M0.S       # SAFETY BOUNDARY - M0/M0+
+|   +-- cm4/PendSV_M4.S       # SAFETY BOUNDARY - M4/M4F
+|   +-- cm7/PendSV_M7.S       # SAFETY BOUNDARY - M7
+|   +-- cm33/PendSV_M33.S     # SAFETY BOUNDARY - M33
+|   +-- cm55/PendSV_M55.S     # SAFETY BOUNDARY - M55
++-- RISCV/                    # PLACEHOLDER - not in v1.x scope, not functional
+|   +-- rv32/                 # design sketch only; do not use
++-- src/
+|   +-- taktos.cpp            # scheduler, init
+|   +-- taktos_sem.cpp        # semaphore slow paths
+|   +-- taktos_mutex.cpp      # mutex slow paths
+|   +-- taktos_queue.cpp      # queue slow paths
+|   +-- taktos_thread.cpp     # thread lifecycle
+|   +-- posix/                # PSE51 implementation
++-- Benchmark/Thread-Metric/  # Thread-Metric Eclipse projects (nRF52832, nRF54L15)
++-- KVB/                      # Kernel Validation Benchmark - primary on-target test harness
++-- examples/                 # basic, mutex, posix, queue
++-- test/                     # MPU vector reloc tests (on-target)
 ```
 
 ### Arch port
@@ -170,7 +170,7 @@ Each architecture implements four C functions declared in `TaktOS.h`:
 ```c
 void  TaktOSTickInit  (uint32_t KernClockHz, uint32_t tickHz, TaktOSTickClockSrc_t tickClockSrc);
 void  TaktOSCtxSwitch (void);   // request deferred context switch
-void  TaktOSStartFirst(void);   // launch first task — never returns
+void  TaktOSStartFirst(void);   // launch first task - never returns
 void *TaktOSStackInit (void *stackTop, void (*entry)(void*), void *arg);
 ```
 
@@ -180,7 +180,7 @@ void *TaktOSStackInit (void *stackTop, void (*entry)(void*), void *arg);
 |---|---|---|---|
 | Land | `TaktOSCriticalSection.h`, `systick.h` | ~80 per arch | Arch files only |
 | Roots | scheduler, semaphore, mutex, queue, task | ~760 portable C++23 | None |
-| Arch port | `ARM/cm*/PendSV_*.S`, `TaktKernelCM.cpp` | ~200–300 | ARM only |
+| Arch port | `ARM/cm*/PendSV_*.S`, `TaktKernelCM.cpp` | ~200-300 | ARM only |
 | Fruit | POSIX PSE51 (pthread, sem_t, mqueue, timer) | ~1,800 | None |
 
 **Safety boundary total: ~1,454 LOC** (ARM + portable C++23).
@@ -189,7 +189,7 @@ void *TaktOSStackInit (void *stackTop, void (*entry)(void*), void *arg);
 
 ## Certification strategy
 
-TaktOS is supplied as an **IEC 61508 Safety Element out of Context (SEooC)** with supporting evidence artifacts. Assessment and certification of the integrated product are performed by the integrator's own assessor during product safety qualification — I-SYST does not pay for or represent that TaktOS is itself certified.
+TaktOS is supplied as an **IEC 61508 Safety Element out of Context (SEooC)** with supporting evidence artifacts. Assessment and certification of the integrated product are performed by the integrator's own assessor during product safety qualification - I-SYST does not pay for or represent that TaktOS is itself certified.
 
 Evidence artifacts provided with TaktOS are intended to support the integrator's safety case:
 
@@ -199,13 +199,13 @@ Evidence artifacts provided with TaktOS are intended to support the integrator's
 - Unit test suite (host-native, Google Test, no arch dependency)
 - FMEA worksheets and development process documentation
 
-The small safety boundary (~1,500 LOC) is designed to keep the integrator's MC/DC tractability burden within reach. Static allocation, zero heap, application-owned IRQs, and a single critical-section mechanism are the design choices that make the boundary small — they are correct by design, not trimmed for cost.
+The small safety boundary (~1,500 LOC) is designed to keep the integrator's MC/DC tractability burden within reach. Static allocation, zero heap, application-owned IRQs, and a single critical-section mechanism are the design choices that make the boundary small - they are correct by design, not trimmed for cost.
 
 ---
 
 ## Development environment setup
 
-The fastest way to get a working embedded toolchain is **IOcomposer** —
+The fastest way to get a working embedded toolchain is **IOcomposer** -
 an AI-assisted IDE for embedded development. One script installs the
 complete environment: IDE, GCC ARM toolchain, OpenOCD, and
 SDK paths. Typical setup time: ~15 minutes.
@@ -228,7 +228,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -Command "irm https://iocomposer.i
 ```
 
 After installing, open IOcomposer and load a TaktOS project:
-**File → Open Projects from File System…** → browse to
+**File -> Open Projects from File System...** -> browse to
 `TaktOS/ARM/cm4/Eclipse/` (or the relevant arch folder).
 
 ### Manual toolchain install
@@ -247,10 +247,10 @@ If you prefer to manage toolchains yourself:
 The TaktOS kernel **builds to a static library**, one `.a` per architecture
 variant. Your firmware is a **separate application project** that links
 against that library. Nothing from the kernel is merged into your source
-tree — no `taktos_config.h` to edit, no kernel generator, no devicetree.
+tree - no `taktos_config.h` to edit, no kernel generator, no devicetree.
 
 Kernel library builds live under `ARM/<arch>/Eclipse/<config>/`. Example:
-`ARM/cm4/Eclipse/ReleaseFPU/` builds to `libTaktOS_M4.a` — the Cortex-M4
+`ARM/cm4/Eclipse/ReleaseFPU/` builds to `libTaktOS_M4.a` - the Cortex-M4
 + FPU hard-float, size-optimized kernel. Build it by importing
 `ARM/cm4/Eclipse/` as an Eclipse project and hitting build; the `.a`
 lands in the `ReleaseFPU/` output folder.
@@ -266,10 +266,10 @@ The Thread-Metric projects under `Benchmark/ThreadMetric/` are worked
 examples of this model on five different MCUs.
 
 **Why a library rather than source-in-tree:**
-- Clean certification boundary — the library is the SEooC; your app is not.
-- No config drift across projects — all tunables are runtime arguments to
+- Clean certification boundary - the library is the SEooC; your app is not.
+- No config drift across projects - all tunables are runtime arguments to
   `TaktOSInit()`.
-- Same kernel binary on every project targeting the same core — MC/DC
+- Same kernel binary on every project targeting the same core - MC/DC
   coverage runs once, not per firmware.
 
 ### Toolchains
@@ -296,7 +296,7 @@ TaktOSCfg_t cfg = { .KernClockHz = 64000000u };
 TaktOSInit(&cfg);
 ```
 
-Override only the fields that deviate from the default — typical full
+Override only the fields that deviate from the default - typical full
 example for a chip that needs an explicit software-interrupt address:
 
 ```c
@@ -305,7 +305,7 @@ TaktOSCfg_t cfg = {
     .TickHz      = 1000u,                // default; can be omitted
     .TickClockSrc    = TAKTOS_TICK_CLOCK_PROCESSOR,  // default; can be omitted
     .HandlerBaseAddr = (uintptr_t)gRamVectorTable,   // ARM MPU vector relocation
-    .SoftIntAddr     = 0x600C00D8u,      // RISC-V ESP32-C3 SYSTEM_CPU_INTR_FROM_CPU_0
+    .SoftIntAddr     = 0x600C0014u,      // RISC-V ESP32-C3 SYSTEM_CPU_INTR_FROM_CPU_0
 };
 TaktOSInit(&cfg);
 ```
@@ -319,7 +319,7 @@ MPU/PMP guard regions are library build options, not application defines.
 
 | Product | Role |
 |---|---|
-| **TaktOS** | Deterministic kernel — bare-metal RTOS (this repo) |
+| **TaktOS** | Deterministic kernel - bare-metal RTOS (this repo) |
 | **IOsonata** | Driver/interface framework (`DevIntrf_t` bus injection) |
 | **BlueSonata** | Bluetooth connectivity layer |
 | **IOcomposer** | AI-assisted embedded IDE / development environment |
@@ -331,19 +331,19 @@ IOsonata architecture (the Land/Roots/Trees/Fruit orchard metaphor and `DevIntrf
 ## Status
 
 - [x] ARM Cortex-M0/M0+ port
-- [x] ARM Cortex-M4/M4F port — Thread-Metric validated on nRF52832
-- [x] ARM Cortex-M7 port — functional, no Thread-Metric run yet
-- [x] ARM Cortex-M33 port — Thread-Metric validated on nRF54L15
-- [x] ARM Cortex-M55 port — functional, no Thread-Metric run yet
+- [x] ARM Cortex-M4/M4F port - Thread-Metric validated on nRF52832
+- [x] ARM Cortex-M7 port - functional, no Thread-Metric run yet
+- [x] ARM Cortex-M33 port - Thread-Metric validated on nRF54L15
+- [x] ARM Cortex-M55 port - functional, no Thread-Metric run yet
 - [x] POSIX PSE51 layer (pthread, sem, mqueue, timer)
-- [x] Thread-Metric TM1/TM2/TM3/TM6/TM7/TM8 — TaktOS, FreeRTOS, ThreadX on nRF52832 and nRF54L15
-- [ ] RISC-V RV32IMAC port — **placeholder, not in v1.x scope.** `RISCV/` and `Benchmark/ThreadMetric/ESP32C*/` contain placeholder code only; not on the v1.x roadmap.
-- [ ] MC/DC coverage run — pending KVB host platform port (gcov-instrumented x86 build of cert-boundary modules running KVB test bodies)
-- [ ] POSIX PSE51 functional test suite — pending KVB POSIX test group
+- [x] Thread-Metric TM1/TM2/TM3/TM6/TM7/TM8 - TaktOS, FreeRTOS, ThreadX on nRF52832 and nRF54L15
+- [ ] RISC-V RV32IMAC port - **placeholder, not in v1.x scope.** `RISCV/` and `Benchmark/ThreadMetric/ESP32C*/` contain placeholder code only; not on the v1.x roadmap.
+- [ ] MC/DC coverage run - pending KVB host platform port (gcov-instrumented x86 build of cert-boundary modules running KVB test bodies)
+- [ ] POSIX PSE51 functional test suite - pending KVB POSIX test group
 - [ ] IEC 61508 SIL 2 certification campaign
 
 TM4 and TM5 are not planned: TM4 requires kernel-owned IRQs (TaktOS does not have them by design), TM5 requires dynamic allocation (TaktOS does not have it by design).
 
 ---
 
-Copyright (c) 2026 I-SYST Inc. TaktOS is released under the MIT License — see [LICENSE](LICENSE).
+Copyright (c) 2026 I-SYST Inc. TaktOS is released under the MIT License - see [LICENSE](LICENSE).

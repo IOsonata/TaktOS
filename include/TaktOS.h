@@ -121,11 +121,11 @@ typedef enum {
 //     TaktOSInit(&cfg);
 // Set only the fields that deviate from the default for your chip.
 typedef struct __TaktOSCfg {
-    uint32_t              KernClockHz;     // Tick peripheral input clock (Hz).  REQUIRED — 0 → error.
-    uint32_t              TickHz;          // Kernel tick rate (Hz).  0 → TAKTOS_DEFAULT_TICK_HZ (1000).
-    TaktOSTickClockSrc_t  TickClockSrc;    // Tick clock domain.  0 → PROCESSOR.
-    uintptr_t             HandlerBaseAddr; // Arch exception/trap base address.  0 → port's statically linked handlers.
-    uintptr_t             SoftIntAddr;     // Software-interrupt trigger MMIO.  0 → port's TAKT_DEFAULT_SOFT_INT_ADDR.
+    uint32_t              KernClockHz;     // Tick peripheral input clock (Hz).  REQUIRED - 0 -> error.
+    uint32_t              TickHz;          // Kernel tick rate (Hz).  0 -> TAKTOS_DEFAULT_TICK_HZ (1000).
+    TaktOSTickClockSrc_t  TickClockSrc;    // Tick clock domain.  0 -> PROCESSOR.
+    uintptr_t             HandlerBaseAddr; // Arch exception/trap base address.  0 -> port's statically linked handlers.
+    uintptr_t             SoftIntAddr;     // Software-interrupt trigger MMIO.  0 -> port's TAKT_DEFAULT_SOFT_INT_ADDR.
 } TaktOSCfg_t;
 
 //--- Priority level defines -------------------------------------
@@ -173,7 +173,7 @@ extern "C" {
  * deferred-context-switch trigger.  All configuration is passed in a single
  * TaktOSCfg_t struct; see its field documentation above for per-field
  * meaning.  Any zero / DEFAULT field is replaced with the port's documented
- * default — only KernClockHz is required.
+ * default - only KernClockHz is required.
  *
  * Minimum-effort init for a standard CLINT-based RV32 chip:
  * @code
@@ -182,12 +182,12 @@ extern "C" {
  *     TaktOSStart();
  * @endcode
  *
- * Init that overrides one default (ESP32-C3 — no CLINT, so SoftIntAddr
+ * Init that overrides one default (ESP32-C3 - no CLINT, so SoftIntAddr
  * must be set explicitly to the SYSTEM_CPU_INTR_FROM_CPU_0 register):
  * @code
  *     TaktOSCfg_t cfg = {
  *         .KernClockHz = 16000000u,
- *         .SoftIntAddr = 0x600C00D8u,
+ *         .SoftIntAddr = 0x600C0014u,
  *     };
  *     TaktOSInit(&cfg);
  *     TaktOSStart();
@@ -214,7 +214,7 @@ void TaktOSStart(void);          // never returns
  * @brief	Return the configured kernel tick rate in Hz.
  *
  * Returns the TickHz value passed to TaktOSInit().  Useful for converting
- * between time units and ticks at user level — e.g. timeout APIs that
+ * between time units and ticks at user level - e.g. timeout APIs that
  * accept ticks but the caller has milliseconds.
  *
  * @return	Tick rate in Hz, or 0 if TaktOSInit() has not yet been called.

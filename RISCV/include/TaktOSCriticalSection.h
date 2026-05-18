@@ -8,7 +8,7 @@ primitives used by TaktOS.  The deferred context-switch trigger
 (TaktOSCtxSwitch) is inlined here and writes 1 to the address held in the
 global pointer g_TaktSoftIntReg, which is initialized once by TaktOSInit()
 from its SoftIntAddr parameter.  No build macros, no weak symbol overrides,
-no preprocessor — the user passes the chip's software-interrupt register
+no preprocessor - the user passes the chip's software-interrupt register
 address explicitly at init.
 
 No vendor HAL is referenced here.  The arch library compiles standalone
@@ -83,7 +83,7 @@ TAKT_ALWAYS_INLINE void TaktOSEnableInterrupts(void)
     __asm__ volatile ("csrsi mstatus, 0x8" ::: "memory");
 }
 
-/* Deferred context-switch request — inline write of 1 to the chip's
+/* Deferred context-switch request - inline write of 1 to the chip's
  * software-interrupt trigger register.
  *
  * g_TaktSoftIntReg is set once by TaktOSInit() from Cfg->SoftIntAddr.
@@ -93,7 +93,7 @@ TAKT_ALWAYS_INLINE void TaktOSEnableInterrupts(void)
  *     GD32VF103 (CLINT at non-standard base):
  *         .SoftIntAddr = 0xD1000000u,
  *     ESP32-C3 (no CLINT, uses INTMTX-routed SYSTEM register):
- *         .SoftIntAddr = 0x600C00D8u,    // SYSTEM_CPU_INTR_FROM_CPU_0
+ *         .SoftIntAddr = 0x600C0014u,    // SYSTEM_CPU_INTR_FROM_CPU_0
  *
  * Hot-path cost is one load of the global pointer + one store to MMIO
  * (~3-4 cy), fully inlined at every call site.  Called from TaktReadyTask /
@@ -114,7 +114,7 @@ TAKT_ALWAYS_INLINE void TaktOSCtxSwitch(void)
 /* RISC-V has no architectural equivalent to Cortex-M's IPSR.  A target
  * port that needs the blocking-from-ISR safety check must override this
  * inline by defining TAKT_RISCV_PORT_HAS_IN_ISR=1 and supplying its own
- * TaktOSInIsr() — e.g. via a software-maintained ISR-nesting counter
+ * TaktOSInIsr() - e.g. via a software-maintained ISR-nesting counter
  * incremented in the trap entry stub and decremented on exit, or via a
  * platform-specific status register read.  Default returns false; the
  * blocking APIs treat the caller as a thread context.  This is acceptable

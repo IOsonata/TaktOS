@@ -28,8 +28,8 @@ declarations in TaktOSCriticalSection.h (TaktOSCtxSwitch, TaktOSStartFirst).
  * RV32 default = standard CLINT MSIP base, per the RISC-V Privileged Spec
  * reference (SiFive E series, Nuclei N100/N200/N300, BL616, Renesas
  * R9A02G021, ESP32-C6/H2, etc.).  Chips with CLINT at a non-standard base
- * (GD32VF103 at 0xD1000000) or no CLINT at all (ESP32-C3 — uses
- * SYSTEM_CPU_INTR_FROM_CPU_0 at 0x600C00D8) supply the value explicitly in
+ * (GD32VF103 at 0xD1000000) or no CLINT at all (ESP32-C3 - uses
+ * SYSTEM_CPU_INTR_FROM_CPU_0 at 0x600C0014) supply the value explicitly in
  * cfg.SoftIntAddr. */
 #define TAKT_DEFAULT_SOFT_INT_ADDR     0x02000000u
 
