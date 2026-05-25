@@ -21,7 +21,10 @@ that you can inspect in a debugger.
 
 ## Common pattern
 
-Every example follows the same startup model:
+Every example follows the same startup model. Kernel configuration is
+passed in a single `TaktOSCfg_t` struct; any zero field falls back to the
+documented per-field default, so a typical example only needs the chip
+clock specified:
 
 ```c
 #ifndef APP_CORE_CLOCK_HZ
@@ -30,17 +33,20 @@ Every example follows the same startup model:
 
 int main(void)
 {
-    TaktOSInit(APP_CORE_CLOCK_HZ, 1000u, TAKTOS_TICK_CLOCK_PROCESSOR, 0u);
+    TaktOSCfg_t cfg = { .KernClockHz = APP_CORE_CLOCK_HZ };
+    TaktOSInit(&cfg);
     /* create threads */
     TaktOSStart();
 }
 ```
 
 Change `APP_CORE_CLOCK_HZ` to match your target if it is not 48 MHz.
-The examples use a **1 kHz tick** for simple human-readable timing. Pass
-`0u` for `HandlerBaseAddr` when using the default statically linked handler
-path. Supply an application-owned writable handler/trap table base only on
-ports that support dynamic patching.
+The examples use a **1 kHz tick** for simple human-readable timing - that
+is the `TickHz` default, so the field is omitted from the struct above.
+Override only the fields that deviate from the default. For ports that
+need an explicit MPU vector-relocation base or a RISC-V software-interrupt
+trigger address, add `.HandlerBaseAddr` or `.SoftIntAddr` to the struct
+initializer. See `mpu_guard.c` for a worked `HandlerBaseAddr` example.
 
 ## Current public APIs used here
 
@@ -75,13 +81,13 @@ TaktOSQueueReceive(&q, &msg, true, TAKTOS_WAIT_FOREVER);
 ### Mutex API
 
 ```c
-/* Plain mutex — no priority adjustment */
+/* Plain mutex - no priority adjustment */
 static TaktOSMutex_t mtx;
 TaktOSMutexInit(&mtx);
 TaktOSMutexLock(&mtx, true, TAKTOS_WAIT_FOREVER);
 TaktOSMutexUnlock(&mtx);
 
-/* IPCP mutex — bounded priority inversion (PTHREAD_PRIO_PROTECT) */
+/* IPCP mutex - bounded priority inversion (PTHREAD_PRIO_PROTECT) */
 static TaktOSMutex_t pcp;
 TaktOSMutexInitProtect(&pcp, TAKTOS_PRIORITY_HIGH);
 TaktOSMutexLock(&pcp, true, TAKTOS_WAIT_FOREVER);   /* boosts holder to HIGH */
