@@ -378,7 +378,7 @@ Stack overflow detection (paint+check guard word) is always active. MPU/PMP guar
 |---|---|
 | **TaktOS** | Deterministic kernel - bare-metal RTOS (this repo) |
 | **IOsonata** | Driver/interface framework (`DevIntrf_t` bus injection) |
-| **BlueSonata** | Bluetooth connectivity layer |
+| **Voci** | C++ communication protocol framework (work in progress). Bluetooth host in refactor from IOsonata; WiFi, cellular, IEEE 802.15.4, LoRaWAN, IP, Ethernet, USB, CAN, Modbus, MQTT, CoAP, HTTP planned. HAL- and OS-agnostic; pairs with IOsonata + TaktOS as the reference integration. |
 | **IOcomposer** | AI-assisted embedded IDE / development environment |
 
 IOsonata architecture (the Land/Roots/Trees/Fruit metaphor and `DevIntrf_t` driver model that TaktOS builds on) is documented in *Beyond Blinky* by Nguyen Hoan Hoang.
