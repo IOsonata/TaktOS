@@ -43,7 +43,7 @@ extern "C"
 void TaktOSTickInit(uint32_t, uint32_t, TaktOSTickClockSrc_t) {}
 
 //  TaktOSStartFirst 
-// Launches the first task on ARM via SVC #0.  Never called from unit tests
+// Launches the first task on ARM via a PendSV bootstrap.  Never called from unit tests
 // (TaktOSStart() is not called; tests manipulate scheduler state directly).
 // Provide a stub so the linker is satisfied.
 extern "C"

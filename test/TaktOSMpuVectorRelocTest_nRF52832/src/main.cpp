@@ -7,9 +7,10 @@
 The application owns the RAM vector table. It copies the active table from
 flash to RAM, switches VTOR to the RAM table, and passes that base address to
 TaktOSInit(). The ARM port then patches only the reserved kernel slots:
-  - SVCall
   - PendSV
   - SysTick
+The SVCall slot is intentionally left untouched (free for a SoftDevice stack);
+first-task launch is SVC-free and goes through PendSV (see TaktOSStartFirst).
 
 Validation flow in debugger:
   1. Run and confirm gVectorRelocated == 1 and gMpuHandlersBound == 1.
@@ -101,7 +102,6 @@ volatile uint32_t g_MemManageCfsr = 0u;
 volatile uint32_t g_MemManageMmar = 0u;
 
 extern "C" void PendSV_Handler_MPU(void);
-extern "C" void SVC_Handler_MPU(void);
 extern "C" void TaktKernelTickHandler(void);
 
 static inline uint32_t MmioRead32(uintptr_t Addr)
@@ -149,8 +149,12 @@ static void CaptureKernelVectorSlots(void)
     g_VectorSlotPendSV = g_RamVectorTable[ARM_VECTOR_PENDSV_INDEX];
     g_VectorSlotSysTick = g_RamVectorTable[ARM_VECTOR_SYSTICK_INDEX];
 
+    /* SVCall is intentionally NOT patched by the kernel (first task launches
+     * via PendSV), so the relocated slot must still match the flash original. */
+    uint32_t flashSvc = ((const uint32_t*)(uintptr_t)g_FlashVectorBase)[ARM_VECTOR_SVC_INDEX];
+
     g_MpuHandlersBound =
-        g_VectorSlotSVC == (uint32_t)(uintptr_t)SVC_Handler_MPU &&
+        g_VectorSlotSVC == flashSvc &&
         g_VectorSlotPendSV == (uint32_t)(uintptr_t)PendSV_Handler_MPU &&
         g_VectorSlotSysTick == (uint32_t)(uintptr_t)TaktKernelTickHandler ? 1u : 0u;
 }

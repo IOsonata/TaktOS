@@ -74,8 +74,36 @@ extern "C" void TaktKernelTickHandler(void);
 
 #if defined(__ARM_ARCH_6M__) || defined(__ARM_ARCH_7M__) || defined(__ARM_ARCH_7EM__) || defined(__ARM_ARCH_8M_MAIN__)
 extern "C" void PendSV_Handler_MPU(void);
-extern "C" void SVC_Handler_MPU(void);
 #endif
+
+/* ---------------------------------------------------------------------------
+ * SVC-free first-task launch bootstrap
+ *
+ * TaktOSStartFirst (in the per-core PendSV_M*.S) no longer issues an SVC.
+ * It points g_TaktosCtx.pCurrent at g_TaktBootDiscard, sets PSP to the top of
+ * g_TaktBootScratch, switches to PSP, and pends PendSV.  The single bootstrap
+ * PendSV saves the throwaway boot context into the scratch (never read again)
+ * and restores the first real task -- reusing the identical restore path as
+ * every steady-state context switch (no duplicated frame logic, no first-launch
+ * branch in the hot path).
+ *
+ * Why no SVC: the SVCall vector is owned by SoftDevice-style stacks (e.g. the
+ * nRF54L sdk-nrf-bm SoftDevice statically defines a strong SVC_Handler and
+ * forwards every SVC unconditionally to the SoftDevice).  PendSV and SysTick
+ * are left to the RTOS, so the launch and all context switching live there.
+ *
+ * Scratch sizing: one bootstrap exception frame.  Standard frame = 32 B (HW) +
+ * 36 B (r4-r11,lr) = 68 B.  The bootstrap clears CONTROL.FPCA when switching to
+ * PSP, so no FP/MVE context is lazily stacked.  128 B is ample on all cores.
+ * --------------------------------------------------------------------------- */
+extern "C" {
+alignas(8) uint8_t g_TaktBootScratch[128];
+uintptr_t          g_TaktBootDiscard;   /* receives the discarded boot SP (pCurrent->pSp) */
+}
+/* Explicit `extern` is required: a plain namespace-scope `const` defaults to
+ * internal linkage in C++ (even inside extern "C"), which would emit a local,
+ * mangled symbol that the .S TaktOSStartFirst reference could not resolve. */
+extern "C" void * const g_TaktBootScratchTop = &g_TaktBootScratch[sizeof g_TaktBootScratch];
 
 #define SCB_VTOR_ADDR                   0xE000ED08UL
 #define TAKT_ARM_VECTOR_TABLE_ALIGN     128u
@@ -122,7 +150,11 @@ extern "C" bool TaktKernelHandlerAssign(uintptr_t HandlerBaseAddr)
     TaktOSMpuInit();
     TaktOSMemFaultEnable();
 
-    vt[11] = (uint32_t)SVC_Handler_MPU;
+    /* Bind only PendSV (switch) and SysTick (tick).  The SVCall slot (vt[11])
+     * is deliberately left untouched: TaktOS launches the first task via PendSV
+     * (see g_TaktBootScratch / TaktOSStartFirst), so the SVC vector stays free
+     * for a SoftDevice-style stack that owns it.  The first task's MPU guard
+     * and PSPLIM are installed by the bootstrap PendSV_Handler_MPU itself. */
     vt[14] = (uint32_t)PendSV_Handler_MPU;
     vt[15] = (uint32_t)TaktKernelTickHandler;
 

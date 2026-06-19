@@ -4,8 +4,12 @@
  *
  * Contains three functions:
  *   PendSV_Handler  — steady-state context switch (called on every switch)
- *   SVC_Handler     — first task launch only (called once by TaktOSStartFirst)
- *   TaktOSStartFirst — issues SVC #0 to trigger first launch; never returns
+ *   PendSV_Handler_MPU — same, plus the per-task MPU region-7 stack guard
+ *   TaktOSStartFirst — bootstraps the first task through PendSV; never returns
+ *
+ * First-task launch is SVC-free: it pends PendSV and reuses the identical
+ * restore path as every context switch (see TaktOSStartFirst below). This
+ * leaves the SVCall vector free for a SoftDevice-style stack that owns it.
  *
  * Design:
  *   Same precomputed-pNextThread approach as M4 — no scheduler scan at
@@ -257,99 +261,23 @@ PendSV_Handler_MPU:
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * SVC_Handler — first task launch only
+ * TaktOSStartFirst — SVC-free first-task launch via a PendSV bootstrap
  *
- * Same 2-LDM restore pattern as PendSV_Handler.
- * Never called after TaktOSStart().
- * ═══════════════════════════════════════════════════════════════════════════ */
-
-        .section .text.SVC_Handler, "ax", %progbits
-        .global  SVC_Handler
-        .type    SVC_Handler, %function
-        .thumb_func
-        .align   2
-
-SVC_Handler:
-        LDR     r1, =g_TaktosCtx
-        LDR     r2, [r1, #CTX_NEXT_THREAD]  /* r2 = first TCB (preserved)    */
-        STR     r2, [r1, #CTX_CURRENT]
-        LDR     r0, [r2, #0]                 /* r0 = first task SP             */
-
-        /* 2-LDM restore — identical pattern to PendSV */
-        ADDS    r0, #16
-        LDM     r0!, {r4-r7}
-        MOV     r8,  r4
-        MOV     r9,  r5
-        MOV     r10, r6
-        MOV     r11, r7
-        SUBS    r0, #32
-        LDM     r0!, {r4-r7}
-        ADDS    r0, #16                 /* r0 = frame+32 = initial PSP (no LR word on M0) */
-
-        MSR     PSP, r0
-
-
-
-        MOVS    r0, #CONTROL_SPSEL
-        MSR     CONTROL, r0
-        ISB
-        LDR     r1, =EXC_RETURN_THREAD_PSP
-        MOV     lr, r1
-        BX      lr
-
-        .size   SVC_Handler, . - SVC_Handler
-
-
-/* ═══════════════════════════════════════════════════════════════════════════
- * SVC_Handler_MPU — first task launch only with MPU stack guard
- * ═══════════════════════════════════════════════════════════════════════════ */
-
-        .section .text.SVC_Handler_MPU, "ax", %progbits
-        .global  SVC_Handler_MPU
-        .type    SVC_Handler_MPU, %function
-        .thumb_func
-        .align   2
-
-SVC_Handler_MPU:
-        LDR     r1, =g_TaktosCtx
-        LDR     r2, [r1, #CTX_NEXT_THREAD]  /* r2 = first TCB (preserved)    */
-        STR     r2, [r1, #CTX_CURRENT]
-        LDR     r0, [r2, #0]                 /* r0 = first task SP             */
-
-        /* 2-LDM restore — identical pattern to PendSV */
-        ADDS    r0, #16
-        LDM     r0!, {r4-r7}
-        MOV     r8,  r4
-        MOV     r9,  r5
-        MOV     r10, r6
-        MOV     r11, r7
-        SUBS    r0, #32
-        LDM     r0!, {r4-r7}
-        ADDS    r0, #16                 /* r0 = frame+32 = initial PSP (no LR word on M0) */
-
-        MSR     PSP, r0
-
-        /* r2 = first TCB — not clobbered by LDM or MOV sequences above     */
-        LDR     r3, [r2, #TCB_STACK_BOTTOM]
-        MOVS    r1, #0x17
-        ORRS    r3, r1
-        LDR     r1, =0xE000ED9C
-        STR     r3, [r1]
-        LDR     r3, =0x1000000F
-        STR     r3, [r1, #4]
-
-        MOVS    r0, #CONTROL_SPSEL
-        MSR     CONTROL, r0
-        ISB
-        LDR     r1, =EXC_RETURN_THREAD_PSP
-        MOV     lr, r1
-        BX      lr
-
-        .size   SVC_Handler_MPU, . - SVC_Handler_MPU
-
-
-/* ═══════════════════════════════════════════════════════════════════════════
- * TaktOSStartFirst — triggers SVC to launch first task
+ * Replaces the old "SVC #0" launch so the SVCall vector stays free for a
+ * SoftDevice-style stack that statically owns SVC_Handler (e.g. nRF54L
+ * sdk-nrf-bm).  The first task is launched through PendSV, reusing the exact
+ * 2-LDM restore path of every context switch — no duplicated frame logic and
+ * no first-launch branch in the steady-state PendSV hot path.
+ *
+ *   1. pCurrent = g_TaktBootDiscard so the bootstrap PendSV's save half writes
+ *      the throwaway boot context into discardable scratch (never read again).
+ *   2. PSP = top of g_TaktBootScratch, then switch CONTROL to PSP.  ARMv6-M
+ *      PendSV does NOT reload LR, so PendSV MUST be entered from Thread/PSP:
+ *      hardware then sets EXC_RETURN to 0xFFFFFFFD and the restore returns to
+ *      Thread/PSP (entering from MSP would return to MSP and run the first
+ *      task on the wrong stack).
+ *   3. Pend PendSV; it tail-chains immediately (lowest priority, nothing else
+ *      pending) and restores the first real task.  Never returns here.
  * ═══════════════════════════════════════════════════════════════════════════ */
 
         .section .text.TaktOSStartFirst, "ax", %progbits
@@ -359,8 +287,25 @@ SVC_Handler_MPU:
         .align   2
 
 TaktOSStartFirst:
-        SVC     #0
-        B       .                       /* never reached                      */
+        LDR     r1, =g_TaktosCtx
+        LDR     r2, =g_TaktBootDiscard
+        STR     r2, [r1, #CTX_CURRENT]           /* pCurrent = discard target  */
+
+        LDR     r0, =g_TaktBootScratchTop
+        LDR     r0, [r0]                          /* r0 = top of boot scratch   */
+        MSR     PSP, r0
+
+        MOVS    r0, #CONTROL_SPSEL                /* SPSEL=1 (use PSP)           */
+        MSR     CONTROL, r0
+        ISB
+
+        LDR     r0, =0xE000ED04                   /* SCB ICSR                    */
+        LDR     r1, =0x10000000                   /* PENDSVSET                   */
+        STR     r1, [r0]
+        DSB
+        ISB
+        CPSIE   i                                 /* allow PendSV to fire        */
+1:      B       1b                                /* never reached               */
 
         .size   TaktOSStartFirst, . - TaktOSStartFirst
 

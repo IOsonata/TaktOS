@@ -97,7 +97,7 @@ SOFTWARE.
 #define __TAKT_MPU_V8M_H__
 
 #include <stdint.h>
-#include "cmsis_compiler.h"
+//#include "cmsis_compiler.h"
 
 //  MPU register base (identical to ARMv7-M) 
 #define MPU_BASE            0xE000ED90u

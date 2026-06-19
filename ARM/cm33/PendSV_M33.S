@@ -2,12 +2,15 @@
  * TaktOS — Cortex-M33 context switch
  * ARM/cm33/PendSV_M33.S
  *
- * Contains five functions:
+ * Contains three functions:
  *   PendSV_Handler      — steady-state context switch (PSPLIM only)
  *   PendSV_Handler_MPU  — steady-state context switch (PSPLIM + MPU region 7)
- *   SVC_Handler         — first task launch (PSPLIM only)
- *   SVC_Handler_MPU     — first task launch (PSPLIM + MPU region 7)
- *   TaktOSStartFirst    — issues SVC #0 to trigger first launch; never returns
+ *   TaktOSStartFirst    — bootstraps the first task through PendSV; never returns
+ *
+ * First-task launch is SVC-free: it pends PendSV and reuses the identical
+ * restore path as every context switch (see TaktOSStartFirst below), so the
+ * SVCall vector stays free for a SoftDevice-style stack that owns it. The
+ * bootstrap PendSV (or PendSV_MPU) installs the first task's PSPLIM/MPU guard.
  *
  * Design:
  *   Same core as M4: precomputed pNextThread, paired LDR loads hiding stalls,
@@ -226,39 +229,6 @@ PendSV_Handler:
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * SVC_Handler — first task launch only
- *
- * BUG FIX: use r2 = next TCB throughout so PSPLIM can read pStackBottom
- * from r2 after the stack is restored. The previous version used r0 for
- * the pNextThread load, lost the TCB pointer, then read r2 undefined.
- * ═══════════════════════════════════════════════════════════════════════════ */
-
-        .section .text.SVC_Handler, "ax", %progbits
-        .global  SVC_Handler
-        .type    SVC_Handler, %function
-        .thumb_func
-        .align   2
-
-SVC_Handler:
-        LDR     r1, =g_TaktosCtx
-        LDR     r2, [r1, #CTX_NEXT_THREAD]  /* r2 = first TCB (preserved)    */
-        STR     r2, [r1, #CTX_CURRENT]
-        LDR     r0, [r2, #0]                 /* r0 = first task SP            */
-        LDMIA   r0!, {r4-r11, lr}           /* consume SW frame incl. LR word */
-        MSR     PSP, r0
-        LDR     r0, [r2, #TCB_STACK_BOTTOM]
-        MSR     PSPLIM, r0
-
-        MOV     r0, #CONTROL_SPSEL
-        MSR     CONTROL, r0
-        ISB
-        LDR     lr, =EXC_RETURN_THREAD_PSP
-        BX      lr
-
-        .size   SVC_Handler, . - SVC_Handler
-
-
-/* ═══════════════════════════════════════════════════════════════════════════
  * PendSV_Handler_MPU — steady-state context switch with MPU region 7 guard
  *
  * Identical GP-register save/restore and PSPLIM path as PendSV_Handler.
@@ -364,59 +334,23 @@ PendSV_Handler_MPU:
 
 
 /* ═══════════════════════════════════════════════════════════════════════════
- * SVC_Handler_MPU — first task launch with PSPLIM + MPU region 7
+ * TaktOSStartFirst — SVC-free first-task launch via a PendSV bootstrap
  *
- * Same structure as SVC_Handler; additionally writes MPU region 7 for the
- * first task so the guard is active before the task executes its first
- * instruction.  Without this, the first task would run unprotected until
- * the first preemption triggered PendSV_Handler_MPU.
+ * Replaces the old "SVC #0" launch so the SVCall vector stays free for a
+ * SoftDevice-style stack that statically owns SVC_Handler (e.g. nRF54L
+ * sdk-nrf-bm).  The first task is launched through PendSV, reusing the exact
+ * restore path of every context switch — no duplicated frame logic and no
+ * first-launch branch in the steady-state PendSV hot path.
  *
- * Register liveness:
- *   r2 = next TCB (never clobbered).
- *   r0 = first-task SP after LDMIA, then reloaded with pStackBottom for
- *        PSPLIM and reused for the MPU writes.
- *   r3 = scratch: MPU_RNR address.
- *   r1 = scratch: RBAR/RLAR values and the region number 7.
- * ═══════════════════════════════════════════════════════════════════════════ */
-
-        .section .text.SVC_Handler_MPU, "ax", %progbits
-        .global  SVC_Handler_MPU
-        .type    SVC_Handler_MPU, %function
-        .thumb_func
-        .align   2
-
-SVC_Handler_MPU:
-        LDR     r1, =g_TaktosCtx
-        LDR     r2, [r1, #CTX_NEXT_THREAD]     /* r2 = first TCB (preserved)   */
-        STR     r2, [r1, #CTX_CURRENT]
-        LDR     r0, [r2, #0]                    /* r0 = first task SP           */
-        LDMIA   r0!, {r4-r11, lr}              /* consume SW frame incl. LR    */
-        MSR     PSP, r0
-
-        /* PSPLIM for first task.                                               */
-        LDR     r0, [r2, #TCB_STACK_BOTTOM]
-        MSR     PSPLIM, r0
-
-        /* MPU region 7 for first task.                                         */
-        LDR     r3, =TAKT_MPU_RNR_ADDR         /* MPU_RNR                      */
-        MOVS    r1, #TAKT_MPU_GUARD_REGION
-        STR     r1, [r3]                        /* RNR = 7                      */
-        ORR     r1, r0, #0x05
-        STR     r1, [r3, #4]                    /* RBAR                         */
-        ORR     r1, r0, #0x01
-        STR     r1, [r3, #8]                    /* RLAR                         */
-
-        MOV     r0, #CONTROL_SPSEL
-        MSR     CONTROL, r0
-        ISB
-        LDR     lr, =EXC_RETURN_THREAD_PSP
-        BX      lr
-
-        .size   SVC_Handler_MPU, . - SVC_Handler_MPU
-
-
-/* ═══════════════════════════════════════════════════════════════════════════
- * TaktOSStartFirst — triggers SVC to launch first task
+ *   1. pCurrent = g_TaktBootDiscard so the bootstrap PendSV's save half writes
+ *      the throwaway boot context into discardable scratch (never read again).
+ *   2. Clear PSPLIM, set PSP = top of g_TaktBootScratch, then switch CONTROL to
+ *      PSP.  Writing CONTROL=#SPSEL also clears FPCA, so the bootstrap save uses
+ *      a standard (no-FP) frame.  Entering PendSV from Thread/PSP makes hardware
+ *      set EXC_RETURN to 0xFFFFFFFD, so the restore returns to Thread/PSP.
+ *   3. Pend PendSV; it tail-chains immediately (lowest priority, nothing else
+ *      pending) and restores the first real task, installing its PSPLIM/MPU
+ *      guard.  Never returns here.
  * ═══════════════════════════════════════════════════════════════════════════ */
 
         .section .text.TaktOSStartFirst, "ax", %progbits
@@ -426,8 +360,27 @@ SVC_Handler_MPU:
         .align   2
 
 TaktOSStartFirst:
-        SVC     #0
-        B       .                       /* never reached                      */
+        LDR     r1, =g_TaktosCtx
+        LDR     r2, =g_TaktBootDiscard
+        STR     r2, [r1, #CTX_CURRENT]           /* pCurrent = discard target  */
+
+        MOVS    r3, #0
+        MSR     PSPLIM, r3                        /* clear limit for scratch     */
+        LDR     r0, =g_TaktBootScratchTop
+        LDR     r0, [r0]                          /* r0 = top of boot scratch   */
+        MSR     PSP, r0
+
+        MOV     r0, #CONTROL_SPSEL                /* SPSEL=1 (PSP); clears FPCA  */
+        MSR     CONTROL, r0
+        ISB
+
+        LDR     r0, =0xE000ED04                   /* SCB ICSR                    */
+        LDR     r1, =0x10000000                   /* PENDSVSET                   */
+        STR     r1, [r0]
+        DSB
+        ISB
+        CPSIE   i                                 /* allow PendSV to fire        */
+1:      B       1b                                /* never reached               */
 
         .size   TaktOSStartFirst, . - TaktOSStartFirst
 

@@ -5,8 +5,8 @@
 
 Provides the ARM-specific primitives that the portable kernel depends on:
   TaktOSCtxSwitch()    pend PendSV via SCB ICSR (inlined, ~2 cy)
-  TaktOSStartFirst()   launch first task via SVC #0 (declared; implemented
-                        in ARM/cm{0,4,7,33,55}/PendSV_M*.S)
+  TaktOSStartFirst()   launch first task via a PendSV bootstrap, SVC-free
+                        (declared; implemented in ARM/cm{0,4,7,33,55}/PendSV_M*.S)
   TAKTOS_SOFT_STACK_CHECK  defined on M0/M4/M7 (no PSPLIM) to enable the
                         software guard-word check in the tick handler
 

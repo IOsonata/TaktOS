@@ -362,11 +362,12 @@ void TaktSleepListRemove(hTaktOSThread_t hThread);
 //                     Declared in the arch-specific TaktKernelCore.h /
 //                     TaktOSCriticalSection.h header included above.
 //  TaktOSStartFirst  launch the first task.  Mechanism is ISA-specific:
-//                     ARM raises SVC #0  SVC_Handler switches MSP→PSP;
+//                     ARM bootstraps the first task through PendSV (SVC-free,
+//                     so the SVCall vector stays free for a SoftDevice);
 //                     RISC-V loads the first frame and executes mret.
 //                     Declared in the arch-specific header (not here) so
 //                     the call site in taktos.cpp resolves it at link time
-//                     without exposing ARM-only SVC semantics in this file.
+//                     without exposing arch-only launch semantics in this file.
 //  TaktKernelStackInit   build initial fake exception frame.
 
 /**
