@@ -4,8 +4,8 @@
 @brief  TaktOS kernel  initialisation, scheduler, tick handler, and idle task
 
 Clock note:
-  TaktOSInit(&cfg) reads cfg.KernClockHz / cfg.TickHz / cfg.TickClockSrc
-  and passes them unchanged to TaktOSTickInit() at startup.
+  TaktOSInit(&cfg) reads cfg.KernClockHz / cfg.TickHz / cfg.TickClockSrc /
+  cfg.TickPriority and passes them unchanged to TaktOSTickInit() at startup.
   The kernel never interprets
   KernClockHz as the CPU frequency  it is solely the input clock of the
   tick peripheral.  The caller (application or HAL) is responsible for
@@ -81,6 +81,7 @@ volatile uint32_t *g_TaktSoftIntReg = nullptr;
 static uint32_t s_KernClockHz;		// Tick peripheral input clock in Hz
 static uint32_t s_TickFreq;			// Tick freq in Hz
 static TaktOSTickClockSrc_t s_TickClockSrc;	// Selected tick clock path
+static uint32_t s_TickPriority;		// Tick interrupt priority (TaktOS standard scale)
 static bool s_KernelMpuActive;        // true when arch bound MPU-aware kernel handlers
 
 // Deferred yield  set by TaktOSThreadYield() when called from an ISR or
@@ -441,6 +442,11 @@ TaktOSErr_t TaktOSInit(const TaktOSCfg_t *Cfg)
     s_KernClockHz     = Cfg->KernClockHz;
     s_TickFreq        = tickHz;
     s_TickClockSrc    = Cfg->TickClockSrc;
+    /* TickPriority uses the TaktOS standard priority scale and is forwarded
+     * unchanged.  Conversion to the interrupt controller encoding, clamping,
+     * and resolution of TAKTOS_TICK_PRIORITY_DEFAULT (0) to the hardware
+     * default are done by the port in TaktOSTickInit(). */
+    s_TickPriority    = Cfg->TickPriority;
     s_KernelMpuActive = TaktKernelHandlerAssign(Cfg->HandlerBaseAddr);
     g_TaktSoftIntReg  = (volatile uint32_t *)softInt;
 
@@ -515,7 +521,7 @@ extern "C" void TaktTestSetDeferredYieldFor(TaktOSThread_t *t)
 void TaktOSStart(void)
 {
     TaktUpdateNextThread();
-    TaktOSTickInit(s_KernClockHz, s_TickFreq, s_TickClockSrc);
+    TaktOSTickInit(s_KernClockHz, s_TickFreq, s_TickClockSrc, s_TickPriority);
     TaktOSStartFirst();
 
     for (;;)

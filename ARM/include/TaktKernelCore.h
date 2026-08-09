@@ -47,7 +47,10 @@ SOFTWARE.
 #ifndef __TAKTKERNELCORE_H__
 #define __TAKTKERNELCORE_H__
 
+#include <stdint.h>
+
 #include "TaktCompiler.h"
+#include "TaktOS.h"
 
 // Thread memory sizing is architecture-defined here so each port can account
 // for:
@@ -114,6 +117,53 @@ SOFTWARE.
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+/**
+ * @brief	Convert a TaktOS standard priority to the Cortex-M exception priority field.
+ *
+ * TaktOS scale: TAKTOS_PRIORITY_LOWEST(1) .. TAKTOS_PRIORITY_CRITICAL(31),
+ * higher value = more urgent.  The Cortex-M exception priority field runs in
+ * the opposite direction: 8 bits, 0x00 most urgent, 0xFF least urgent.  This
+ * function inverts and rescales, endpoint-exact:
+ *
+ *     TAKTOS_PRIORITY_LOWEST   (1)  -> 0xFF   lowest exception priority
+ *     TAKTOS_PRIORITY_LOW      (8)  -> 0xC3
+ *     TAKTOS_PRIORITY_NORMAL   (16) -> 0x7F
+ *     TAKTOS_PRIORITY_HIGH     (24) -> 0x3B
+ *     TAKTOS_PRIORITY_HIGHEST  (28) -> 0x19
+ *     TAKTOS_PRIORITY_CRITICAL (31) -> 0x00   highest configurable priority
+ *
+ * A part implements only the top __NVIC_PRIO_BITS bits of the field and reads
+ * the remaining bits back as zero.  That quantises the scale but keeps it
+ * monotonic: on a 3-bit part LOWEST maps to the bottom level (0xE0) and
+ * CRITICAL to the top level (0x00).
+ *
+ * Input outside the scale is clamped.  Priority 0 (TAKTOS_PRIORITY_IDLE,
+ * reused by TaktOSCfg_t as TAKTOS_TICK_PRIORITY_DEFAULT) returns 0xFF, which
+ * equals the ARM port default, so the default path needs no special case.
+ *
+ * Declared in this header rather than in TaktKernelCM.cpp so that a HAL
+ * overriding the weak TaktOSTickInit() with a GP timer / LPTIM / RTC tick can
+ * apply the same conversion before calling NVIC_SetPriority().
+ *
+ * @param	Prio : TaktOS standard priority, 1..31.
+ * @return	8-bit Cortex-M exception priority value (SHPR / NVIC IPR field).
+ */
+TAKT_ALWAYS_INLINE uint8_t TaktArchTickPrioMap(uint32_t Prio)
+{
+    if (Prio >= TAKTOS_PRIORITY_CRITICAL)
+    {
+        return 0x00u;                       // clamp - highest configurable
+    }
+
+    if (Prio <= TAKTOS_PRIORITY_LOWEST)
+    {
+        return 0xFFu;                       // clamp - lowest, also Prio == 0
+    }
+
+    return (uint8_t)(((TAKTOS_PRIORITY_CRITICAL - Prio) * 0xFFu)
+                     / (TAKTOS_PRIORITY_CRITICAL - TAKTOS_PRIORITY_LOWEST));
+}
 
 /**
  * @brief	Pend PendSV via SCB ICSR  request a deferred context switch.

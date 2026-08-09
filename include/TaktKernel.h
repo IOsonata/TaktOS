@@ -381,8 +381,18 @@ void TaktSleepListRemove(hTaktOSThread_t hThread);
  * @param	TickHz       : Desired kernel tick rate in Hz.
  * @param	TickClockSrc : Clock path selector (TAKTOS_TICK_CLOCK_PROCESSOR or
  *                        TAKTOS_TICK_CLOCK_REFERENCE).
+ * @param	TickPriority : Tick interrupt priority on the TaktOS standard
+ *                        priority scale (TAKTOS_PRIORITY_LOWEST(1) ..
+ *                        TAKTOS_PRIORITY_CRITICAL(31), higher = more urgent),
+ *                        taken from TaktOSCfg_t.TickPriority.  The port
+ *                        converts it to the interrupt controller encoding and
+ *                        clamps input above TAKTOS_PRIORITY_CRITICAL.
+ *                        TAKTOS_TICK_PRIORITY_DEFAULT (0) selects the port
+ *                        default.  A port whose tick source has no
+ *                        configurable priority ignores this parameter.
  */
-void TaktOSTickInit(uint32_t KernClockHz, uint32_t TickHz, TaktOSTickClockSrc_t TickClockSrc);
+void TaktOSTickInit(uint32_t KernClockHz, uint32_t TickHz, TaktOSTickClockSrc_t TickClockSrc,
+                    uint32_t TickPriority);
 
 /**
  * @brief	Build the initial fake exception frame on a new thread's stack.

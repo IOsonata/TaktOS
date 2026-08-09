@@ -40,7 +40,7 @@ void *TaktOSStackInit(void *pStackTop, void (*)(void*), void *)
 // No hardware tick source on the host.  The unit-test harness drives
 // TaktKernelTickHandler() directly when tick-driven behaviour is tested.
 extern "C"
-void TaktOSTickInit(uint32_t, uint32_t, TaktOSTickClockSrc_t) {}
+void TaktOSTickInit(uint32_t, uint32_t, TaktOSTickClockSrc_t, uint32_t) {}
 
 //  TaktOSStartFirst 
 // Launches the first task on ARM via a PendSV bootstrap.  Never called from unit tests

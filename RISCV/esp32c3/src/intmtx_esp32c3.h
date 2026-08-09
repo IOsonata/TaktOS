@@ -159,13 +159,21 @@ static inline uint32_t IntMtxGetEipStatus(void)
  * @brief  Configure both TaktOS CPU interrupts (tick + ctx switch).
  *
  * Called once from TaktOSTickInit() to set up the full interrupt routing:
- *   SYSTIMER_TARGET0 → CPU INT 2,  level,  priority 2
+ *   SYSTIMER_TARGET0 → CPU INT 2,  level,  priority TickPriority
  *   CPU_INTR_FROM_CPU0 → CPU INT 29, edge, priority 1
  *   Threshold = 0
  * Machine external interrupt enable (mie.MEIE) must be set by the caller.
+ *
+ * @param  TickPriority  INTMTX priority for the tick CPU INT line, 1..7,
+ *                       higher value = higher priority.  This is the native
+ *                       hardware value — the caller has already mapped
+ *                       TaktOSCfg_t.TickPriority off the TaktOS standard
+ *                       scale (see TaktArchTickPrioMap in TaktOSTickInit).
  */
-static inline void IntMtxTaktOSInit(void)
+static inline void IntMtxTaktOSInit(uint32_t TickPriority)
 {
+    uint32_t tickPrio = TickPriority & 0x7u;
+
     // Map peripheral sources to CPU INT lines
     IntMtxMapSrc(INTMTX_SRC_SYSTIMER_T0,    TAKT_TICK_CPU_INT);
     IntMtxMapSrc(INTMTX_SRC_CPU_INTR_FROM0, TAKT_CTX_CPU_INT);
@@ -175,7 +183,7 @@ static inline void IntMtxTaktOSInit(void)
     IntMtxCpuIntSetType(TAKT_CTX_CPU_INT,  true);   // edge
 
     // Configure priorities
-    IntMtxCpuIntSetPriority(TAKT_TICK_CPU_INT, TAKT_TICK_CPU_INT_PRIORITY);
+    IntMtxCpuIntSetPriority(TAKT_TICK_CPU_INT, tickPrio);
     IntMtxCpuIntSetPriority(TAKT_CTX_CPU_INT,  TAKT_CTX_CPU_INT_PRIORITY);
 
     // Enable both CPU INT lines

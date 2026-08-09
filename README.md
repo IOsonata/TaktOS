@@ -228,11 +228,14 @@ TaktOS/
 Each architecture implements four C functions declared in `TaktOS.h`:
 
 ```c
-void  TaktOSTickInit  (uint32_t KernClockHz, uint32_t TickHz, TaktOSTickClockSrc_t tickClockSrc);
+void  TaktOSTickInit  (uint32_t KernClockHz, uint32_t TickHz, TaktOSTickClockSrc_t tickClockSrc,
+                       uint32_t TickPriority);
 void  TaktOSCtxSwitch (void);   // request deferred context switch
 void  TaktOSStartFirst(void);   // launch first task - never returns
 void *TaktOSStackInit (void *stackTop, void (*entry)(void*), void *arg);
 ```
+
+`TickPriority` comes straight from `TaktOSCfg_t.TickPriority` on the TaktOS standard priority scale - the port maps it to its own interrupt-priority encoding with `TaktArchTickPrioMap()` (Cortex-M: `ARM/include/TaktKernelCore.h`; ESP32-C3: `RISCV/esp32c3/include/TaktKernelCore.h`; RV32 CLINT: none, the machine timer has no configurable priority). A HAL that replaces the weak `TaktOSTickInit` should call the same mapper so the config means the same thing everywhere. On Cortex-M, PendSV stays pinned at `0xFF` regardless of the tick priority, so a context switch always tail-chains after the tick and after every user ISR.
 
 `TaktOSTickInit` and the trap dispatch entry are declared weak. The kernel ships CLINT-compatible weak defaults for RV32 (`RISCV/rv32/src/TaktKernelRiscv.cpp`) and SysTick-based defaults for ARM (`ARM/src/TaktKernelCM.cpp`). Chips whose interrupt fabric differs from the standard pattern (ESP32-C3 SYSTIMER + INTMTX, GD32VF103 CLINT at a non-standard base) override these with strong defs - in app code, in chip-specific source, or anywhere convenient. TaktOS is HAL-agnostic.
 
@@ -356,11 +359,27 @@ TaktOSCfg_t cfg = {
     .KernClockHz     = 16000000u,            // tick peripheral input clock (Hz)
     .TickHz          = 1000u,                // default; can be omitted
     .TickClockSrc    = TAKTOS_TICK_CLOCK_PROCESSOR,  // default; can be omitted
+    .TickPriority    = TAKTOS_PRIORITY_LOWEST,       // TaktOS priority scale; 0 = port default
     .HandlerBaseAddr = (uintptr_t)gRamVectorTable,   // ARM MPU vector relocation
     .SoftIntAddr     = 0x600C0014u,          // RISC-V ESP32-C3 SYSTEM_CPU_INTR_FROM_CPU_0
 };
 TaktOSInit(&cfg);
 ```
+
+`TickPriority` uses the **TaktOS standard priority scale** - the same `TAKTOS_PRIORITY_*` levels used for thread priority and mutex ceilings, `LOWEST(1)` through `CRITICAL(31)`, higher value = more urgent. The port converts the level to the hardware encoding:
+
+| TaktOS level | Cortex-M SHPR | ESP32-C3 INTMTX | RV32 CLINT |
+|---|---|---|---|
+| `TAKTOS_PRIORITY_LOWEST` (1) | `0xFF` (lowest) | 1 | n/a |
+| `TAKTOS_PRIORITY_LOW` (8) | `0xC3` | 2 | n/a |
+| `TAKTOS_PRIORITY_NORMAL` (16) | `0x7F` | 4 | n/a |
+| `TAKTOS_PRIORITY_HIGH` (24) | `0x3B` | 5 | n/a |
+| `TAKTOS_PRIORITY_CRITICAL` (31) | `0x00` (highest) | 7 | n/a |
+| `TAKTOS_TICK_PRIORITY_DEFAULT` (0) | `0xFF` | 2 | n/a |
+
+A Cortex-M part implements only the top `__NVIC_PRIO_BITS` bits of the exception priority field. That quantises the scale but keeps it monotonic: `LOWEST` maps to the bottom hardware level and `CRITICAL` to the top level. RV32 CLINT ignores the field - the machine timer interrupt has no configurable priority.
+
+A tick priority above an application ISR lets the tick pre-empt that ISR. Scheduler state stays consistent because kernel critical sections mask all interrupts; the cost is that the ISR worst-case latency then includes the tick handler execution time.
 
 Per-chip examples for `SoftIntAddr`:
 

@@ -113,22 +113,10 @@ typedef enum {
 // port's TaktKernelCore.h.
 #define TAKTOS_DEFAULT_TICK_HZ          1000u
 
-//--- Kernel configuration --------------------------------
-// Passed to TaktOSInit() at kernel startup.  Any field left zero is
-// filled in by TaktOSInit() from the documented per-field default, so the
-// minimum-effort init is:
-//     TaktOSCfg_t cfg = { .KernClockHz = <chip clock> };
-//     TaktOSInit(&cfg);
-// Set only the fields that deviate from the default for your chip.
-typedef struct __TaktOSCfg {
-    uint32_t              KernClockHz;     // Tick peripheral input clock (Hz).  REQUIRED - 0 -> error.
-    uint32_t              TickHz;          // Kernel tick rate (Hz).  0 -> TAKTOS_DEFAULT_TICK_HZ (1000).
-    TaktOSTickClockSrc_t  TickClockSrc;    // Tick clock domain.  0 -> PROCESSOR.
-    uintptr_t             HandlerBaseAddr; // Arch exception/trap base address.  0 -> port's statically linked handlers.
-    uintptr_t             SoftIntAddr;     // Software-interrupt trigger MMIO.  0 -> port's TAKT_DEFAULT_SOFT_INT_ADDR.
-} TaktOSCfg_t;
-
 //--- Priority level defines -------------------------------------
+// TaktOS standard priority scale.  Single scale, used for thread priority,
+// mutex ceiling, and kernel tick interrupt priority.  Higher value = more
+// urgent.
 // Priority 0 is reserved for the idle thread.
 // User threads: LOWEST(1) through HIGHEST(31).
 
@@ -142,6 +130,46 @@ typedef struct __TaktOSCfg {
 #define TAKTOS_PRIORITY_HIGH        24u
 #define TAKTOS_PRIORITY_HIGHEST     28u
 #define TAKTOS_PRIORITY_CRITICAL    31u
+
+//--- Tick interrupt priority ---------------------------
+// Value written to TaktOSCfg_t.TickPriority and passed to TaktOSTickInit().
+//
+// Uses the TaktOS standard priority scale above, not a hardware interrupt
+// priority encoding.  Range TAKTOS_PRIORITY_LOWEST (1) to
+// TAKTOS_PRIORITY_CRITICAL (31), higher value = more urgent, same scale and
+// direction as thread priority.  The arch port converts the value to its
+// interrupt controller encoding and clamps input above the top of the scale.
+// Each port documents its conversion in its TaktKernelCore.h.
+//
+// TAKTOS_TICK_PRIORITY_DEFAULT (0) selects the port default.  0 is the
+// reserved idle level and is never a valid interrupt priority, so a
+// zero-initialised cfg field keeps the previous behaviour.  A port whose
+// tick source has no configurable priority ignores the field.
+//
+// A tick priority above an application ISR lets the tick pre-empt that ISR.
+// Scheduler state stays consistent because kernel critical sections mask all
+// interrupts.  The cost is that the ISR worst-case latency increases by the
+// tick handler execution time.
+#define TAKTOS_TICK_PRIORITY_DEFAULT    0u
+
+//--- Kernel configuration --------------------------------
+// Passed to TaktOSInit() at kernel startup.  Any field left zero is
+// filled in by TaktOSInit() from the documented per-field default, so the
+// minimum-effort init is:
+//     TaktOSCfg_t cfg = { .KernClockHz = <chip clock> };
+//     TaktOSInit(&cfg);
+// Set only the fields that deviate from the default for your chip.
+typedef struct __TaktOSCfg {
+    uint32_t              KernClockHz;     // Tick peripheral input clock (Hz).  REQUIRED - 0 -> error.
+    uint32_t              TickHz;          // Kernel tick rate (Hz).  0 -> TAKTOS_DEFAULT_TICK_HZ (1000).
+    TaktOSTickClockSrc_t  TickClockSrc;    // Tick clock domain.  0 -> PROCESSOR.
+    uint32_t              TickPriority;    // Tick interrupt priority on the TaktOS standard scale
+                                           //   (TAKTOS_PRIORITY_LOWEST..TAKTOS_PRIORITY_CRITICAL,
+                                           //   higher = more urgent).  The port maps it to the
+                                           //   hardware encoding.  0 -> port default.
+    uintptr_t             HandlerBaseAddr; // Arch exception/trap base address.  0 -> port's statically linked handlers.
+    uintptr_t             SoftIntAddr;     // Software-interrupt trigger MMIO.  0 -> port's TAKT_DEFAULT_SOFT_INT_ADDR.
+} TaktOSCfg_t;
 
 //--- Priority Ceiling Protocol -----------------------------------
 // IPCP (Immediate Priority Ceiling Protocol) per-thread state limit.
@@ -188,6 +216,18 @@ extern "C" {
  *     TaktOSCfg_t cfg = {
  *         .KernClockHz = 16000000u,
  *         .SoftIntAddr = 0x600C0014u,
+ *     };
+ *     TaktOSInit(&cfg);
+ *     TaktOSStart();
+ * @endcode
+ *
+ * Init that raises the tick above the lowest priority level.  TickPriority
+ * uses the standard priority scale, so the same source builds for every
+ * port; each port converts the level to its interrupt controller encoding:
+ * @code
+ *     TaktOSCfg_t cfg = {
+ *         .KernClockHz  = 64000000u,
+ *         .TickPriority = TAKTOS_PRIORITY_HIGH,
  *     };
  *     TaktOSInit(&cfg);
  *     TaktOSStart();

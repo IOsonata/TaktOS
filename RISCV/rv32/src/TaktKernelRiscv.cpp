@@ -67,7 +67,8 @@ extern "C" void TaktKernelTickHandler(void);
  *     reinforces C linkage). ─────────────────────────────────────────── */
 extern "C" bool  TaktKernelHandlerAssign(uintptr_t HandlerBaseAddr);
 extern "C" void *TaktKernelStackInit(void *pStackTop, void (*pThreadFct)(void *), void *pArg);
-extern "C" void  TaktOSTickInit(uint32_t KernClockHz, uint32_t TickHz, TaktOSTickClockSrc_t TickClockSrc);
+extern "C" void  TaktOSTickInit(uint32_t KernClockHz, uint32_t TickHz, TaktOSTickClockSrc_t TickClockSrc,
+                                uint32_t TickPriority);
 extern "C" int   TaktHalTrapDispatch(void);
 
 
@@ -215,9 +216,17 @@ extern "C" void *TaktKernelStackInit(void *pStackTop,
 
 __attribute__((weak))
 void TaktOSTickInit(uint32_t KernClockHz, uint32_t TickHz,
-                    TaktOSTickClockSrc_t TickClockSrc)
+                    TaktOSTickClockSrc_t TickClockSrc, uint32_t TickPriority)
 {
     (void)TickClockSrc;  /* RV32 CLINT has a single mtime clock domain */
+    (void)TickPriority;  /* TaktOS standard priority scale, ignored here: the
+                          * CLINT machine timer interrupt has no configurable
+                          * priority.  mie.MTIE is either set or clear, and
+                          * interrupt precedence is fixed by the privileged
+                          * spec.  A chip with a PLIC-routed or vendor tick
+                          * source overrides this function and converts the
+                          * value there (see TaktArchTickPrioMap in the
+                          * ESP32-C3 port). */
 
     if (g_TaktSoftIntReg == NULL || KernClockHz == 0u || TickHz == 0u) {
         return;

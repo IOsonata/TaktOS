@@ -4,7 +4,8 @@
 @brief  TaktOS ARM Cortex-M port  tick source (SysTick) and stack initialisation
 
 Provides:
-  TaktOSTickInit(KernClockHz, TickHz)  weak default using SysTick.
+  TaktOSTickInit(KernClockHz, TickHz, TickClockSrc, TickPriority)  weak
+    default using SysTick.
     Any HAL can override with a strong definition to use a different
     peripheral (GP timer, LPTIM, RTC) without touching the kernel.
   TaktKernelStackInit(pStackTop, entry, arg)  builds the initial fake
@@ -240,7 +241,11 @@ void *TaktKernelStackInit(void *pStackTop, void (*pThreadFct)(void*), void *pArg
  * @brief  Set the PendSV exception priority.
  *
  * PendSV priority is in SHPR3 bits [23:16].
- * Must be called during init and set to the SAME value as SysTick (0xFF).
+ * Must be called during init and set to 0xFF, the lowest exception priority.
+ * Not configurable through TaktOSCfg_t.TickPriority; that field sets the
+ * SysTick priority only.  PendSV stays at 0xFF when the tick is raised above
+ * it so the context switch still tail-chains after the tick handler and after
+ * every user ISR.
  *
  * Rationale: PendSV resets to priority 0x00 (highest). At priority 0x00,
  * a pended PendSV would immediately preempt any running user ISR instead of
@@ -269,19 +274,35 @@ __attribute__((weak))
 /**
  * @brief	Weak default tick source initialiser  uses ARM SysTick.
  *
- * Configures SysTick at the requested frequency and sets both PendSV and
- * SysTick to priority 0xFF (lowest) so that all user ISRs pre-empt the
- * tick and PendSV tail-chains correctly after them.
+ * Configures SysTick at the requested frequency, pins PendSV to priority
+ * 0xFF (lowest) so it always tail-chains after every ISR, and sets the
+ * SysTick exception priority from @p TickPriority.
+ *
+ * @p TickPriority is on the TaktOS standard priority scale
+ * (TAKTOS_PRIORITY_LOWEST(1) .. TAKTOS_PRIORITY_CRITICAL(31), higher = more
+ * urgent), the same scale used for threads.  TaktArchTickPrioMap() converts
+ * it to the Cortex-M exception priority field.  TAKTOS_TICK_PRIORITY_DEFAULT
+ * (0) yields 0xFF, the lowest exception priority, which lets every
+ * application ISR pre-empt the tick (behaviour before the field existed).
+ *
  * Override this symbol with a strong definition to use a different tick
- * peripheral (GP timer, LPTIM, RTC) without changing the kernel.
+ * peripheral (GP timer, LPTIM, RTC) without changing the kernel.  Call
+ * TaktArchTickPrioMap() in the override to keep identical priority semantics.
  *
  * @see TaktOSTickInit in TaktKernel.h for the full API.
  */
-void TaktOSTickInit(uint32_t KernClockHz, uint32_t TickHz, TaktOSTickClockSrc_t TickClockSrc)
+void TaktOSTickInit(uint32_t KernClockHz, uint32_t TickHz, TaktOSTickClockSrc_t TickClockSrc,
+                    uint32_t TickPriority)
 {
+    // TaktOS scale -> Cortex-M exception priority field.  TaktArchTickPrioMap()
+    // clamps out-of-range input and returns 0xFF for
+    // TAKTOS_TICK_PRIORITY_DEFAULT (0), which equals this port default, so no
+    // separate default branch is required here.
+    uint8_t tickPrio = TaktArchTickPrioMap(TickPriority);
+
     SysTickStop();
     PendSVSetPriority(0xFFu);               // lowest priority  must tail-chain after ISRs
-    SysTickSetPriority(0xFFu);              // lowest priority
+    SysTickSetPriority(tickPrio);
 
 
     uint32_t clksrc = TickClockSrc == TAKTOS_TICK_CLOCK_PROCESSOR ? SYSTICK_CLOCK_SRC_MCU : SYSTICK_CLOCK_SRC_EXT;

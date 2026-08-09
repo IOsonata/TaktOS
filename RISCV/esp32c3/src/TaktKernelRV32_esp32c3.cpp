@@ -217,17 +217,24 @@ void *TaktKernelStackInit(void *pStackTop, void (*pThreadFct)(void*), void *pArg
  * @param  TickHz     Desired tick rate in Hz (typically 1000).
  * @param  TickClockSrc Selected tick clock source. Ignored on ESP32-C3/C6
  *                      because SYSTIMER is not SysTick-based.
+ * @param  TickPriority Tick priority on the TaktOS standard scale
+ *                      (TAKTOS_PRIORITY_LOWEST(1)..TAKTOS_PRIORITY_CRITICAL(31),
+ *                      higher = more urgent).  TaktArchTickPrioMap() converts
+ *                      it to the INTMTX 1..7 encoding;
+ *                      TAKTOS_TICK_PRIORITY_DEFAULT (0) selects
+ *                      TAKT_TICK_CPU_INT_PRIORITY.
  */
-void TaktOSTickInit(uint32_t CoreClkHz, uint32_t TickHz, TaktOSTickClockSrc_t TickClockSrc)
+void TaktOSTickInit(uint32_t CoreClkHz, uint32_t TickHz, TaktOSTickClockSrc_t TickClockSrc,
+                    uint32_t TickPriority)
 {
     (void)CoreClkHz;      // SYSTIMER clock is independent of CPU frequency
     (void)TickClockSrc;   // Not applicable on this target
 
     // ── Step 1: configure interrupt matrix ─────────────────────────────────
-    // Routes SYSTIMER_TARGET0 → CPU INT 2 (level, priority 2)
+    // Routes SYSTIMER_TARGET0 → CPU INT 2 (level, mapped TickPriority)
     //        CPU_INTR_FROM_CPU_0 → CPU INT 29 (edge, priority 1)
     // Enables both CPU INT lines; sets threshold = 0.
-    IntMtxTaktOSInit();
+    IntMtxTaktOSInit(TaktArchTickPrioMap(TickPriority));
 
     // ── Step 2: configure SYSTIMER TARGET0 in period mode ──────────────────
     // SYSTIMER clock = 80 MHz (fixed on both ESP32-C3 and ESP32-C6).
