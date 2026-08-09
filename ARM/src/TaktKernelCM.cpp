@@ -301,7 +301,8 @@ void TaktOSTickInit(uint32_t KernClockHz, uint32_t TickHz, TaktOSTickClockSrc_t 
     // TaktArchTickPrioField() clamps out-of-range input and returns 0xFF for
     // TAKTOS_TICK_PRIORITY_DEFAULT (0), which equals this port default, so no
     // separate default branch is required here.
-    uint8_t tickPrioField = TaktArchTickPrioField(TickPriority);
+    uint8_t tickPrioField = TickPriority == TAKTOS_TICK_PRIORITY_DEFAULT ?
+    						TAKTOS_PRIORITY_LOWEST : TaktArchTickPrioField(TickPriority);
 
     SysTickStop();
     PendSVSetPriority(0xFFu);               // lowest priority  must tail-chain after ISRs
