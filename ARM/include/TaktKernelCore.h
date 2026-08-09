@@ -119,10 +119,10 @@ extern "C" {
 #endif
 
 /**
- * @brief	Convert a TaktOS standard priority to the Cortex-M exception priority field.
+ * @brief	Convert a TaktOS standard priority to the raw Cortex-M priority field.
  *
  * TaktOS scale: TAKTOS_PRIORITY_LOWEST(1) .. TAKTOS_PRIORITY_CRITICAL(31),
- * higher value = more urgent.  The Cortex-M exception priority field runs in
+ * higher value = more urgent.  The Cortex-M SHPR/IPR priority field runs in
  * the opposite direction: 8 bits, 0x00 most urgent, 0xFF least urgent.  This
  * function inverts and rescales, endpoint-exact:
  *
@@ -135,21 +135,23 @@ extern "C" {
  *
  * A part implements only the top __NVIC_PRIO_BITS bits of the field and reads
  * the remaining bits back as zero.  That quantises the scale but keeps it
- * monotonic: on a 3-bit part LOWEST maps to the bottom level (0xE0) and
- * CRITICAL to the top level (0x00).
+ * monotonic: on a 3-bit part LOWEST becomes the bottom implemented level
+ * (0xE0 when read back) and CRITICAL remains the top level (0x00).
  *
  * Input outside the scale is clamped.  Priority 0 (TAKTOS_PRIORITY_IDLE,
  * reused by TaktOSCfg_t as TAKTOS_TICK_PRIORITY_DEFAULT) returns 0xFF, which
  * equals the ARM port default, so the default path needs no special case.
  *
- * Declared in this header rather than in TaktKernelCM.cpp so that a HAL
- * overriding the weak TaktOSTickInit() with a GP timer / LPTIM / RTC tick can
- * apply the same conversion before calling NVIC_SetPriority().
+ * IMPORTANT: this is the raw 8-bit SHPR/IPR field value.  It can be written
+ * directly to an SHPR/IPR byte, as SysTickSetPriority() does.  It must NOT be
+ * passed directly to CMSIS NVIC_SetPriority(), which expects an unshifted
+ * logical priority in the range 0 .. (2^__NVIC_PRIO_BITS - 1).  Use
+ * TaktArchTickPrioNvic() for that API.
  *
- * @param	Prio : TaktOS standard priority, 1..31.
- * @return	8-bit Cortex-M exception priority value (SHPR / NVIC IPR field).
+ * @param	Prio : TaktOS standard priority, 1..31, or 0 for the ARM default.
+ * @return	Raw 8-bit Cortex-M SHPR/IPR priority field.
  */
-TAKT_ALWAYS_INLINE uint8_t TaktArchTickPrioMap(uint32_t Prio)
+TAKT_ALWAYS_INLINE uint8_t TaktArchTickPrioField(uint32_t Prio)
 {
     if (Prio >= TAKTOS_PRIORITY_CRITICAL)
     {
@@ -163,6 +165,48 @@ TAKT_ALWAYS_INLINE uint8_t TaktArchTickPrioMap(uint32_t Prio)
 
     return (uint8_t)(((TAKTOS_PRIORITY_CRITICAL - Prio) * 0xFFu)
                      / (TAKTOS_PRIORITY_CRITICAL - TAKTOS_PRIORITY_LOWEST));
+}
+
+/**
+ * @brief	Convert a TaktOS priority to the logical value used by
+ *          CMSIS NVIC_SetPriority().
+ *
+ * CMSIS NVIC_SetPriority() accepts an unshifted priority value whose width is
+ * the target's implemented __NVIC_PRIO_BITS.  This helper converts the raw
+ * SHPR/IPR field produced by TaktArchTickPrioField() back to that logical
+ * representation.
+ *
+ * Example for a 3-bit Cortex-M target:
+ *
+ *     TAKTOS_PRIORITY_LOW -> raw field 0xC3 -> NVIC logical priority 6
+ *
+ * @param	Prio     : TaktOS standard priority, 1..31, or 0 for the ARM default.
+ * @param	PrioBits : Number of implemented Cortex-M priority bits, normally
+ *                   __NVIC_PRIO_BITS.  Valid range is 1..8.
+ * @return	Logical priority for CMSIS NVIC_SetPriority().  PrioBits is
+ *          clamped to the Cortex-M valid range 1..8.
+ */
+TAKT_ALWAYS_INLINE uint32_t TaktArchTickPrioNvic(uint32_t Prio, uint32_t PrioBits)
+{
+    if (PrioBits < 1u)
+    {
+        PrioBits = 1u;
+    }
+    else if (PrioBits > 8u)
+    {
+        PrioBits = 8u;
+    }
+
+    return ((uint32_t)TaktArchTickPrioField(Prio)) >> (8u - PrioBits);
+}
+
+/*
+ * Backward-compatible name retained for existing ARM HAL overrides.
+ * It returns the RAW SHPR/IPR field, not a CMSIS NVIC_SetPriority() value.
+ */
+TAKT_ALWAYS_INLINE uint8_t TaktArchTickPrioMap(uint32_t Prio)
+{
+    return TaktArchTickPrioField(Prio);
 }
 
 /**

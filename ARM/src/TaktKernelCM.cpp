@@ -280,29 +280,32 @@ __attribute__((weak))
  *
  * @p TickPriority is on the TaktOS standard priority scale
  * (TAKTOS_PRIORITY_LOWEST(1) .. TAKTOS_PRIORITY_CRITICAL(31), higher = more
- * urgent), the same scale used for threads.  TaktArchTickPrioMap() converts
- * it to the Cortex-M exception priority field.  TAKTOS_TICK_PRIORITY_DEFAULT
+ * urgent), the same scale used for threads.  TaktArchTickPrioField() converts
+ * it to the raw Cortex-M SHPR/IPR priority field.  TAKTOS_TICK_PRIORITY_DEFAULT
  * (0) yields 0xFF, the lowest exception priority, which lets every
  * application ISR pre-empt the tick (behaviour before the field existed).
  *
  * Override this symbol with a strong definition to use a different tick
- * peripheral (GP timer, LPTIM, RTC) without changing the kernel.  Call
- * TaktArchTickPrioMap() in the override to keep identical priority semantics.
+ * peripheral (GP timer, LPTIM, RTC) without changing the kernel.  If the
+ * override writes an SHPR/IPR priority field directly, use
+ * TaktArchTickPrioField().  If it calls CMSIS NVIC_SetPriority(), use
+ * TaktArchTickPrioNvic(TickPriority, __NVIC_PRIO_BITS) instead; the raw field
+ * value must not be passed directly to NVIC_SetPriority().
  *
  * @see TaktOSTickInit in TaktKernel.h for the full API.
  */
 void TaktOSTickInit(uint32_t KernClockHz, uint32_t TickHz, TaktOSTickClockSrc_t TickClockSrc,
                     uint32_t TickPriority)
 {
-    // TaktOS scale -> Cortex-M exception priority field.  TaktArchTickPrioMap()
-    // clamps out-of-range input and returns 0xFF for
+    // TaktOS scale -> raw Cortex-M SHPR priority field.
+    // TaktArchTickPrioField() clamps out-of-range input and returns 0xFF for
     // TAKTOS_TICK_PRIORITY_DEFAULT (0), which equals this port default, so no
     // separate default branch is required here.
-    uint8_t tickPrio = TaktArchTickPrioMap(TickPriority);
+    uint8_t tickPrioField = TaktArchTickPrioField(TickPriority);
 
     SysTickStop();
     PendSVSetPriority(0xFFu);               // lowest priority  must tail-chain after ISRs
-    SysTickSetPriority(tickPrio);
+    SysTickSetPriority(tickPrioField);
 
 
     uint32_t clksrc = TickClockSrc == TAKTOS_TICK_CLOCK_PROCESSOR ? SYSTICK_CLOCK_SRC_MCU : SYSTICK_CLOCK_SRC_EXT;
