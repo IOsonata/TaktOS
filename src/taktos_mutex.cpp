@@ -249,13 +249,13 @@ TaktOSErr_t TaktOSMutexLockSlowPath(TaktOSMutex_t *pMtx, uint32_t IntState,
     if (TimeoutTicks != TAKTOS_WAIT_FOREVER)
     {
         // Tick timeout expires when the global tick reaches now + TimeoutTicks.
-        current->WakeTick = TaktOSTickCount() + TimeoutTicks;
+        current->WakeTick = TaktKernelDeadline(TimeoutTicks);
         TaktSleepListAdd(current);
     }
     // WAIT_FOREVER: WakeTick already 0 from the init above.
 
     TaktOSExitCritical(IntState);
-    TaktOSCtxSwitch();
+    TaktOSCtxSwitchBlock();
 
     const uint8_t wr = current->WakeReason;
 

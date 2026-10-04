@@ -173,14 +173,14 @@ TAKT_COLD TAKT_NOINLINE TaktOSErr_t TaktOSSemTakeSlowPath(TaktOSSem_t *pSem, uin
     if (timeoutTicks != TAKTOS_WAIT_FOREVER)
     {
         // Tick timeout expires when the global tick reaches now + timeoutTicks.
-        current->WakeTick = TaktOSTickCount() + timeoutTicks;
+        current->WakeTick = TaktKernelDeadline(timeoutTicks);
         TaktSleepListAdd(current);
     }
     // WAIT_FOREVER: WakeTick is always 0 on entry  cleared by all three
     // waker paths (GiveSlowPath, TaktThreadWakeTick, Resume/HandOff).
 
     TaktOSExitCritical(Primask);
-    TaktOSCtxSwitch();
+    TaktOSCtxSwitchBlock();
 
     // After wakeup: check how we were woken.
     // WakeTick: already cleared by whoever woke us
@@ -290,5 +290,4 @@ TaktOSErr_t TaktOSSemTake(TaktOSSem_t *pSem, bool bBlocking, uint32_t TimeoutTic
     return TaktOSSemTakeSlowPath(pSem, state, TimeoutTicks);
 }
 #endif
-
 

@@ -213,50 +213,11 @@ TAKT_ALWAYS_INLINE uint8_t *TaktQueueRingGet(TaktOSQueue_t *pQue) {
  * deadline expires.
  */
 TaktOSErr_t TaktOSQueueSendSlowPath(TaktOSQueue_t *pQue, const void *pData,
-                                     uint32_t TimeoutTicks)
+                                     uint32_t TimeoutTicks, uint32_t saved)
 {
-    uint32_t saved = TaktOSEnterCritical();
-
-    // Re-check under lock  a receiver may have freed a slot since the fast
-    // path gave up.  Two exclusive cases:
-    //
-    //   A) A blocked receiver is already waiting.  Hand the item directly to
-    //      that receiver WITHOUT enqueuing it first.  Enqueuing then handing
-    //      off would duplicate the item: the ring buffer copy would be
-    //      delivered once now (to the waiter) and again when the next receiver
-    //      drains the ring.
-    //
-    //   B) A free slot exists but no blocked receiver.  Enqueue normally.
-    //
-    // The two cases are mutually exclusive by invariant: receivers only block
-    // when the queue is empty (available == capacity), so recvList.pHead != NULL
-    // implies available == capacity, which means TaktQueueRingPut would return
-    // NULL.  Checking recvList first avoids a redundant ring probe in case A.
-
-    if (pQue->RecvList.pHead != nullptr)
-    {
-        // Case A: direct handoff  do NOT touch the ring buffer.
-        bool needSwitch = TaktQueueHandoffToReceiver(pQue, pData);
-        TaktOSExitCritical(saved);
-
-        if (needSwitch)
-        {
-            TaktOSCtxSwitch();
-        }
-
-        return TAKTOS_OK;
-    }
-
-    uint8_t* slot = TaktQueueRingPut(pQue);
-
-    if (slot != nullptr)
-    {
-        // Case B: free slot, no blocked receiver  enqueue normally.
-        TaktQueueFastCopy(slot, pData, pQue->ItemSize);
-        TaktOSExitCritical(saved);
-
-        return TAKTOS_OK;
-    }
+    // Entered from TaktOSQueueSend with the critical section still held,
+    // right after it found RecvList empty and the ring full.  Nothing can
+    // have changed since, so block directly: no relock, no second probe.
 
     // Still full  block.
     //
@@ -297,7 +258,7 @@ TaktOSErr_t TaktOSQueueSendSlowPath(TaktOSQueue_t *pQue, const void *pData,
     if (TimeoutTicks != TAKTOS_WAIT_FOREVER)
     {
         // Tick timeout expires when the global tick reaches now + TimeoutTicks.
-        cur->WakeTick = TaktOSTickCount() + TimeoutTicks;
+        cur->WakeTick = TaktKernelDeadline(TimeoutTicks);
         TaktSleepListAdd(cur);
     }
     else
@@ -306,7 +267,7 @@ TaktOSErr_t TaktOSQueueSendSlowPath(TaktOSQueue_t *pQue, const void *pData,
     }
 
     TaktOSExitCritical(saved);
-    TaktOSCtxSwitch();
+    TaktOSCtxSwitchBlock();
 
     // After wakeup: item was placed in ring buffer by TaktQueueHandoffFromSender.
     // No re-compete needed  either it succeeded (EVENT) or timed out.
@@ -336,32 +297,10 @@ TaktOSErr_t TaktOSQueueSendSlowPath(TaktOSQueue_t *pQue, const void *pData,
  * sender performs a direct handoff or the deadline expires.
  */
 TaktOSErr_t TaktOSQueueReceiveSlowPath(TaktOSQueue_t *pQue, void *pData,
-                                        uint32_t TimeoutTicks)
+                                        uint32_t TimeoutTicks, uint32_t saved)
 {
-    uint32_t saved = TaktOSEnterCritical();
-
-    // Re-check under lock  a sender may have added an item.
-    uint8_t* slot = TaktQueueRingGet(pQue);
-
-    if (slot != nullptr)
-    {
-        TaktQueueFastCopy(pData, slot, pQue->ItemSize);
-        bool needSwitch = false;
-
-        if (pQue->SendList.pHead != nullptr)
-        {
-        	needSwitch = TaktQueueHandoffFromSender(pQue);
-        }
-
-        TaktOSExitCritical(saved);
-
-        if (needSwitch)
-        {
-        	TaktOSCtxSwitch();
-        }
-
-        return TAKTOS_OK;
-    }
+    // Entered from TaktOSQueueReceive with the critical section still held,
+    // right after it found the ring empty.  Block directly.
 
     // Still empty  block.
     //
@@ -398,7 +337,7 @@ TaktOSErr_t TaktOSQueueReceiveSlowPath(TaktOSQueue_t *pQue, void *pData,
     if (TimeoutTicks != TAKTOS_WAIT_FOREVER)
     {
         // Tick timeout expires when the global tick reaches now + TimeoutTicks.
-        cur->WakeTick = TaktOSTickCount() + TimeoutTicks;
+        cur->WakeTick = TaktKernelDeadline(TimeoutTicks);
         TaktSleepListAdd(cur);
     }
     else
@@ -407,7 +346,7 @@ TaktOSErr_t TaktOSQueueReceiveSlowPath(TaktOSQueue_t *pQue, void *pData,
     }
 
     TaktOSExitCritical(saved);
-    TaktOSCtxSwitch();
+    TaktOSCtxSwitchBlock();
 
     // After wakeup: item was copied to data by TaktQueueHandoffToReceiver.
     cur->pMsg     = nullptr;
@@ -561,13 +500,15 @@ TaktOSErr_t TaktOSQueueSend(TaktOSQueue_t *pQue, const void *pData, bool bBlocki
         return TAKTOS_OK;
     }
 
-    TaktOSExitCritical(state);
     if (!bBlocking || TimeoutTicks == TAKTOS_NO_WAIT)
     {
+        TaktOSExitCritical(state);
     	return TAKTOS_ERR_FULL;
     }
 
-    return TaktOSQueueSendSlowPath(pQue, pData, TimeoutTicks);
+    // Still inside the critical section: the slow path blocks without
+    // dropping the lock, so no second ring probe and no relock.
+    return TaktOSQueueSendSlowPath(pQue, pData, TimeoutTicks, state);
 }
 
 /**
@@ -608,14 +549,14 @@ TaktOSErr_t TaktOSQueueReceive(TaktOSQueue_t *pQue, void *pData, bool bBlocking,
         return TAKTOS_OK;
     }
 
-    TaktOSExitCritical(state);
-
     if (!bBlocking || TimeoutTicks == TAKTOS_NO_WAIT)
     {
+        TaktOSExitCritical(state);
     	return TAKTOS_ERR_EMPTY;
     }
 
-    return TaktOSQueueReceiveSlowPath(pQue, pData, TimeoutTicks);
+    // Still inside the critical section: the slow path blocks without
+    // dropping the lock, so no second ring probe and no relock.
+    return TaktOSQueueReceiveSlowPath(pQue, pData, TimeoutTicks, state);
 }
 #endif
-

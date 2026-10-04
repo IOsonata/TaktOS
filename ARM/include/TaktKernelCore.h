@@ -219,12 +219,37 @@ TAKT_ALWAYS_INLINE uint8_t TaktArchTickPrioMap(uint32_t Prio)
  *
  * Host/stub builds: no-op.
  */
+#define TAKT_HAS_CTX_SWITCH_BLOCK	1
+
 #if defined(TAKT_ARCH_STUB) || defined(__x86_64__) || defined(__i386__)
 TAKT_ALWAYS_INLINE void TaktOSCtxSwitch(void) { /* host stub  no-op */ }
+TAKT_ALWAYS_INLINE void TaktOSCtxSwitchBlock(void) { /* host stub  no-op */ }
 #else
 TAKT_ALWAYS_INLINE void TaktOSCtxSwitch(void)
 {
     *((volatile unsigned int*)0xE000ED04u) = (1u << 28);
+    // Compiler barrier: no load or store may be moved across the pend.
+    __asm__ volatile ("" ::: "memory");
+}
+
+/**
+ * @brief	Pend PendSV from a blocking path and wait until it is taken.
+ *
+ * A blocking slow path reads its wake result (WakeReason, ...)
+ * right after the pend.  Without a barrier:
+ *   - the compiler may move that load above the ICSR store, and
+ *   - the core may execute a few instructions after the store before the
+ *     pended exception is recognised.
+ * Either way the thread reads its result before it has actually blocked.
+ * DSB makes the ICSR write complete, ISB refetches so PendSV is taken
+ * before the next instruction, with interrupts enabled. Thread mode only;
+ * ISR callers use
+ * TaktOSCtxSwitch (the pend is taken on exception return anyway).
+ */
+TAKT_ALWAYS_INLINE void TaktOSCtxSwitchBlock(void)
+{
+    *((volatile unsigned int*)0xE000ED04u) = (1u << 28);
+    __asm__ volatile ("dsb\n isb" ::: "memory");
 }
 #endif
 

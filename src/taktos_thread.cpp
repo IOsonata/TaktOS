@@ -159,7 +159,7 @@ static inline bool TaktSuspendCurrentFast(void)
         return false;
     }
     TaktOSExitCritical(primask);
-    TaktOSCtxSwitch();
+    TaktOSCtxSwitchBlock();
     return true;
 }
 
@@ -228,6 +228,7 @@ hTaktOSThread_t TaktOSThreadCreate(void *pMem, uint32_t MemSize,
     t->pWaitList    = nullptr;
     t->pMsg         = nullptr;
     t->HeldCeilingTop = 0u;            // no PCP mutexes held at create
+    t->SigPending   = 0u;
     t->pSp          = TaktKernelStackInit((uint8_t*)pMem + MemSize, pEntry, pArg);
 
     {
@@ -461,7 +462,7 @@ TaktOSErr_t TaktOSThreadSleepTicks(hTaktOSThread_t hThread, uint32_t ticks)
 
     if (isCurrent)
     {
-        TaktOSCtxSwitch();
+        TaktOSCtxSwitchBlock();
     }
 
     return TAKTOS_OK;
@@ -579,7 +580,7 @@ TaktOSErr_t TaktOSThreadDestroy(hTaktOSThread_t hThread)
 
     if (isCurrent)
     {
-        TaktOSCtxSwitch();
+        TaktOSCtxSwitchBlock();
     }
 
     return TAKTOS_OK;
@@ -682,7 +683,7 @@ TaktOSErr_t TaktOSThreadHandOff(hTaktOSThread_t hNext)
     TaktForceNextThread(hNext);
 
     TaktOSExitCritical(primask);
-    TaktOSCtxSwitch();
+    TaktOSCtxSwitchBlock();
     return TAKTOS_OK;
 }
 

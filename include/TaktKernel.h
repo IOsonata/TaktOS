@@ -69,6 +69,16 @@ SOFTWARE.
 #  error "TAKTOS_STACK_GUARD_ALIGN must be a power of two"
 #endif
 
+// Other ports retain their switch request plus a compiler barrier. A port
+// with a deferred interrupt must supply its own hardware ordering if needed.
+#if !defined(TAKT_HAS_CTX_SWITCH_BLOCK)
+TAKT_ALWAYS_INLINE void TaktOSCtxSwitchBlock(void)
+{
+    TaktOSCtxSwitch();
+    __asm__ volatile ("" ::: "memory");
+}
+#endif
+
 //--- Wakeup reason -------------------------------------------------
 // Written before blocking; read after wakeup to distinguish a normal
 // event (sem Give / mutex Unlock) from a tick-ISR timeout expiry.
@@ -112,8 +122,9 @@ struct __TaktOSThread_s {
 	                                	//!<   set before blocking on queue send/recv; cleared by wake path
 	uint8_t HeldCeilings[TAKTOS_MAX_HELD_PCP_MUTEXES]; //!< offset 32  IPCP stack of held-mutex ceilings
 	uint8_t HeldCeilingTop;				//!< offset 36  depth of HeldCeilings stack (0 = none)
-	uint8_t _pad2[3];					//!< offset 37  alignment pad to 40 bytes
-}; // 40 bytes
+	uint8_t SigPending;                  //!< offset 37  one latched wake notification
+	uint8_t _pad2[2];                    //!< offset 38  existing padding, no TCB growth
+}; // 40 bytes with the default held-ceiling count on 32-bit targets
 
 
 typedef struct {
@@ -140,6 +151,28 @@ TAKT_ALWAYS_INLINE uint32_t TaktOSTickCount(void) {
 	extern uint32_t g_TickCount;
 
     return g_TickCount;
+}
+
+/**
+ * @brief	Compute an absolute wake tick for a timed kernel-object wait.
+ *
+ * WakeTick == 0 is the "not in sleep list" marker used by every early-wake
+ * path (Give, Unlock, queue handoff, Resume, Suspend, HandOff, Destroy).
+ * A plain TickCount + Ticks lands on 0 once per counter wrap; such a thread
+ * would be linked in the sleep list while every waker skips the removal,
+ * and the shared pNext link would then corrupt the run queue.  A deadline
+ * that would be 0 is moved to 1 (one tick later).
+ *
+ * Must be called inside a critical section.
+ *
+ * @param	Ticks : Relative timeout (not TAKTOS_WAIT_FOREVER / TAKTOS_NO_WAIT).
+ * @return	Absolute wake tick, never 0.
+ */
+TAKT_ALWAYS_INLINE uint32_t TaktKernelDeadline(uint32_t Ticks)
+{
+    uint32_t t = TaktOSTickCount() + Ticks;
+
+    return (t != 0u) ? t : 1u;
 }
 
 //--- Scheduler --------------------------------------------------
@@ -170,6 +203,12 @@ typedef struct {
 
 extern TaktRunQueue_t g_TaktRunQueue;
 extern TaktKernelCtx_t g_TaktosCtx;
+
+// Marker wait list for thread signal waits.  Never holds a thread: a thread
+// in a signal wait sets pWaitList = &g_TaktSigWaitList so the existing cancel
+// paths (tick timeout, Resume, Suspend, HandOff, Destroy) treat it like any
+// kernel-object wait.  TaktWaitListRemove on this empty list is a no-op.
+extern TaktKernelWaitList_t g_TaktSigWaitList;
 
 //--- Bitmap helpers ---------------------------------------------
 // Must be called inside a critical section.
@@ -497,4 +536,3 @@ static inline void TaktWaitListRemove(TaktKernelWaitList_t *pList, TaktOSThread_
 
 
 #endif // __TAKTKERNEL_H__
-

@@ -274,9 +274,12 @@ TAKT_ALWAYS_INLINE uint8_t *TaktQueueRingGet(TaktOSQueue_t *pQue) {
  * @param	pQue          : Pointer to queue.
  * @param	pData         : Item to send (4-byte aligned, ItemSize bytes).
  * @param	TimeoutTicks  : Maximum ticks to block.
+ * @param	IntState      : Saved interrupt state.  The critical section is held
+ *                         on entry; this function takes ownership and exits it.
  * @return	TAKTOS_OK, TAKTOS_ERR_TIMEOUT, or TAKTOS_ERR_INTERRUPTED.
  */
-TaktOSErr_t TaktOSQueueSendSlowPath   (TaktOSQueue_t *pQue, const void *pData, uint32_t TimeoutTicks);
+TaktOSErr_t TaktOSQueueSendSlowPath   (TaktOSQueue_t *pQue, const void *pData, uint32_t TimeoutTicks,
+                                       uint32_t IntState);
 
 /**
  * @brief	Slow path for TaktOSQueueReceive  called when the queue is empty.
@@ -288,9 +291,12 @@ TaktOSErr_t TaktOSQueueSendSlowPath   (TaktOSQueue_t *pQue, const void *pData, u
  * @param	pQue          : Pointer to queue.
  * @param	pData         : Buffer to receive into (4-byte aligned, ItemSize bytes).
  * @param	TimeoutTicks  : Maximum ticks to block.
+ * @param	IntState      : Saved interrupt state.  The critical section is held
+ *                         on entry; this function takes ownership and exits it.
  * @return	TAKTOS_OK, TAKTOS_ERR_TIMEOUT, or TAKTOS_ERR_INTERRUPTED.
  */
-TaktOSErr_t TaktOSQueueReceiveSlowPath(TaktOSQueue_t *pQue, void *pData, uint32_t TimeoutTicks);
+TaktOSErr_t TaktOSQueueReceiveSlowPath(TaktOSQueue_t *pQue, void *pData, uint32_t TimeoutTicks,
+                                       uint32_t IntState);
 
 /**
  * @brief	Send an item to the queue.
@@ -358,13 +364,15 @@ TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSQueueSend(TaktOSQueue_t *pQue, const void *
         return TAKTOS_OK;
     }
 
-    TaktOSExitCritical(state);
     if (!bBlocking || TimeoutTicks == TAKTOS_NO_WAIT)
     {
+        TaktOSExitCritical(state);
     	return TAKTOS_ERR_FULL;
     }
 
-    return TaktOSQueueSendSlowPath(pQue, pData, TimeoutTicks);
+    // Still inside the critical section: the slow path blocks without
+    // dropping the lock, so no second ring probe and no relock.
+    return TaktOSQueueSendSlowPath(pQue, pData, TimeoutTicks, state);
 }
 
 /**
@@ -427,14 +435,15 @@ TAKT_ALWAYS_INLINE TaktOSErr_t TaktOSQueueReceive(TaktOSQueue_t *pQue, void *pDa
         return TAKTOS_OK;
     }
 
-    TaktOSExitCritical(state);
-
     if (!bBlocking || TimeoutTicks == TAKTOS_NO_WAIT)
     {
+        TaktOSExitCritical(state);
     	return TAKTOS_ERR_EMPTY;
     }
 
-    return TaktOSQueueReceiveSlowPath(pQue, pData, TimeoutTicks);
+    // Still inside the critical section: the slow path blocks without
+    // dropping the lock, so no second ring probe and no relock.
+    return TaktOSQueueReceiveSlowPath(pQue, pData, TimeoutTicks, state);
 }
 
 #endif

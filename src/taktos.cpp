@@ -474,6 +474,7 @@ TaktOSErr_t TaktOSInit(const TaktOSCfg_t *Cfg)
     idle->pWaitList    = nullptr;
     idle->pMsg         = nullptr;
     idle->HeldCeilingTop = 0u;
+    idle->SigPending   = 0u;
     idle->pSp = TaktKernelStackInit(stackTop, IdleThread, nullptr);
 
     TaktReadyTask(idle);

@@ -6,10 +6,11 @@
 Implements mq_open / mq_close / mq_unlink / mq_send / mq_receive /
 mq_getattr / mq_setattr.
 
-Each named queue maps to a static pool slot backed by a TaktOSSem_t for
-flow control and a TaktOSMutex_t for serialisation.  Messages are stored
-in a fixed-size internal array and retrieved in descending priority order
-with FIFO ordering within the same priority level.
+Each named queue maps to a static pool slot.  Two TaktOSSem_t (spaces,
+items) provide blocking and timeouts.  Message slots are kept on index-linked
+free / message lists updated under short kernel critical sections; payload
+copies run outside the critical section.  Messages are retrieved in
+descending priority order with FIFO ordering within the same priority level.
 
 QM  outside cert boundary.
 
@@ -44,10 +45,9 @@ SOFTWARE.
 #include <stdarg.h>
 #include <string.h>
 #include "posix/mqueue.h"
-#include "TaktOSMutex.h"
 #include "TaktOSSem.h"
 
-// Helper: translate ticks to blocking/non-blocking sem/mutex calls
+// Helper: translate ticks to blocking/non-blocking sem calls
 static inline TaktOSErr_t sem_take_timed(TaktOSSem_t* s, uint32_t ticks)
 {
     if (ticks == TAKTOS_NO_WAIT)
@@ -57,23 +57,43 @@ static inline TaktOSErr_t sem_take_timed(TaktOSSem_t* s, uint32_t ticks)
     return TaktOSSemTake(s, true, ticks);
 }
 
+// Message slots are linked by 8-bit index.  MQ_NIL terminates a list.
+#define MQ_NIL  0xFFu
+static_assert(TAKT_POSIX_MQ_MAX_MSG < MQ_NIL, "TAKT_POSIX_MQ_MAX_MSG must be < 255");
+
 struct MqMsg {
-    bool         used;
+    uint8_t      next;      // next index in the free list or the message list
     unsigned int prio;
     uint32_t     len;
-    uint32_t     seq;
     uint8_t      data[TAKT_POSIX_MQ_MAX_MSGSIZE];
 };
 
+// Flow control:
+//   spaces : one token per free slot  -> a sender holding a token is
+//            guaranteed a slot on the free list
+//   items  : one token per linked message -> a receiver holding a token is
+//            guaranteed a message on the message list
+// Tokens are given only after the list operation is published, so both
+// guarantees hold with any number of concurrent senders / receivers.
+//
+// List manipulation is a few loads/stores done under the kernel critical
+// section.  The message payload copy is done outside it: between unlink and
+// relink the slot index is owned by exactly one thread.
+//
+// Message list order: descending priority, FIFO within a priority.  Append
+// at tail is O(1) whenever the new priority is <= the tail priority (all
+// messages at one priority is the common case).  A higher-priority message
+// walks from the head to its insert point (at most maxmsg nodes).
 struct MqSlot {
-    TaktOSMutex_t lock;
     TaktOSSem_t   items;
     TaktOSSem_t   spaces;
     MqMsg         msgs[TAKT_POSIX_MQ_MAX_MSG];
+    uint8_t       freeHead;
+    uint8_t       head;     // highest priority, oldest
+    uint8_t       tail;     // lowest priority, newest
     uint32_t      msgsize;
     uint32_t      maxmsg;
     uint32_t      curmsgs;
-    uint32_t      next_seq;
     int           flags;
     char          name[TAKT_POSIX_MQ_NAMEMAX];
     bool          in_use;
@@ -107,15 +127,55 @@ static void mq_init_slot(MqSlot* slot, const char* name, int oflag,
                          uint32_t msgsz, uint32_t maxmsg)
 {
     memset(slot, 0, sizeof(*slot));
-    TaktOSMutexInit(&slot->lock);
     TaktOSSemInit(&slot->items,  0u,     maxmsg);
     TaktOSSemInit(&slot->spaces, maxmsg, maxmsg);
-    slot->msgsize = msgsz;
-    slot->maxmsg  = maxmsg;
-    slot->flags   = (oflag & O_NONBLOCK) ? O_NONBLOCK : 0;
-    slot->in_use  = true;
+
+    for (uint32_t i = 0u; i < maxmsg; ++i)
+    {
+        slot->msgs[i].next = (i + 1u < maxmsg) ? (uint8_t)(i + 1u) : (uint8_t)MQ_NIL;
+    }
+    slot->freeHead = 0u;
+    slot->head     = MQ_NIL;
+    slot->tail     = MQ_NIL;
+    slot->msgsize  = msgsz;
+    slot->maxmsg   = maxmsg;
+    slot->flags    = (oflag & O_NONBLOCK) ? O_NONBLOCK : 0;
+    slot->in_use   = true;
     strncpy(slot->name, name, TAKT_POSIX_MQ_NAMEMAX - 1u);
     slot->name[TAKT_POSIX_MQ_NAMEMAX - 1u] = '\0';
+}
+
+// Link message idx into the priority-ordered list.  Critical section held.
+static inline void mq_link(MqSlot* slot, uint8_t idx)
+{
+    MqMsg* msgs = slot->msgs;
+    const unsigned int prio = msgs[idx].prio;
+
+    if (slot->tail == MQ_NIL)
+    {
+        msgs[idx].next = MQ_NIL;
+        slot->head = idx;
+        slot->tail = idx;
+        return;
+    }
+
+    if (msgs[slot->tail].prio >= prio)
+    {
+        msgs[idx].next = MQ_NIL;
+        msgs[slot->tail].next = idx;
+        slot->tail = idx;
+        return;
+    }
+
+    // Higher than the tail: insert before the first node of lower priority.
+    // One exists (at least the tail), so the walk never runs off the list.
+    uint8_t* p = &slot->head;
+    while (msgs[*p].prio >= prio)
+    {
+        p = &msgs[*p].next;
+    }
+    msgs[idx].next = *p;
+    *p = idx;
 }
 
 static int mq_send_internal(MqSlot* slot, const char* msg, size_t len,
@@ -132,33 +192,35 @@ static int mq_send_internal(MqSlot* slot, const char* msg, size_t len,
         return -1;
     }
 
-    TaktOSMutexLock(&slot->lock, true, TAKTOS_WAIT_FOREVER);
-    int free_idx = -1;
-    for (uint32_t i = 0u; i < slot->maxmsg; ++i)
+    uint32_t state = TaktOSEnterCritical();
+    const uint8_t idx = slot->freeHead;
+    if (idx != MQ_NIL)
     {
-        if (!slot->msgs[i].used)
-        {
-            free_idx = (int)i;
-            break;
-        }
+        slot->freeHead = slot->msgs[idx].next;
     }
-    if (free_idx < 0)
+    TaktOSExitCritical(state);
+
+    if (idx == MQ_NIL)
     {
-        TaktOSMutexUnlock(&slot->lock);
+        // Unreachable while the spaces invariant holds.
         TaktOSSemGive(&slot->spaces, false);
-        errno = EAGAIN; return -1;
+        errno = EAGAIN;
+        return -1;
     }
-    MqMsg& m = slot->msgs[free_idx];
-    m.used = true;
+
+    MqMsg& m = slot->msgs[idx];
     m.prio = prio;
     m.len  = (uint32_t)len;
-    m.seq  = slot->next_seq++;
     if (len > 0u)
     {
         memcpy(m.data, msg, len);
     }
+
+    state = TaktOSEnterCritical();
+    mq_link(slot, idx);
     slot->curmsgs++;
-    TaktOSMutexUnlock(&slot->lock);
+    TaktOSExitCritical(state);
+
     TaktOSSemGive(&slot->items, false);
     return 0;
 }
@@ -177,41 +239,44 @@ static ssize_t mq_receive_internal(MqSlot* slot, char* buf, size_t len,
         return -1;
     }
 
-    TaktOSMutexLock(&slot->lock, true, TAKTOS_WAIT_FOREVER);
-    int best = -1;
-    for (uint32_t i = 0u; i < slot->maxmsg; ++i)
+    uint32_t state = TaktOSEnterCritical();
+    const uint8_t idx = slot->head;
+    if (idx != MQ_NIL)
     {
-        if (!slot->msgs[i].used)
+        slot->head = slot->msgs[idx].next;
+        if (slot->head == MQ_NIL)
         {
-            continue;
+            slot->tail = MQ_NIL;
         }
-        if (best < 0 ||
-            slot->msgs[i].prio > slot->msgs[best].prio ||
-            (slot->msgs[i].prio == slot->msgs[best].prio &&
-             slot->msgs[i].seq  <  slot->msgs[best].seq))
-        {
-            best = (int)i;
-        }
+        slot->curmsgs--;
     }
-    if (best < 0)
+    TaktOSExitCritical(state);
+
+    if (idx == MQ_NIL)
     {
-        TaktOSMutexUnlock(&slot->lock);
-        TaktOSSemGive(&slot->spaces, false);
-        errno = EAGAIN; return -1;
+        // Unreachable while the items invariant holds.  Return the items
+        // token that was taken (the old code returned a spaces token here).
+        TaktOSSemGive(&slot->items, false);
+        errno = EAGAIN;
+        return -1;
     }
-    MqMsg& m = slot->msgs[best];
+
+    MqMsg& m = slot->msgs[idx];
     if (prio)
     {
         *prio = m.prio;
     }
+    const ssize_t out_len = (ssize_t)m.len;
     if (m.len > 0u)
     {
         memcpy(buf, m.data, m.len);
     }
-    const ssize_t out_len = (ssize_t)m.len;
-    m.used = false; m.len = 0u;
-    slot->curmsgs--;
-    TaktOSMutexUnlock(&slot->lock);
+
+    state = TaktOSEnterCritical();
+    m.next = slot->freeHead;
+    slot->freeHead = idx;
+    TaktOSExitCritical(state);
+
     TaktOSSemGive(&slot->spaces, false);
     return out_len;
 }
@@ -353,12 +418,10 @@ int mq_getattr(mqd_t mqdes, struct mq_attr* attr)
         errno = EINVAL;
         return -1;
     }
-    TaktOSMutexLock(&slot->lock, true, TAKTOS_WAIT_FOREVER);
     attr->mq_flags   = slot->flags;
     attr->mq_maxmsg  = (long)slot->maxmsg;
     attr->mq_msgsize = (long)slot->msgsize;
-    attr->mq_curmsgs = (long)slot->curmsgs;
-    TaktOSMutexUnlock(&slot->lock);
+    attr->mq_curmsgs = (long)slot->curmsgs;   // single aligned word read
     return 0;
 }
 
