@@ -76,6 +76,11 @@
 			<locationURI>PARENT-3-PROJECT_LOC/include/TaktOSSem.h</locationURI>
 		</link>
 		<link>
+			<name>include/TaktOSSignal.h</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/include/TaktOSSignal.h</locationURI>
+		</link>
+		<link>
 			<name>include/TaktOSThread.h</name>
 			<type>1</type>
 			<locationURI>PARENT-3-PROJECT_LOC/include/TaktOSThread.h</locationURI>
@@ -139,6 +144,11 @@
 			<name>src/taktos_sem.cpp</name>
 			<type>1</type>
 			<locationURI>PARENT-3-PROJECT_LOC/src/taktos_sem.cpp</locationURI>
+		</link>
+		<link>
+			<name>src/taktos_signal.cpp</name>
+			<type>1</type>
+			<locationURI>PARENT-3-PROJECT_LOC/src/taktos_signal.cpp</locationURI>
 		</link>
 		<link>
 			<name>src/taktos_thread.cpp</name>
