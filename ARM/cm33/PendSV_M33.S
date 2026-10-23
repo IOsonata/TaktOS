@@ -26,9 +26,10 @@
  *   M33 parts get hardware stack-overflow detection unconditionally.
  *
  * Compile-time gates:
- *   Always compiled in; runtime-gated by TST lr, #EXC_RETURN_FPU_BIT:
+ *   FPU builds only; runtime-gated by TST lr, #EXC_RETURN_FPU_BIT:
  *                         save/restore S16–S31 (FPv5-SP-D16).
  *                         Hardware lazy-stacks S0–S15 and FPSCR.
+ *                         Non-FPU builds omit the tests and FP instructions.
  *                         Gate: TST lr, #EXC_RETURN_FPU_BIT; IT EQ; VSTMDB/VLDMIA.
  *   PendSV_Handler_MPU writes MPU region 7 (32-byte RO-priv stack guard, XN=1)
  *                         via RBAR + RLAR on every switch.  PSPLIM is still
@@ -47,7 +48,7 @@
  *   so LDR r0, [r3, #TCB_STACK_BOTTOM] + MSR PSPLIM, r0 costs ~3cy and requires
  *   no extra register saves.  SVC_Handler also sets PSPLIM for the first task.
  *
- * Cycle budget — no FPU, no MPU (Cortex-M33, PSPLIM always on):
+ * Cycle budget — FPU build, FP inactive, no MPU (Cortex-M33, PSPLIM always on):
  * ─────────────────────────────────────────────────────────────────────────────
  *  Phase                                              Cycles (TRM)
  *  HW exception entry (auto-stack)                       12
@@ -182,9 +183,11 @@ PendSV_Handler:
         /* ── 1. Save current thread ──────────────────────────────────── */
         MRS     r0, PSP
 
+#if (defined(__VFP_FP__) && !defined(__SOFTFP__)) || defined(__ARMVFP__)
         TST     lr, #EXC_RETURN_FPU_BIT
         IT      EQ
         VSTMDBEQ r0!, {s16-s31}
+#endif
 
         /* Save LR (EXC_RETURN) in the SW frame so the restore path reads the
          * INCOMING thread's FPU state rather than the outgoing thread's.
@@ -203,9 +206,11 @@ PendSV_Handler:
         STR     r3, [r1, #CTX_CURRENT]         /* current=next; hides r0 stall */
         LDMIA   r0!, {r4-r11, lr}              /* lr = incoming thread's EXC_RETURN */
 
+#if (defined(__VFP_FP__) && !defined(__SOFTFP__)) || defined(__ARMVFP__)
         TST     lr, #EXC_RETURN_FPU_BIT        /* test INCOMING thread's FPU state */
         IT      EQ
         VLDMIAEQ r0!, {s16-s31}
+#endif
 
         MSR     PSP, r0
 
@@ -279,9 +284,11 @@ PendSV_Handler_MPU:
         /* ── 1. Save current thread ──────────────────────────────────── */
         MRS     r0, PSP
 
+#if (defined(__VFP_FP__) && !defined(__SOFTFP__)) || defined(__ARMVFP__)
         TST     lr, #EXC_RETURN_FPU_BIT
         IT      EQ
         VSTMDBEQ r0!, {s16-s31}
+#endif
 
         STMDB   r0!, {r4-r11, lr}
 
@@ -295,9 +302,11 @@ PendSV_Handler_MPU:
         STR     r3, [r1, #CTX_CURRENT]         /* current=next; hides r0 stall  */
         LDMIA   r0!, {r4-r11, lr}              /* lr = incoming EXC_RETURN      */
 
+#if (defined(__VFP_FP__) && !defined(__SOFTFP__)) || defined(__ARMVFP__)
         TST     lr, #EXC_RETURN_FPU_BIT        /* INCOMING thread FPU state     */
         IT      EQ
         VLDMIAEQ r0!, {s16-s31}
+#endif
 
         MSR     PSP, r0
 
