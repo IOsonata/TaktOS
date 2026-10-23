@@ -1,6 +1,7 @@
 /Debug/
 /Release/
 /.settings/
-/Debug_MPU/
-/Release_MPU/
+/Debug_FPU/
+/Release_FPU/
 /Release_Inl/
+/Release_Inl_FPU/
